@@ -13,10 +13,11 @@ def list_pages(namespace_url=None):
 
     for a in tree.xpath('//a[@class="twikilink"]'):
         name = a.text.strip()
+        url = a.attrib['href']
         if namespace_url:
-            yield name, a.attrib['href']
+            yield (name,), url
         else:
-            yield 'Main/' + name, a.attrib['href']
+            yield ('Main', name), url
 
     if not namespace_url:
         namespaces = tree.xpath(
@@ -29,14 +30,18 @@ def list_pages(namespace_url=None):
                 INDEX_INDEX, a.attrib['href']
             )
             for key, value in list_pages(url):
-                yield '{}/{}'.format(namespace, key), value
+                assert len(key) == 1
+                yield (namespace,) + key, value
 
 
 def save_links(links, cur):
-    cur.execute('CREATE TABLE indexindex (name text, url text)')
+    cur.execute('''
+        CREATE TABLE indexindex
+        (namespace text, name text, url text)
+    ''')
     for name, url in links:
-        cur.execute('INSERT INTO indexindex VALUES (?, ?)',
-                    (name, url))
+        cur.execute('INSERT INTO indexindex VALUES (?, ?, ?)',
+                    (name[0], name[1], url))
 
 
 if __name__ == '__main__':
