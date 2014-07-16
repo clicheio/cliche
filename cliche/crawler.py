@@ -1,3 +1,5 @@
+import os
+import sqlite3
 import urllib.parse
 
 from lxml.html import parse
@@ -36,5 +38,15 @@ def list_pages(namespace_url=None):
 
 
 if __name__ == '__main__':
-    from pprint import pprint as p
-    p(list_pages())
+    db_file = 'test.tmp'
+    links = list_pages()
+    if os.path.isfile(db_file):
+        os.remove(db_file)
+    conn = sqlite3.connect(db_file)
+    c = conn.cursor()
+    c.execute('CREATE TABLE indexindex (name text, url text)')
+    for name, url in links.items():
+        c.execute('INSERT INTO indexindex VALUES ("{}", "{}")'
+                  .format(name, url))
+    for row in c.execute('SELECT * FROM indexindex ORDER BY name'):
+        print(row)
