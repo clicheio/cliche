@@ -13,10 +13,11 @@ def list_pages(namespace_url=None):
 
     for a in tree.xpath('//a[@class="twikilink"]'):
         name = a.text.strip()
+        url = a.attrib['href']
         if namespace_url:
-            yield (name,), a.attrib['href']
+            yield (name,), url
         else:
-            yield ('Main', name), a.attrib['href']
+            yield ('Main', name), url
 
     if not namespace_url:
         namespaces = tree.xpath(
