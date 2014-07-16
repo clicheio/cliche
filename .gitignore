@@ -1,3 +1,3 @@
 .*.swp
-.tmp
+*.tmp
 cliche.egg-info
