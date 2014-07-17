@@ -83,7 +83,7 @@ def crawl_links(crawl_queue, conn):
             .text.strip()[:-1]
         if namespace == '':
             namespace = 'Main'
-        last_crawled = c.execute('SELECT last_crawled FROM indexindex'
+        last_crawled = c.execute('SELECT last_crawled FROM indexindex '
                                  'WHERE namespace = ? and name = ?',
                                  (namespace, name)).fetchone()
         if last_crawled is not None:
@@ -135,7 +135,7 @@ if __name__ == '__main__':
     save_links(list_pages(), c)
     conn.commit()
 
-    seed = c.execute('SELECT namespace, name, url FROM indexindex'
+    seed = c.execute('SELECT namespace, name, url FROM indexindex '
                      'ORDER BY namespace asc, name asc').fetchall()
     crawl_links(seed, conn)
     conn.commit()
