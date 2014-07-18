@@ -55,11 +55,13 @@ def save_links(links, cur):
             cur.execute('UPDATE indexindex SET url = ? '
                         'WHERE namespace = ? and name = ?',
                         (url, name[0], name[1]))
+    print('Total {}'.format(cur.execute('SELECT count(*) FROM indexindex')
+                            .fetchone()[0]))
 
 
 def links_to_crawl(crawl_queue):
     while crawl_queue:
-        link = crawl_queue.pop()
+        link = crawl_queue.pop(0)
         if len(link) == 3:
             yield link + (None,)
         else:
@@ -78,35 +80,32 @@ def crawl_links(crawl_queue, conn):
         )
         ''')
     for namespace, name, url, referer in links_to_crawl(crawl_queue):
-        conn.commit()
+        current_time = datetime.now()
         tree = parse(url)
-        is_update = False
-        if namespace is not None:
-            is_update = True
-        namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
-            .text.strip()[:-1]
-        if namespace == '':
-            namespace = 'Main'
-        last_crawled = c.execute('SELECT last_crawled FROM indexindex '
-                                 'WHERE namespace = ? and name = ?',
-                                 (namespace, name)).fetchone()
-        if last_crawled is not None:
-            if last_crawled[0] is not None:
-                if (datetime.now() - last_crawled[0]).days <= 0:
-                    continue
-        print("Crawling: {}/{} @ {}".format(namespace, name, url))
-        last_crawled = datetime.now()
-        if is_update:
-            c.execute('''
-                UPDATE indexindex SET last_crawled = ?
-                WHERE namespace = ? and name = ?
-                ''', (last_crawled, namespace, name))
+        if namespace is None:
+            namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
+                .text.strip()[:-1]
+            if namespace == '':
+                namespace = 'Main'
+        if c.execute('SELECT count(*) FROM indexindex '
+                     'WHERE namespace = ? and name = ?',
+                     (namespace, name)).fetchone()[0] != 0:
+            last_crawled = c.execute('SELECT last_crawled FROM indexindex '
+                                     'WHERE namespace = ? and name = ?',
+                                     (namespace, name)).fetchone()
+            if last_crawled is not None:
+                if last_crawled[0] is not None:
+                    if (current_time - last_crawled[0]).days < 1:
+                        continue
         else:
             try:
                 c.execute('INSERT INTO indexindex VALUES (?, ?, ?, ?)',
-                          (namespace, name, url, last_crawled))
+                          (namespace, name, url, None))
             except sqlite3.IntegrityError:
                 pass
+        conn.commit()
+        print("Fetching: {}/{} @ {}"
+              .format(namespace, name, url))
         for a in tree.xpath('//a[@class="twikilink"]'):
             try:
                 destination_name = a.text.strip()
@@ -125,8 +124,12 @@ def crawl_links(crawl_queue, conn):
                           (referer[0], referer[1], namespace, name))
             except sqlite3.IntegrityError:
                 pass
-        print('Crawled: {}/{} @ {}, {}'
-              .format(namespace, name, url, last_crawled))
+        print('Crawling {}/{} @ {} completed at {}'
+              .format(namespace, name, url, current_time))
+        c.execute('''
+            UPDATE indexindex SET last_crawled = ?
+            WHERE namespace = ? and name = ?
+                ''', (current_time, namespace, name))
 
 
 general_help_string = '''
