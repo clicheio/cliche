@@ -59,16 +59,16 @@ def save_links(links, cur):
                             .fetchone()[0]))
 
 
-def links_to_crawl(crawl_queue):
-    while crawl_queue:
-        link = crawl_queue.pop(0)
+def links_to_crawl(crawl_stack):
+    while crawl_stack:
+        link = crawl_stack.pop()
         if len(link) == 3:
             yield link + (None,)
         else:
             yield link
 
 
-def crawl_links(crawl_queue, conn):
+def crawl_links(crawl_stack, conn):
     c = conn.cursor()
     c.execute('''
         CREATE TABLE IF NOT EXISTS relations
@@ -79,7 +79,15 @@ def crawl_links(crawl_queue, conn):
         destination_namespace, destination)
         )
         ''')
-    for namespace, name, url, referer in links_to_crawl(crawl_queue):
+    start_time = datetime.now()
+    start_indexindex_count = int(
+        c.execute('SELECT count(*) FROM indexindex')
+        .fetchone()[0])
+    start_relations_count = int(
+        c.execute('SELECT count(*) FROM relations')
+        .fetchone()[0])
+    round_count = 0
+    for namespace, name, url, referer in links_to_crawl(crawl_stack):
         current_time = datetime.now()
         tree = parse(url)
         if namespace is None:
@@ -87,6 +95,8 @@ def crawl_links(crawl_queue, conn):
                 .text.strip()[:-1]
             if namespace == '':
                 namespace = 'Main'
+        print("Fetching: {}/{} @ {}"
+              .format(namespace, name, url))
         if c.execute('SELECT count(*) FROM indexindex '
                      'WHERE namespace = ? and name = ?',
                      (namespace, name)).fetchone()[0] != 0:
@@ -96,6 +106,8 @@ def crawl_links(crawl_queue, conn):
             if last_crawled is not None:
                 if last_crawled[0] is not None:
                     if (current_time - last_crawled[0]).days < 1:
+                        print("Skipping: {}/{} @ {} due to recent crawl"
+                              .format(namespace, name, url))
                         continue
         else:
             try:
@@ -104,8 +116,6 @@ def crawl_links(crawl_queue, conn):
             except sqlite3.IntegrityError:
                 pass
         conn.commit()
-        print("Fetching: {}/{} @ {}"
-              .format(namespace, name, url))
         for a in tree.xpath('//a[@class="twikilink"]'):
             try:
                 destination_name = a.text.strip()
@@ -114,8 +124,8 @@ def crawl_links(crawl_queue, conn):
                 )
                 next_crawl = (None, destination_name, destination_url,
                               (namespace, name))
-                if next_crawl not in crawl_queue:
-                    crawl_queue.append(next_crawl)
+                if next_crawl not in crawl_stack:
+                    crawl_stack.append(next_crawl)
             except AttributeError:
                 pass
         if referer is not None:
@@ -130,6 +140,24 @@ def crawl_links(crawl_queue, conn):
             UPDATE indexindex SET last_crawled = ?
             WHERE namespace = ? and name = ?
                 ''', (current_time, namespace, name))
+        round_count += 1
+        if round_count >= 10:
+            round_count = 0
+            elasped = datetime.now() - start_time
+            elasped_hours = elasped.total_seconds() / 3600
+            indexindex_count = int(
+                c.execute('SELECT count(*) FROM indexindex')
+                .fetchone()[0]) - start_indexindex_count
+            relations_count = int(
+                c.execute('SELECT count(*) FROM relations')
+                .fetchone()[0]) - start_relations_count
+            print('-> indexindex: {} ({}/h) relations: {} ({}/h) '
+                  'elasped {}'
+                  .format(indexindex_count,
+                          int(indexindex_count / elasped_hours),
+                          relations_count,
+                          int(relations_count / elasped_hours),
+                          elasped))
 
 
 general_help_string = '''
