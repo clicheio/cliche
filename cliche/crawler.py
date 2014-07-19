@@ -91,8 +91,12 @@ def crawl_links(crawl_stack, conn):
         current_time = datetime.now()
         tree = parse(url)
         if namespace is None:
-            namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
-                .text.strip()[:-1]
+            try:
+                namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
+                    .text.strip()[:-1]
+            except AttributeError:
+                print('Error: There is no pagetitle on this page.')
+                continue
             if namespace == '':
                 namespace = 'Main'
         print("Fetching: {}/{} @ {}"
