@@ -94,7 +94,7 @@ def crawl_links(crawl_stack, conn):
             try:
                 namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
                     .text.strip()[:-1]
-            except AttributeError:
+            except (AttributeError, AssertionError):
                 print('Error: There is no pagetitle on this page.')
                 continue
             if namespace == '':
