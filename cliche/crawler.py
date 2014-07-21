@@ -109,8 +109,9 @@ def crawl_links(crawl_stack, conn):
                                      (namespace, name)).fetchone()
             if last_crawled is not None:
                 if last_crawled[0] is not None:
-                    if (current_time - last_crawled[0]).days < 1:
-                        print("Skipping: {}/{} @ {} due to recent crawl"
+                    if (current_time - last_crawled[0]).days < 7:
+                        print('Skipping: {}/{} @ {} due to recent crawl '
+                              'in 7 days'
                               .format(namespace, name, url))
                         continue
         else:
