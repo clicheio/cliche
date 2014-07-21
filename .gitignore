@@ -1,3 +1,4 @@
 .*.swp
 *.tmp
+__pycache__
 cliche.egg-info
