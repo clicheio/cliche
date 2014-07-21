@@ -90,15 +90,15 @@ def crawl_links(crawl_stack, conn):
     for namespace, name, url, referer in links_to_crawl(crawl_stack):
         current_time = datetime.now()
         tree = parse(url)
-        if namespace is None:
-            try:
-                namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
-                    .text.strip()[:-1]
-            except (AttributeError, AssertionError, IndexError):
-                print('Error: There is no pagetitle on this page.')
-                continue
-            if namespace == '':
-                namespace = 'Main'
+        try:
+            namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
+                .text.strip()[:-1]
+        except (AttributeError, AssertionError, IndexError):
+            print('Error: There is no pagetitle on this page.')
+            continue
+        if namespace == '':
+            namespace = 'Main'
+        name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
         print("Fetching: {}/{} @ {}"
               .format(namespace, name, url))
         if c.execute('SELECT count(*) FROM indexindex '
