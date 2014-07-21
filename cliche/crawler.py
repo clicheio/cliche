@@ -166,6 +166,23 @@ def crawl_links(crawl_stack, conn):
                           elasped))
 
 
+def initialize(connection):
+    c = connection.cursor()
+    save_links(list_pages(), c)
+    connection.commit()
+
+
+def crawl(connection):
+    c = connection.cursor()
+    if c.execute("SELECT name FROM sqlite_master "
+                 "WHERE name='indexindex'").fetchone() is None:
+        initialize(connection)
+    seed = c.execute('SELECT namespace, name, url FROM indexindex '
+                     'ORDER BY namespace asc, name asc').fetchall()
+    crawl_links(seed, connection)
+    connection.commit()
+
+
 general_help_string = '''
 Usage: python crawler.py <command> <arguments>
 
@@ -191,7 +208,7 @@ automatically created.
 '''.strip()
 
 
-if __name__ == '__main__':
+def main():
     if len(sys.argv) > 1:
         if sys.argv[1] == 'init':
             if len(sys.argv) != 3:
@@ -201,9 +218,7 @@ if __name__ == '__main__':
             db_file = sys.argv[2]
             conn = sqlite3.connect(db_file,
                                    detect_types=sqlite3.PARSE_DECLTYPES)
-            c = conn.cursor()
-            save_links(list_pages(), c)
-            conn.commit()
+            initialize(conn)
         elif sys.argv[1] == 'relation':
             if len(sys.argv) != 3:
                 print('Usage: python crawler.py relation <db-file>',
@@ -212,19 +227,14 @@ if __name__ == '__main__':
             db_file = sys.argv[2]
             conn = sqlite3.connect(db_file,
                                    detect_types=sqlite3.PARSE_DECLTYPES)
-            c = conn.cursor()
-            if c.execute("SELECT name FROM sqlite_master "
-                         "WHERE name='indexindex'").fetchone() is None:
-                print('indexindex table is not present on provided db-file, '
-                      'exiting.', file=sys.stderr)
-                raise SystemExit(1)
-            seed = c.execute('SELECT namespace, name, url FROM indexindex '
-                             'ORDER BY namespace asc, name asc').fetchall()
-            crawl_links(seed, conn)
-            conn.commit()
+            crawl(conn)
         else:
             print(general_help_string, file=sys.stderr)
             raise SystemExit(1)
     else:
         print(general_help_string, file=sys.stderr)
         raise SystemExit(1)
+
+
+if __name__ == '__main__':
+    main()
