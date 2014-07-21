@@ -5,7 +5,10 @@ import sys
 import sqlite3
 import urllib.parse
 
+from celery.utils.log import get_task_logger
 from lxml.html import parse
+
+from .worker import worker
 
 
 INDEX_INDEX = 'http://tvtropes.org/pmwiki/index_report.php'
@@ -41,24 +44,23 @@ def list_pages(namespace_url=None):
                 yield (namespace,) + key, value
 
 
-def save_links(links, cur):
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS indexindex
-        (
-        namespace text, name text, url text, last_crawled timestamp,
-        constraint pk_indexindex primary key(namespace, name)
-        )
-    ''')
-    for name, url in links:
-        try:
-            cur.execute('INSERT INTO indexindex VALUES (?, ?, ?, NULL)',
-                        (name[0], name[1], url))
-        except sqlite3.IntegrityError:
-            cur.execute('UPDATE indexindex SET url = ? '
-                        'WHERE namespace = ? and name = ?',
-                        (url, name[0], name[1]))
-    print('Total {}'.format(cur.execute('SELECT count(*) FROM indexindex')
-                            .fetchone()[0]))
+@worker.task
+def save_link(name, url):
+    conn = sqlite3.connect(worker.conf.DB_FILENAME,
+                           detect_types=sqlite3.PARSE_DECLTYPES)
+    cur = conn.cursor()
+    try:
+        cur.execute('INSERT INTO indexindex VALUES (?, ?, ?, NULL)',
+                    (name[0], name[1], url))
+    except sqlite3.IntegrityError:
+        cur.execute('UPDATE indexindex SET url = ? '
+                    'WHERE namespace = ? and name = ?',
+                    (url, name[0], name[1]))
+    cur.commit()
+    get_task_logger(__name__ + '.save_link').info(
+        'Total %d',
+        cur.execute('SELECT count(*) FROM indexindex').fetchone()[0]
+    )
 
 
 def links_to_crawl(crawl_stack):
@@ -167,9 +169,20 @@ def crawl_links(crawl_stack, conn):
 
 
 def initialize(connection):
-    c = connection.cursor()
-    save_links(list_pages(), c)
+    cur = connection.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS indexindex
+        (
+        namespace text, name text, url text, last_crawled timestamp,
+        constraint pk_indexindex primary key(namespace, name)
+        )
+    ''')
     connection.commit()
+    for name, url in list_pages():
+        save_link.delay(name, url)
+    # FIXME
+    print('Total',
+          cur.execute('SELECT count(*) FROM indexindex').fetchone()[0])
 
 
 def crawl(connection):
@@ -183,20 +196,28 @@ def crawl(connection):
     connection.commit()
 
 
+def load_config(filename):
+    with open(filename) as f:
+        code = compile(f.read(), filename, 'exec')
+    loc = {}
+    exec(code, globals(), loc)
+    return loc
+
+
 general_help_string = '''
 Usage: python crawler.py <command> <arguments>
 
 commands:
 
     init:
-        Usage: python crawler.py init <db-file>
+        Usage: python crawler.py init <config-file>
 
         Crawls indexindex of TVTropes.
         If an entry already exists, it is updated to new url.
         If the process is inturruped in the middle, nothing will be saved.
 
     relation:
-        Usage: python crawler.py relation <db-file>
+        Usage: python crawler.py relation <config-file>
 
         Crawls each pages and saves it to a table, using items in
         indexindex table as seeds. New pages are saved to indexindex table,
@@ -212,19 +233,25 @@ def main():
     if len(sys.argv) > 1:
         if sys.argv[1] == 'init':
             if len(sys.argv) != 3:
-                print('Usage: python crawler.py init <db-file>',
+                print('Usage: python crawler.py init <config-file>',
                       file=sys.stderr)
                 raise SystemExit(1)
-            db_file = sys.argv[2]
+            config_file = sys.argv[2]
+            config = load_config(config_file)
+            worker.config_from_object(config)
+            db_file = config['DB_FILENAME']
             conn = sqlite3.connect(db_file,
                                    detect_types=sqlite3.PARSE_DECLTYPES)
             initialize(conn)
         elif sys.argv[1] == 'relation':
             if len(sys.argv) != 3:
-                print('Usage: python crawler.py relation <db-file>',
+                print('Usage: python crawler.py relation <config-file>',
                       file=sys.stderr)
                 raise SystemExit(1)
-            db_file = sys.argv[2]
+            config_file = sys.argv[2]
+            config = load_config(config_file)
+            worker.config_from_object(config)
+            db_file = config['DB_FILENAME']
             conn = sqlite3.connect(db_file,
                                    detect_types=sqlite3.PARSE_DECLTYPES)
             crawl(conn)
