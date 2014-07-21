@@ -2,13 +2,14 @@ import sys
 import sqlite3
 import urllib.parse
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from lxml.html import parse
 
 
 INDEX_INDEX = 'http://tvtropes.org/pmwiki/index_report.php'
 WIKI_PAGE = 'http://tvtropes.org/pmwiki/pmwiki.php/'
+CRAWL_INTERVAL = timedelta(days=7)
 
 
 def list_pages(namespace_url=None):
@@ -108,7 +109,7 @@ def crawl_links(crawl_stack, conn):
                                      'WHERE namespace = ? and name = ?',
                                      (namespace, name)).fetchone()
             if last_crawled and last_crawled[0]:
-                if (current_time - last_crawled[0]).days < 7:
+                if (current_time - last_crawled[0]) < CRAWL_INTERVAL:
                     print('Skipping: {}/{} @ {} due to recent crawl '
                           'in 7 days'
                           .format(namespace, name, url))
