@@ -107,13 +107,12 @@ def crawl_links(crawl_stack, conn):
             last_crawled = c.execute('SELECT last_crawled FROM indexindex '
                                      'WHERE namespace = ? and name = ?',
                                      (namespace, name)).fetchone()
-            if last_crawled is not None:
-                if last_crawled[0] is not None:
-                    if (current_time - last_crawled[0]).days < 7:
-                        print('Skipping: {}/{} @ {} due to recent crawl '
-                              'in 7 days'
-                              .format(namespace, name, url))
-                        continue
+            if last_crawled and last_crawled[0]:
+                if (current_time - last_crawled[0]).days < 7:
+                    print('Skipping: {}/{} @ {} due to recent crawl '
+                          'in 7 days'
+                          .format(namespace, name, url))
+                    continue
         else:
             try:
                 c.execute('INSERT INTO indexindex VALUES (?, ?, ?, ?)',
