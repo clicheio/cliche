@@ -1,8 +1,9 @@
+from __future__ import print_function
+
+from datetime import datetime, timedelta
 import sys
 import sqlite3
 import urllib.parse
-
-from datetime import datetime, timedelta
 
 from lxml.html import parse
 
