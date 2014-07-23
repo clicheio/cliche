@@ -49,13 +49,14 @@ def save_link(name, url):
     conn = psycopg2.connect(worker.conf.DB_FILENAME)
     cur = conn.cursor()
     try:
-        cur.execute('INSERT INTO indexindex VALUES (?, ?, ?, NULL)',
+        cur.execute('INSERT INTO indexindex VALUES (%s, %s, %s, NULL)',
                     (name[0], name[1], url))
     except psycopg2.IntegrityError:
-        cur.execute('UPDATE indexindex SET url = ? '
-                    'WHERE namespace = ? and name = ?',
+        cur.execute('UPDATE indexindex SET url = %s '
+                    'WHERE namespace = %s and name = %s',
                     (url, name[0], name[1]))
-    cur.commit()
+        conn.rollback()
+    conn.commit()
     cur.execute('SELECT count(*) FROM indexindex')
     get_task_logger(__name__ + '.save_link').info(
         'Total %d',
@@ -85,11 +86,11 @@ def crawl_link(namespace, name, url, referer, start_time,
     logger.info("Fetching: {}/{} @ {}"
                 .format(namespace, name, url))
     c.execute('SELECT count(*) FROM indexindex '
-              'WHERE namespace = ? and name = ?',
+              'WHERE namespace = %s and name = %s',
               (namespace, name))
     if cur.fetchone()[0] != 0:
         c.execute('SELECT last_crawled FROM indexindex '
-                  'WHERE namespace = ? and name = ?',
+                  'WHERE namespace = %s and name = %s',
                   (namespace, name))
         last_crawled = c.fetchone()
         if last_crawled and last_crawled[0]:
@@ -100,10 +101,10 @@ def crawl_link(namespace, name, url, referer, start_time,
                 return
     else:
         try:
-            c.execute('INSERT INTO indexindex VALUES (?, ?, ?, ?)',
+            c.execute('INSERT INTO indexindex VALUES (%s, %s, %s, %s)',
                       (namespace, name, url, None))
         except psycopg2.IntegrityError:
-            pass
+            conn.rollback()
     conn.commit()
     for a in tree.xpath('//a[@class="twikilink"]'):
         try:
@@ -120,15 +121,15 @@ def crawl_link(namespace, name, url, referer, start_time,
             pass
     if referer is not None:
         try:
-            c.execute('INSERT INTO relations VALUES (?, ?, ?, ?)',
+            c.execute('INSERT INTO relations VALUES (%s, %s, %s, %s)',
                       (referer[0], referer[1], namespace, name))
         except psycopg2.IntegrityError:
-            pass
+            conn.rollback()
     logger.info('Crawling {}/{} @ {} completed at {}'
                 .format(namespace, name, url, current_time))
     c.execute('''
-        UPDATE indexindex SET last_crawled = ?
-        WHERE namespace = ? and name = ?
+        UPDATE indexindex SET last_crawled = %s
+        WHERE namespace = %s and name = %s
             ''', (current_time, namespace, name))
     round_count += 1
     if round_count >= 10:
@@ -158,8 +159,10 @@ def initialize(connection):
         )
     ''')
     connection.commit()
-    for name, url in list_pages():
-        save_link.delay(name, url)
+    cur.execute('SELECT count(*) FROM indexindex')
+    if cur.fetchone()[0] < 1:
+        for name, url in list_pages():
+            save_link.delay(name, url)
     # FIXME
     cur.execute('SELECT count(*) FROM indexindex')
     print('Total', cur.fetchone()[0])
@@ -177,10 +180,7 @@ def crawl(connection):
         )
         ''')
     connection.commit()
-    cur.execute("SELECT name FROM sqlite_master "
-                   "WHERE name='indexindex'")
-    if cur.fetchone() is None:
-        initialize(connection)
+    initialize(connection)
     cur.execute('SELECT namespace, name, url FROM indexindex '
                 'ORDER BY namespace asc, name asc')
     seed = cur.fetchall()
