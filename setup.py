@@ -9,6 +9,10 @@ setup(
     license='AGPLv3 or later',
     packages=find_packages(),
     install_requires=['lxml >= 3.3.5'],
+    entry_points='''
+        [console_scripts]
+        cliche-crawler = cliche.crawler:main
+    ''',
     classifiers=[
         'Development Status :: 1 - Planning',
         'License :: OSI Approved :: '
