@@ -56,116 +56,97 @@ def save_link(name, url):
         cur.execute('UPDATE indexindex SET url = ? '
                     'WHERE namespace = ? and name = ?',
                     (url, name[0], name[1]))
-    cur.commit()
+    conn.commit()
     get_task_logger(__name__ + '.save_link').info(
         'Total %d',
         cur.execute('SELECT count(*) FROM indexindex').fetchone()[0]
     )
 
 
-def links_to_crawl(crawl_stack):
-    while crawl_stack:
-        link = crawl_stack.pop()
-        if len(link) == 3:
-            yield link + (None,)
-        else:
-            yield link
-
-
-def crawl_links(crawl_stack, conn):
+@worker.task
+def crawl_link(namespace, name, url, referer, start_time,
+               start_indexindex_count, start_relations_count,
+               round_count):
+    conn = sqlite3.connect(worker.conf.DB_FILENAME,
+                           detect_types=sqlite3.PARSE_DECLTYPES)
     c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS relations
-        (
-        origin_namespace text, origin text,
-        destination_namespace text, destination text,
-        constraint pk_relations primary key(origin_namespace, origin,
-        destination_namespace, destination)
-        )
-        ''')
-    start_time = datetime.now()
-    start_indexindex_count = int(
-        c.execute('SELECT count(*) FROM indexindex')
-        .fetchone()[0])
-    start_relations_count = int(
-        c.execute('SELECT count(*) FROM relations')
-        .fetchone()[0])
-    round_count = 0
-    for namespace, name, url, referer in links_to_crawl(crawl_stack):
-        current_time = datetime.now()
-        tree = parse(url)
+    logger = get_task_logger(__name__ + '.crawl_link')
+    current_time = datetime.now()
+    tree = parse(url)
+    try:
+        namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
+            .text.strip()[:-1]
+    except (AttributeError, AssertionError, IndexError):
+        logger.warning('Warning: There is no pagetitle on this page. '
+                       'Ignoring.')
+        return
+    if namespace == '':
+        namespace = 'Main'
+    name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
+    logger.info("Fetching: {}/{} @ {}"
+                .format(namespace, name, url))
+    if c.execute('SELECT count(*) FROM indexindex '
+                 'WHERE namespace = ? and name = ?',
+                 (namespace, name)).fetchone()[0] != 0:
+        last_crawled = c.execute('SELECT last_crawled FROM indexindex '
+                                 'WHERE namespace = ? and name = ?',
+                                 (namespace, name)).fetchone()
+        if last_crawled and last_crawled[0]:
+            if (current_time - last_crawled[0]) < CRAWL_INTERVAL:
+                logger.info('Skipping: {}/{} @ {} due to'
+                            'recent crawl in {} days'
+                            .format(namespace, name, url, CRAWL_INTERVAL))
+                return
+    else:
         try:
-            namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
-                .text.strip()[:-1]
-        except (AttributeError, AssertionError, IndexError):
-            print('Error: There is no pagetitle on this page.')
-            continue
-        if namespace == '':
-            namespace = 'Main'
-        name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
-        print("Fetching: {}/{} @ {}"
-              .format(namespace, name, url))
-        if c.execute('SELECT count(*) FROM indexindex '
-                     'WHERE namespace = ? and name = ?',
-                     (namespace, name)).fetchone()[0] != 0:
-            last_crawled = c.execute('SELECT last_crawled FROM indexindex '
-                                     'WHERE namespace = ? and name = ?',
-                                     (namespace, name)).fetchone()
-            if last_crawled and last_crawled[0]:
-                if (current_time - last_crawled[0]) < CRAWL_INTERVAL:
-                    print('Skipping: {}/{} @ {} due to recent crawl '
-                          'in 7 days'
-                          .format(namespace, name, url))
-                    continue
-        else:
-            try:
-                c.execute('INSERT INTO indexindex VALUES (?, ?, ?, ?)',
-                          (namespace, name, url, None))
-            except sqlite3.IntegrityError:
-                pass
-        conn.commit()
-        for a in tree.xpath('//a[@class="twikilink"]'):
-            try:
-                destination_name = a.text.strip()
-                destination_url = urllib.parse.urljoin(
-                    WIKI_PAGE, a.attrib['href']
-                )
-                next_crawl = (None, destination_name, destination_url,
-                              (namespace, name))
-                if next_crawl not in crawl_stack:
-                    crawl_stack.append(next_crawl)
-            except AttributeError:
-                pass
-        if referer is not None:
-            try:
-                c.execute('INSERT INTO relations VALUES (?, ?, ?, ?)',
-                          (referer[0], referer[1], namespace, name))
-            except sqlite3.IntegrityError:
-                pass
-        print('Crawling {}/{} @ {} completed at {}'
-              .format(namespace, name, url, current_time))
-        c.execute('''
-            UPDATE indexindex SET last_crawled = ?
-            WHERE namespace = ? and name = ?
-                ''', (current_time, namespace, name))
-        round_count += 1
-        if round_count >= 10:
-            round_count = 0
-            elasped = datetime.now() - start_time
-            elasped_hours = elasped.total_seconds() / 3600
-            indexindex_count = int(
-                c.execute('SELECT count(*) FROM indexindex')
-                .fetchone()[0]) - start_indexindex_count
-            relations_count = int(
-                c.execute('SELECT count(*) FROM relations')
-                .fetchone()[0]) - start_relations_count
-            print('-> indexindex: {} ({}/h) relations: {} ({}/h) '
-                  'elasped {}'
-                  .format(indexindex_count,
-                          int(indexindex_count / elasped_hours),
-                          relations_count,
-                          int(relations_count / elasped_hours),
-                          elasped))
+            c.execute('INSERT INTO indexindex VALUES (?, ?, ?, ?)',
+                      (namespace, name, url, None))
+        except sqlite3.IntegrityError:
+            pass
+    conn.commit()
+    for a in tree.xpath('//a[@class="twikilink"]'):
+        try:
+            destination_name = a.text.strip()
+            destination_url = urllib.parse.urljoin(
+                WIKI_PAGE, a.attrib['href']
+            )
+            # FIXME if next_crawl not in crawl_stack:
+            crawl_link.delay(None, destination_name, destination_url,
+                             (namespace, name), start_time,
+                             start_indexindex_count, start_relations_count,
+                             round_count)
+        except AttributeError:
+            pass
+    if referer is not None:
+        try:
+            c.execute('INSERT INTO relations VALUES (?, ?, ?, ?)',
+                      (referer[0], referer[1], namespace, name))
+        except sqlite3.IntegrityError:
+            pass
+    logger.info('Crawling {}/{} @ {} completed at {}'
+                .format(namespace, name, url, current_time))
+    c.execute('''
+        UPDATE indexindex SET last_crawled = ?
+        WHERE namespace = ? and name = ?
+            ''', (current_time, namespace, name))
+    round_count += 1
+    if round_count >= 10:
+        round_count = 0
+        elasped = datetime.now() - start_time
+        elasped_hours = elasped.total_seconds() / 3600
+        indexindex_count = int(
+            c.execute('SELECT count(*) FROM indexindex')
+            .fetchone()[0]) - start_indexindex_count
+        relations_count = int(
+            c.execute('SELECT count(*) FROM relations')
+            .fetchone()[0]) - start_relations_count
+        logger.info('-> indexindex: {} ({}/h) relations: {} ({}/h) '
+                    'elasped {}'
+                    .format(indexindex_count,
+                            int(indexindex_count / elasped_hours),
+                            relations_count,
+                            int(relations_count / elasped_hours),
+                            elasped))
 
 
 def initialize(connection):
@@ -186,13 +167,34 @@ def initialize(connection):
 
 
 def crawl(connection):
-    c = connection.cursor()
-    if c.execute("SELECT name FROM sqlite_master "
-                 "WHERE name='indexindex'").fetchone() is None:
+    cur = connection.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS relations
+        (
+        origin_namespace text, origin text,
+        destination_namespace text, destination text,
+        constraint pk_relations primary key(origin_namespace, origin,
+        destination_namespace, destination)
+        )
+        ''')
+    connection.commit()
+    if cur.execute("SELECT name FROM sqlite_master "
+                   "WHERE name='indexindex'").fetchone() is None:
         initialize(connection)
-    seed = c.execute('SELECT namespace, name, url FROM indexindex '
-                     'ORDER BY namespace asc, name asc').fetchall()
-    crawl_links(seed, connection)
+    seed = cur.execute('SELECT namespace, name, url FROM indexindex '
+                       'ORDER BY namespace asc, name asc').fetchall()
+    start_time = datetime.now()
+    start_indexindex_count = int(
+        cur.execute('SELECT count(*) FROM indexindex')
+        .fetchone()[0])
+    start_relations_count = int(
+        cur.execute('SELECT count(*) FROM relations')
+        .fetchone()[0])
+    round_count = 0
+    for namespace, name, url in seed:
+        crawl_link.delay(namespace, name, url, None, start_time,
+                         start_indexindex_count, start_relations_count,
+                         round_count)
     connection.commit()
 
 
