@@ -4,6 +4,7 @@ from setuptools import find_packages, setup
 install_requires = [
     'lxml >= 3.3.5',
     'celery >= 3.1.13',
+    'psycopg2 >= 2.5.3',
 ]
 
 setup(

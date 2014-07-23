@@ -2,11 +2,11 @@ from __future__ import print_function
 
 from datetime import datetime, timedelta
 import sys
-import sqlite3
 import urllib.parse
 
 from celery.utils.log import get_task_logger
 from lxml.html import parse
+import psycopg2
 
 from .worker import worker
 
@@ -46,20 +46,20 @@ def list_pages(namespace_url=None):
 
 @worker.task
 def save_link(name, url):
-    conn = sqlite3.connect(worker.conf.DB_FILENAME,
-                           detect_types=sqlite3.PARSE_DECLTYPES)
+    conn = psycopg2.connect(worker.conf.DB_FILENAME)
     cur = conn.cursor()
     try:
         cur.execute('INSERT INTO indexindex VALUES (?, ?, ?, NULL)',
                     (name[0], name[1], url))
-    except sqlite3.IntegrityError:
+    except psycopg2.IntegrityError:
         cur.execute('UPDATE indexindex SET url = ? '
                     'WHERE namespace = ? and name = ?',
                     (url, name[0], name[1]))
-    conn.commit()
+    cur.commit()
+    cur.execute('SELECT count(*) FROM indexindex')
     get_task_logger(__name__ + '.save_link').info(
         'Total %d',
-        cur.execute('SELECT count(*) FROM indexindex').fetchone()[0]
+        cur.fetchone()[0]
     )
 
 
@@ -67,8 +67,7 @@ def save_link(name, url):
 def crawl_link(namespace, name, url, referer, start_time,
                start_indexindex_count, start_relations_count,
                round_count):
-    conn = sqlite3.connect(worker.conf.DB_FILENAME,
-                           detect_types=sqlite3.PARSE_DECLTYPES)
+    conn = psycopg2.connect(worker.conf.DB_FILENAME)
     c = conn.cursor()
     logger = get_task_logger(__name__ + '.crawl_link')
     current_time = datetime.now()
@@ -85,12 +84,14 @@ def crawl_link(namespace, name, url, referer, start_time,
     name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
     logger.info("Fetching: {}/{} @ {}"
                 .format(namespace, name, url))
-    if c.execute('SELECT count(*) FROM indexindex '
-                 'WHERE namespace = ? and name = ?',
-                 (namespace, name)).fetchone()[0] != 0:
-        last_crawled = c.execute('SELECT last_crawled FROM indexindex '
-                                 'WHERE namespace = ? and name = ?',
-                                 (namespace, name)).fetchone()
+    c.execute('SELECT count(*) FROM indexindex '
+              'WHERE namespace = ? and name = ?',
+              (namespace, name))
+    if cur.fetchone()[0] != 0:
+        c.execute('SELECT last_crawled FROM indexindex '
+                  'WHERE namespace = ? and name = ?',
+                  (namespace, name))
+        last_crawled = c.fetchone()
         if last_crawled and last_crawled[0]:
             if (current_time - last_crawled[0]) < CRAWL_INTERVAL:
                 logger.info('Skipping: {}/{} @ {} due to'
@@ -101,7 +102,7 @@ def crawl_link(namespace, name, url, referer, start_time,
         try:
             c.execute('INSERT INTO indexindex VALUES (?, ?, ?, ?)',
                       (namespace, name, url, None))
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             pass
     conn.commit()
     for a in tree.xpath('//a[@class="twikilink"]'):
@@ -121,7 +122,7 @@ def crawl_link(namespace, name, url, referer, start_time,
         try:
             c.execute('INSERT INTO relations VALUES (?, ?, ?, ?)',
                       (referer[0], referer[1], namespace, name))
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             pass
     logger.info('Crawling {}/{} @ {} completed at {}'
                 .format(namespace, name, url, current_time))
@@ -134,19 +135,17 @@ def crawl_link(namespace, name, url, referer, start_time,
         round_count = 0
         elasped = datetime.now() - start_time
         elasped_hours = elasped.total_seconds() / 3600
-        indexindex_count = int(
-            c.execute('SELECT count(*) FROM indexindex')
-            .fetchone()[0]) - start_indexindex_count
-        relations_count = int(
-            c.execute('SELECT count(*) FROM relations')
-            .fetchone()[0]) - start_relations_count
-        logger.info('-> indexindex: {} ({}/h) relations: {} ({}/h) '
-                    'elasped {}'
-                    .format(indexindex_count,
-                            int(indexindex_count / elasped_hours),
-                            relations_count,
-                            int(relations_count / elasped_hours),
-                            elasped))
+        c.execute('SELECT count(*) FROM indexindex')
+        indexindex_count = int(c.fetchone()[0]) - start_indexindex_count
+        c.execute('SELECT count(*) FROM relations')
+        relations_count = int(c.fetchone()[0]) - start_relations_count
+        logger.info('-> indexindex: %s (%s/h) relations: %s (%s/h) '
+                    'elasped %s',
+                    indexindex_count,
+                    int(indexindex_count / elasped_hours),
+                    relations_count,
+                    int(relations_count / elasped_hours),
+                    elasped)
 
 
 def initialize(connection):
@@ -162,8 +161,8 @@ def initialize(connection):
     for name, url in list_pages():
         save_link.delay(name, url)
     # FIXME
-    print('Total',
-          cur.execute('SELECT count(*) FROM indexindex').fetchone()[0])
+    cur.execute('SELECT count(*) FROM indexindex')
+    print('Total', cur.fetchone()[0])
 
 
 def crawl(connection):
@@ -178,18 +177,18 @@ def crawl(connection):
         )
         ''')
     connection.commit()
-    if cur.execute("SELECT name FROM sqlite_master "
-                   "WHERE name='indexindex'").fetchone() is None:
+    cur.execute("SELECT name FROM sqlite_master "
+                   "WHERE name='indexindex'")
+    if cur.fetchone() is None:
         initialize(connection)
-    seed = cur.execute('SELECT namespace, name, url FROM indexindex '
-                       'ORDER BY namespace asc, name asc').fetchall()
+    cur.execute('SELECT namespace, name, url FROM indexindex '
+                'ORDER BY namespace asc, name asc')
+    seed = cur.fetchall()
     start_time = datetime.now()
-    start_indexindex_count = int(
-        cur.execute('SELECT count(*) FROM indexindex')
-        .fetchone()[0])
-    start_relations_count = int(
-        cur.execute('SELECT count(*) FROM relations')
-        .fetchone()[0])
+    cur.execute('SELECT count(*) FROM indexindex')
+    start_indexindex_count = int(cur.fetchone()[0])
+    cur.execute('SELECT count(*) FROM relations')
+    start_relations_count = int(cur.fetchone()[0])
     round_count = 0
     for namespace, name, url in seed:
         crawl_link.delay(namespace, name, url, None, start_time,
@@ -242,8 +241,7 @@ def main():
             config = load_config(config_file)
             worker.config_from_object(config)
             db_file = config['DB_FILENAME']
-            conn = sqlite3.connect(db_file,
-                                   detect_types=sqlite3.PARSE_DECLTYPES)
+            conn = psycopg2.connect(db_file)
             initialize(conn)
         elif sys.argv[1] == 'relation':
             if len(sys.argv) != 3:
@@ -254,8 +252,7 @@ def main():
             config = load_config(config_file)
             worker.config_from_object(config)
             db_file = config['DB_FILENAME']
-            conn = sqlite3.connect(db_file,
-                                   detect_types=sqlite3.PARSE_DECLTYPES)
+            conn = psycopg2.connect(db_file)
             crawl(conn)
         else:
             print(general_help_string, file=sys.stderr)
