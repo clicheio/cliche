@@ -36,6 +36,10 @@ tests_require = {
     'pytest >= 2.5.0'
 }
 
+docs_require = {
+    'Sphinx >= 1.2'
+}
+
 
 class BaseAlembicCommand(distutils.core.Command):
     """Base class for commands provided by Alembic."""
@@ -147,6 +151,7 @@ setup(
     install_requires=install_requires,
     tests_require=tests_require,
     extras_require={
+        'docs': docs_require,
         'tests': tests_require
     },
     cmdclass=cmdclass,

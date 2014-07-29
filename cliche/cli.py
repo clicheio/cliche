@@ -55,7 +55,6 @@ ALEMBIC_LOGGING = {
 }
 
 
-
 def get_database_engine():
     """Read the configuration (environment variables) and then return
     an engine to database.
