@@ -4,7 +4,7 @@ Cliche
 Cliche is an ontology of fictional works.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    cliche
 

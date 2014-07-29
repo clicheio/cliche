@@ -7,3 +7,4 @@
       cliche/cli
       cliche/orm
       cliche/people
+      cliche/web
