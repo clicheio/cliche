@@ -1,0 +1,3 @@
+
+.. automodule:: cliche.orm
+   :members:

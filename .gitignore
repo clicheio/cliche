@@ -1,4 +1,12 @@
-.*.swp
+*.egg
+*.egg-info
+*.pyc
 *.tmp
+*.yml
+*.yaml
+.*.swp
+.DS_Store
+.idea
+.tox
 __pycache__
-cliche.egg-info
+docs/_build
