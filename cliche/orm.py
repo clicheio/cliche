@@ -33,7 +33,7 @@ __all__ = 'Base', 'Session'
 #:
 #: .. attribute:: __repr_columns__
 #:
-#:    (:class:`collections.Sequence`) This columns will be printed to
+#:    (:class:`collections.abc.Sequence`) This columns will be printed to
 #:    :func:`repr()` string of its instances if :attr:`__repr_columns__`
 #:    is defined.
 #:
@@ -66,7 +66,7 @@ def make_repr(self):
     """
     cls = type(self)
     mod = cls.__module__
-    name = ('' if mod == '__main__ ' else mod + '.') + cls.__name__
+    name = ('' if mod == '__main__ ' else mod + '.') + cls.__qualname__
     try:
         columns = type(self).__repr_columns__
     except AttributeError:

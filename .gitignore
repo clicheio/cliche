@@ -2,4 +2,6 @@
 *.egg-info
 *.pyc
 .*.swp
+.DS_Store
 .idea
+.tox

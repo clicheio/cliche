@@ -1,4 +1,6 @@
 import os.path
+import sys
+import warnings
 
 try:
     from setuptools import setup, find_packages
@@ -6,6 +8,13 @@ except ImportError:
     from ez_setup import use_setuptools
     use_setuptools()
     from setuptools import setup, find_packages
+
+
+if sys.version_info < (3, 3, 0):
+    warnings.warn(
+        'Cliche requires Python 3.3 or higher; the currently running '
+        'Python version is: ' + sys.version
+    )
 
 
 def readme():
@@ -30,7 +39,7 @@ setup(
     author_email='minhee' '@' 'dahlia.kr',
     maintainer='Hong Minhee',
     maintainer_email='minhee' '@' 'dahlia.kr',
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests']),
     zip_safe=False,
     install_requires=install_requires,
     classifiers=[
