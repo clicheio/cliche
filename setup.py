@@ -1,3 +1,4 @@
+import distutils.core
 import os.path
 import sys
 import warnings
@@ -8,6 +9,7 @@ except ImportError:
     from ez_setup import use_setuptools
     use_setuptools()
     from setuptools import setup, find_packages
+from setuptools.command.test import test
 
 
 if sys.version_info < (3, 3, 0):
@@ -25,9 +27,105 @@ def readme():
         return ''
 
 
-install_requires = [
-    'SQLAlchemy >= 0.9.0'
-]
+install_requires = {
+    'SQLAlchemy >= 0.9.0',
+    'alembic >= 0.6.0'
+}
+
+tests_require = {
+    'pytest >= 2.5.0'
+}
+
+
+class BaseAlembicCommand(distutils.core.Command):
+    """Base class for commands provided by Alembic."""
+
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        try:
+            from cliche.cli import get_database_engine
+            from cliche.orm import get_alembic_config, import_all_modules
+            import_all_modules()
+        except ImportError as e:
+            raise ImportError('dependencies are not resolved yet; run '
+                              '"setup.py develop" first\n' + str(e))
+        engine = get_database_engine()
+        config = get_alembic_config(engine)
+        self.alembic_process(config)
+
+    def alembic_process(self, config):
+        raise NotImplementedError('override alembic_process() method')
+
+
+class revision(BaseAlembicCommand):
+    """Adds a new revision to the database migration history."""
+
+    description = __doc__
+    user_options = BaseAlembicCommand.user_options + [
+        ('message=', 'm', 'Message string'),
+        ('autogenerate', None, 'Populates revision script with candidate '
+                               'migration operations, based on comparison '
+                               'of database to model.')
+    ]
+
+    def initialize_options(self):
+        BaseAlembicCommand.initialize_options(self)
+        self.message = None
+        self.autogenerate = False
+
+    def alembic_process(self, config):
+        from alembic.command import revision
+        revision(config, self.message, self.autogenerate)
+
+
+class history(BaseAlembicCommand):
+    """List revisions of the database migration history."""
+
+    description = __doc__
+
+    def alembic_process(self, config):
+        from alembic.command import history
+        history(config)
+
+
+class pytest(test):
+
+    def finalize_options(self):
+        test.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        from pytest import main
+        errno = main(self.test_args)
+        raise SystemExit(errno)
+
+
+cmdclass = {}
+
+try:
+    __import__('pytest')
+except ImportError:
+    pass
+else:
+    cmdclass['test'] = pytest
+
+try:
+    __import__('alembic')
+except ImportError:
+    pass
+else:
+    cmdclass.update(
+        revision=revision,
+        history=history
+    )
 
 
 setup(
@@ -41,7 +139,17 @@ setup(
     maintainer_email='minhee' '@' 'dahlia.kr',
     packages=find_packages(exclude=['tests']),
     zip_safe=False,
+    entry_points={
+        'console_scripts': [
+            'cliche-migrate = cliche.cli:migrate'
+        ]
+    },
     install_requires=install_requires,
+    tests_require=tests_require,
+    extras_require={
+        'tests': tests_require
+    },
+    cmdclass=cmdclass,
     classifiers=[
         'Development Status :: 1 - Planning',
         'Environment :: Web Environment',
