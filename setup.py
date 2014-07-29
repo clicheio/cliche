@@ -35,7 +35,8 @@ install_requires = {
     'PyYAML >= 3.10',
     # Web
     'Flask >= 0.10',
-    'Werkzeug >= 0.9'
+    'Werkzeug >= 0.9',
+    'Flask-Script >= 0.6.0'
 }
 
 tests_require = {
@@ -151,7 +152,7 @@ setup(
     zip_safe=False,
     entry_points={
         'console_scripts': [
-            'cliche-migrate = cliche.cli:migrate'
+            'cliche = cliche.cli:main'
         ]
     },
     install_requires=install_requires,

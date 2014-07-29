@@ -1,26 +1,20 @@
 """:mod:`cliche.cli` --- Command-line interfaces
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:envvar:`CLICHE_DATABASE_URL`
-   The URL of the database to use.
-
-   .. seealso::
-
-      SQLAlchemy --- :ref:`database_urls`
-         The URL is passed to SQLAlchemy's :func:`~sqlalchemy.create_engine()`
-         function.
-
 """
-import argparse
-import logging.config
 import os
+import logging.config
 
 from alembic.util import CommandError
-from sqlalchemy.engine import create_engine
+from flask.ext.script import Manager
+import sys
 
 from .orm import downgrade_database, upgrade_database
+from .web.app import app
+from .web.config import config_from_yaml
+from .web.db import get_database_engine
 
-__all__ = {'get_database_engine', 'migrate'}
+__all__ = {'get_database_engine', 'main', 'manager'}
 
 
 ALEMBIC_LOGGING = {
@@ -55,44 +49,57 @@ ALEMBIC_LOGGING = {
 }
 
 
-def get_database_engine():
-    """Read the configuration (environment variables) and then return
-    an engine to database.
+@Manager
+def manager(config=None):
+    """(:class:`flask.ext.script.Manager`) A Flask-Script manager object."""
+    if config is None:
+        try:
+            config = os.environ['CLICHE_CONFIG']
+        except KeyError:
+            print('The -c/--config option or CLICHE_CONFIG environment '
+                  'variable is required', file=sys.stderr)
+            raise SystemExit(1)
+    if not os.path.isfile(config):
+        print('The configuration file', config, 'cannot be read.')
+        raise SystemExit(1)
+    elif os.path.splitext(config)[1] in ('.yml', '.yaml'):
+        config_from_yaml(app.config, filename=config)
+    else:
+        config = os.path.abspath(config)
+        app.config.from_pyfile(config)
+    return app
 
-    :returns: the database engine
-    :rtype: :class:`sqlalchemy.engine.base.Engine`
-    :raises RuntimeError: when the configuration (environment variables) isn't
-                          properly set
 
-    """
-    try:
-        url = os.environ['CLICHE_DATABASE_URL']
-    except KeyError:
-        raise RuntimeError('Missing CLICHE_DATABASE_URL environment '
-                           'variable')
-    return create_engine(url)
+manager.add_option('-c', '--config',
+                   dest='config',
+                   help='Configuration file (YAML or Python)')
+
+#: (:class:`collections.abc.Callable`) The CLI entry point.
+main = manager.run
 
 
-def migrate(args=None):
+@manager.option('revision', nargs='?', default='head',
+                help='Revision upgrade/downgrade to')
+def upgrade(revision):
     """Creates the database tables, or upgrade it to the latest revision."""
-    parser = argparse.ArgumentParser(description=migrate.__doc__)
-    parser.add_argument('revision', nargs='?', default='head',
-                        help='Revision upgrade/downgrade to')
-    args = parser.parse_args(args)
     logging_config = dict(ALEMBIC_LOGGING)
     logging.config.dictConfig(logging_config)
     try:
         engine = get_database_engine()
     except RuntimeError as e:
-        parser.error(str(e))
+        print(e, file=sys.stderr)
     else:
         try:
-            upgrade_database(engine, args.revision)
+            upgrade_database(engine, revision)
         except CommandError as e:
-            if args.revision != 'head':
+            if revision != 'head':
                 try:
-                    downgrade_database(engine, args.revision)
+                    downgrade_database(engine, revision)
                 except CommandError as e:
-                    parser.error(str(e))
+                    print(e, file=sys.stderr)
             else:
-                parser.error(str(e))
+                print(e, file=sys.stderr)
+
+
+if __name__ == '__main__':
+    main()

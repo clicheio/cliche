@@ -1,6 +1,8 @@
 *.egg
 *.egg-info
 *.pyc
+*.yml
+*.yaml
 .*.swp
 .DS_Store
 .idea
