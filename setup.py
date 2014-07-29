@@ -35,6 +35,7 @@ install_requires = {
     'PyYAML >= 3.10',
     # Web
     'Flask >= 0.10',
+    'Werkzeug >= 0.9'
 }
 
 tests_require = {
