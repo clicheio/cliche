@@ -1,3 +1,5 @@
+*.db
+*.db-journal
 *.egg
 *.egg-info
 *.ipynb
@@ -11,4 +13,6 @@
 .ipynb_checkpoints
 .tox
 __pycache__
+build
+dist
 docs/_build

@@ -35,7 +35,9 @@ install_requires = {
     # Configuration
     'PyYAML >= 3.10',
     # Crawler
+    'celery >= 3.1.13',
     'lxml >= 3.3.5',
+    'psycopg2 >= 2.5.3',  # FIXME
     # Web
     'Flask >= 0.10',
     'Werkzeug >= 0.9',
