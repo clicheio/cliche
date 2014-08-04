@@ -2,7 +2,6 @@ from __future__ import print_function
 
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
-import sys
 import urllib.parse
 
 from celery.utils.log import get_task_logger
@@ -240,7 +239,7 @@ automatically created.
     )
     parser.add_argument('command', choices=['init', 'relation'])
     parser.add_argument('config_file')
-    args=parser.parse_args()
+    args = parser.parse_args()
 
     config = load_config(args.config_file)
     worker.config_from_object(config)
