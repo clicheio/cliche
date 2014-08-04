@@ -24,6 +24,9 @@ class Person(Base):
     #: (:class:`datetime.date`) The date of birth.
     dob = Column(Date)
 
+    #: (:class:`datetime.date`) The date of death.
+    dod = Column(Date)
+
     #: (:class:`datetime.datetime`) The created time.
     created_at = Column(DateTime(timezone=True),
                         nullable=False,
