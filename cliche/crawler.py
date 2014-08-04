@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+from argparse import ArgumentParser
 from datetime import datetime, timedelta
 import sys
 import urllib.parse
@@ -231,35 +232,25 @@ automatically created.
 
 
 def main():
-    if len(sys.argv) > 1:
-        if sys.argv[1] == 'init':
-            if len(sys.argv) != 3:
-                print('Usage: python crawler.py init <config-file>',
-                      file=sys.stderr)
-                raise SystemExit(1)
-            config_file = sys.argv[2]
-            config = load_config(config_file)
-            worker.config_from_object(config)
-            db_file = config['DB_FILENAME']
-            conn = psycopg2.connect(db_file)
-            initialize(conn)
-        elif sys.argv[1] == 'relation':
-            if len(sys.argv) != 3:
-                print('Usage: python crawler.py relation <config-file>',
-                      file=sys.stderr)
-                raise SystemExit(1)
-            config_file = sys.argv[2]
-            config = load_config(config_file)
-            worker.config_from_object(config)
-            db_file = config['DB_FILENAME']
-            conn = psycopg2.connect(db_file)
-            crawl(conn)
-        else:
-            print(general_help_string, file=sys.stderr)
-            raise SystemExit(1)
-    else:
-        print(general_help_string, file=sys.stderr)
-        raise SystemExit(1)
+    parser = ArgumentParser(
+        epilog='''
+If a db file is not already present with each commands, one will be
+automatically created.
+        '''
+    )
+    parser.add_argument('command', choices=['init', 'relation'])
+    parser.add_argument('config_file')
+    args=parser.parse_args()
+
+    config = load_config(args.config_file)
+    worker.config_from_object(config)
+    db_file = config['DB_FILENAME']
+    conn = psycopg2.connect(db_file)
+
+    if args.command == 'init':
+        initialize(conn)
+    elif args.command == 'relation':
+        crawl(conn)
 
 
 if __name__ == '__main__':
