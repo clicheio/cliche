@@ -149,7 +149,7 @@ def crawl_link(namespace, name, url, referer, start_time,
                     elasped)
 
 
-def initialize(connection):
+def crawl(connection):
     cur = connection.cursor()
     cur.execute('''
         CREATE TABLE IF NOT EXISTS indexindex
@@ -163,13 +163,7 @@ def initialize(connection):
     if cur.fetchone()[0] < 1:
         for name, url in list_pages():
             save_link.delay(name, url)
-    # FIXME
-    cur.execute('SELECT count(*) FROM indexindex')
-    print('Total', cur.fetchone()[0])
 
-
-def crawl(connection):
-    cur = connection.cursor()
     cur.execute('''
         CREATE TABLE IF NOT EXISTS relations
         (
@@ -180,7 +174,6 @@ def crawl(connection):
         )
         ''')
     connection.commit()
-    initialize(connection)
     cur.execute('SELECT namespace, name, url FROM indexindex '
                 'ORDER BY namespace asc, name asc')
     seed = cur.fetchall()
@@ -207,35 +200,15 @@ def load_config(filename):
 
 def main():
     parser = ArgumentParser(
-        epilog='''
-If a db file is not already present with each commands, one will be
-automatically created.
-        '''
+        description='Crawles TVTropes and saves metadata.'
     )
-    parser.add_argument('command', choices=['init', 'relation'], help='''
-    init:
-        Crawls indexindex of TVTropes.
-        If an entry already exists, it is updated to new url.
-        If the process is inturruped in the middle, nothing will be saved.
-
-    relation:
-        Crawls each pages and saves it to a table, using items in
-        indexindex table as seeds. New pages are saved to indexindex table,
-        and relationship of pages are saved to relations table.
-        If indexindex table is not found, an error will be raised.
-    ''')
     parser.add_argument('config_file')
     args = parser.parse_args()
 
     config = load_config(args.config_file)
     worker.config_from_object(config)
     db_file = config['DB_FILENAME']
-    conn = psycopg2.connect(db_file)
-
-    if args.command == 'init':
-        initialize(conn)
-    elif args.command == 'relation':
-        crawl(conn)
+    crawl(psycopg2.connect(db_file))
 
 
 if __name__ == '__main__':
