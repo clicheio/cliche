@@ -88,7 +88,7 @@ def crawl_link(namespace, name, url, referer, start_time,
     c.execute('SELECT count(*) FROM indexindex '
               'WHERE namespace = %s and name = %s',
               (namespace, name))
-    if cur.fetchone()[0] != 0:
+    if c.fetchone()[0] != 0:
         c.execute('SELECT last_crawled FROM indexindex '
                   'WHERE namespace = %s and name = %s',
                   (namespace, name))
