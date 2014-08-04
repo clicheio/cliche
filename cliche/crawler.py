@@ -101,12 +101,11 @@ def crawl_link(namespace, name, url, referer, start_time,
     name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
     logger.info("Fetching: {}/{} @ {}"
                 .format(namespace, name, url))
-    else:
-        try:
-            c.execute('INSERT INTO indexindex VALUES (%s, %s, %s, %s)',
-                      (namespace, name, url, None))
-        except psycopg2.IntegrityError:
-            conn.rollback()
+    try:
+        c.execute('INSERT INTO entities VALUES (%s, %s, %s, NULL, NULL)',
+                  (namespace, name, url))
+    except psycopg2.IntegrityError:
+        conn.rollback()
     conn.commit()
     for a in tree.xpath('//a[@class="twikilink"]'):
         try:
