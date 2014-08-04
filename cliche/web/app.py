@@ -6,7 +6,7 @@ from flask import Flask
 
 from .db import setup_session
 
-__all__ = {'app'}
+__all__ = 'app',
 
 
 #: (:class:`flask.Flask`) The Flask application object.

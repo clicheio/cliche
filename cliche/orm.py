@@ -34,9 +34,9 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-__all__ = {'Base', 'Session', 'downgrade_database', 'get_alembic_config',
+__all__ = ('Base', 'Session', 'downgrade_database', 'get_alembic_config',
            'get_database_revision', 'import_all_modules',
-           'initialize_database', 'upgrade_database'}
+           'initialize_database', 'upgrade_database')
 
 
 #: SQLAlchemy declarative base class.

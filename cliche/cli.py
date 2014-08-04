@@ -14,7 +14,7 @@ from .web.app import app
 from .web.config import config_from_yaml
 from .web.db import get_database_engine
 
-__all__ = {'get_database_engine', 'main', 'manager'}
+__all__ = ('get_database_engine', 'main', 'manager')
 
 
 ALEMBIC_LOGGING = {

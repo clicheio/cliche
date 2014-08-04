@@ -5,7 +5,7 @@
 from flask import Config
 from yaml import load
 
-__all__ = {'config_from_yaml'}
+__all__ = 'config_from_yaml',
 
 
 def config_from_yaml(config, *, string=None, file=None, filename=None):

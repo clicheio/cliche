@@ -9,7 +9,7 @@ from sqlalchemy.types import Date, DateTime, Integer, String
 
 from .orm import Base
 
-__all__ = {'Person', 'Team', 'TeamMembership'}
+__all__ = 'Person', 'Team', 'TeamMembership'
 
 
 class Person(Base):

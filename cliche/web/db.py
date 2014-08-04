@@ -10,9 +10,9 @@ from werkzeug.local import LocalProxy
 
 from ..orm import Session
 
-__all__ = {'close_session', 'get_database_engine',
+__all__ = ('close_session', 'get_database_engine',
            'get_database_engine_options', 'get_session', 'session',
-           'setup_session'}
+           'setup_session')
 
 
 def get_database_engine():
