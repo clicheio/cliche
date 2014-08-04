@@ -71,6 +71,7 @@ def crawl_link(namespace, name, url, referer, start_time,
     conn = psycopg2.connect(worker.conf.DB_FILENAME)
     c = conn.cursor()
     logger = get_task_logger(__name__ + '.crawl_link')
+    current_time = datetime.now()
 
     c.execute('SELECT count(*) FROM entities '
               'WHERE url = %s',
@@ -88,7 +89,6 @@ def crawl_link(namespace, name, url, referer, start_time,
                 conn.close()
                 return
 
-    current_time = datetime.now()
     tree = parse(url)
     try:
         namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
