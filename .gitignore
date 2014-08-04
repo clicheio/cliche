@@ -1,4 +1,8 @@
 .*.swp
 *.tmp
+*.db
+*.db-journal
 __pycache__
 cliche.egg-info
+/build/
+/dist/
