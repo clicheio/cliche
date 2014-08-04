@@ -205,31 +205,6 @@ def load_config(filename):
     return loc
 
 
-general_help_string = '''
-Usage: python crawler.py <command> <arguments>
-
-commands:
-
-    init:
-        Usage: python crawler.py init <config-file>
-
-        Crawls indexindex of TVTropes.
-        If an entry already exists, it is updated to new url.
-        If the process is inturruped in the middle, nothing will be saved.
-
-    relation:
-        Usage: python crawler.py relation <config-file>
-
-        Crawls each pages and saves it to a table, using items in
-        indexindex table as seeds. New pages are saved to indexindex table,
-        and relationship of pages are saved to relations table.
-        If indexindex table is not found, an error will be raised.
-
-If a db file is not already present with each commands, one will be
-automatically created.
-'''.strip()
-
-
 def main():
     parser = ArgumentParser(
         epilog='''
@@ -237,7 +212,18 @@ If a db file is not already present with each commands, one will be
 automatically created.
         '''
     )
-    parser.add_argument('command', choices=['init', 'relation'])
+    parser.add_argument('command', choices=['init', 'relation'], help='''
+    init:
+        Crawls indexindex of TVTropes.
+        If an entry already exists, it is updated to new url.
+        If the process is inturruped in the middle, nothing will be saved.
+
+    relation:
+        Crawls each pages and saves it to a table, using items in
+        indexindex table as seeds. New pages are saved to indexindex table,
+        and relationship of pages are saved to relations table.
+        If indexindex table is not found, an error will be raised.
+    ''')
     parser.add_argument('config_file')
     args = parser.parse_args()
 
