@@ -46,148 +46,152 @@ def list_pages(namespace_url=None):
 
 @worker.task
 def save_link(name, url):
-    conn = psycopg2.connect(worker.conf.DB_FILENAME)
-    cur = conn.cursor()
-    try:
-        cur.execute('INSERT INTO indexindex VALUES (%s, %s, %s, NULL)',
-                    (name[0], name[1], url))
-    except psycopg2.IntegrityError:
-        cur.execute('UPDATE indexindex SET url = %s '
-                    'WHERE namespace = %s and name = %s',
-                    (url, name[0], name[1]))
-        conn.rollback()
-    conn.commit()
-    cur.execute('SELECT count(*) FROM indexindex')
-    get_task_logger(__name__ + '.save_link').info(
-        'Total %d',
-        cur.fetchone()[0]
-    )
+    with psycopg2.connect(worker.conf.DB_FILENAME) as conn, \
+            conn.cursor() as cur:
+        try:
+            cur.execute('INSERT INTO entities VALUES (%s, %s, %s, NULL, NULL)',
+                        (name[0], name[1], url))
+        except psycopg2.IntegrityError:
+            cur.execute('UPDATE entities SET url = %s '
+                        'WHERE namespace = %s and name = %s',
+                        (url, name[0], name[1]))
+            conn.rollback()
+        conn.commit()
+        cur.execute('SELECT count(*) FROM entities')
+        get_task_logger(__name__ + '.save_link').info(
+            'Total %d',
+            cur.fetchone()[0]
+        )
 
 
 @worker.task
 def crawl_link(namespace, name, url, referer, start_time,
                start_indexindex_count, start_relations_count,
                round_count):
-    conn = psycopg2.connect(worker.conf.DB_FILENAME)
-    c = conn.cursor()
-    logger = get_task_logger(__name__ + '.crawl_link')
-    current_time = datetime.now()
-    tree = parse(url)
-    try:
-        namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
-            .text.strip()[:-1]
-    except (AttributeError, AssertionError, IndexError):
-        logger.warning('Warning: There is no pagetitle on this page. '
-                       'Ignoring.')
-        return
-    if namespace == '':
-        namespace = 'Main'
-    name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
-    logger.info("Fetching: {}/{} @ {}"
-                .format(namespace, name, url))
-    c.execute('SELECT count(*) FROM indexindex '
-              'WHERE namespace = %s and name = %s',
-              (namespace, name))
-    if c.fetchone()[0] != 0:
-        c.execute('SELECT last_crawled FROM indexindex '
-                  'WHERE namespace = %s and name = %s',
-                  (namespace, name))
-        last_crawled = c.fetchone()
-        if last_crawled and last_crawled[0]:
-            if (current_time - last_crawled[0]) < CRAWL_INTERVAL:
-                logger.info('Skipping: {}/{} @ {} due to'
-                            'recent crawl in {} days'
-                            .format(namespace, name, url, CRAWL_INTERVAL))
-                return
-    else:
+    with psycopg2.connect(worker.conf.DB_FILENAME) as conn, \
+            conn.cursor() as cur:
+        logger = get_task_logger(__name__ + '.crawl_link')
+        current_time = datetime.now()
+
+        cur.execute('SELECT count(*) FROM entities '
+                    'WHERE url = %s',
+                    (url,))
+        if cur.fetchone()[0] != 0:
+            cur.execute('SELECT last_crawled FROM entities '
+                        'WHERE url = %s',
+                        (url,))
+            last_crawled = cur.fetchone()
+            if last_crawled and last_crawled[0]:
+                if (current_time - last_crawled[0]) < CRAWL_INTERVAL:
+                    logger.info('Skipping: {} due to'
+                                'recent crawl in {} days'
+                                .format(url, CRAWL_INTERVAL))
+                    conn.close()
+                    return
+
+        tree = parse(url)
         try:
-            c.execute('INSERT INTO indexindex VALUES (%s, %s, %s, %s)',
-                      (namespace, name, url, None))
+            namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
+                .text.strip()[:-1]
+        except (AttributeError, AssertionError, IndexError):
+            logger.warning('Warning: There is no pagetitle on this page. '
+                           'Ignoring.')
+            return
+        if namespace == '':
+            namespace = 'Main'
+        name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
+        logger.info("Fetching: {}/{} @ {}"
+                    .format(namespace, name, url))
+        try:
+            cur.execute('INSERT INTO entities VALUES (%s, %s, %s, NULL, NULL)',
+                        (namespace, name, url))
         except psycopg2.IntegrityError:
             conn.rollback()
-    conn.commit()
-    for a in tree.xpath('//a[@class="twikilink"]'):
-        try:
-            destination_name = a.text.strip()
-            destination_url = urllib.parse.urljoin(
-                WIKI_PAGE, a.attrib['href']
-            )
-            # FIXME if next_crawl not in crawl_stack:
-            crawl_link.delay(None, destination_name, destination_url,
-                             (namespace, name), start_time,
-                             start_indexindex_count, start_relations_count,
-                             round_count)
-        except AttributeError:
-            pass
-    if referer is not None:
-        try:
-            c.execute('INSERT INTO relations VALUES (%s, %s, %s, %s)',
-                      (referer[0], referer[1], namespace, name))
-        except psycopg2.IntegrityError:
-            conn.rollback()
-    logger.info('Crawling {}/{} @ {} completed at {}'
-                .format(namespace, name, url, current_time))
-    c.execute('''
-        UPDATE indexindex SET last_crawled = %s
-        WHERE namespace = %s and name = %s
-            ''', (current_time, namespace, name))
-    round_count += 1
-    if round_count >= 10:
-        round_count = 0
-        elasped = datetime.now() - start_time
-        elasped_hours = elasped.total_seconds() / 3600
-        c.execute('SELECT count(*) FROM indexindex')
-        indexindex_count = int(c.fetchone()[0]) - start_indexindex_count
-        c.execute('SELECT count(*) FROM relations')
-        relations_count = int(c.fetchone()[0]) - start_relations_count
-        logger.info('-> indexindex: %s (%s/h) relations: %s (%s/h) '
-                    'elasped %s',
-                    indexindex_count,
-                    int(indexindex_count / elasped_hours),
-                    relations_count,
-                    int(relations_count / elasped_hours),
-                    elasped)
+        conn.commit()
+        for a in tree.xpath('//a[@class="twikilink"]'):
+            try:
+                destination_name = a.text.strip()
+                destination_url = urllib.parse.urljoin(
+                    WIKI_PAGE, a.attrib['href']
+                )
+                # FIXME if next_crawl not in crawl_stack:
+                crawl_link.delay(None, destination_name, destination_url,
+                                 (namespace, name), start_time,
+                                 start_indexindex_count, start_relations_count,
+                                 round_count)
+            except AttributeError:
+                pass
+        if referer is not None:
+            try:
+                cur.execute('INSERT INTO relations VALUES '
+                            '(%s, %s, %s, %s, NULL)',
+                            (referer[0], referer[1], namespace, name))
+            except psycopg2.IntegrityError:
+                conn.rollback()
+        logger.info('Crawling {}/{} @ {} completed at {}'
+                    .format(namespace, name, url, current_time))
+        cur.execute('''
+            UPDATE entities SET last_crawled = %s
+            WHERE namespace = %s and name = %s
+                ''', (current_time, namespace, name))
+        round_count += 1
+        if round_count >= 10:
+            round_count = 0
+            elasped = datetime.now() - start_time
+            elasped_hours = elasped.total_seconds() / 3600
+            cur.execute('SELECT count(*) FROM entities')
+            indexindex_count = int(cur.fetchone()[0]) - start_indexindex_count
+            cur.execute('SELECT count(*) FROM relations')
+            relations_count = int(cur.fetchone()[0]) - start_relations_count
+            logger.info('-> entities: %s (%s/h) relations: %s (%s/h) '
+                        'elasped %s',
+                        indexindex_count,
+                        int(indexindex_count / elasped_hours),
+                        relations_count,
+                        int(relations_count / elasped_hours),
+                        elasped)
 
 
 def crawl(connection):
-    cur = connection.cursor()
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS indexindex
-        (
-        namespace text, name text, url text, last_crawled timestamp,
-        constraint pk_indexindex primary key(namespace, name)
-        )
-    ''')
-    connection.commit()
-    cur.execute('SELECT count(*) FROM indexindex')
-    if cur.fetchone()[0] < 1:
-        for name, url in list_pages():
-            save_link.delay(name, url)
-
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS relations
-        (
-        origin_namespace text, origin text,
-        destination_namespace text, destination text,
-        constraint pk_relations primary key(origin_namespace, origin,
-        destination_namespace, destination)
-        )
+    with connection.cursor() as cur:
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS entities
+            (
+            namespace text, name text, url text, last_crawled timestamp,
+            type text,
+            constraint pk_entities primary key(namespace, name)
+            )
         ''')
-    connection.commit()
-    cur.execute('SELECT namespace, name, url FROM indexindex '
-                'ORDER BY namespace asc, name asc')
-    seed = cur.fetchall()
-    start_time = datetime.now()
-    cur.execute('SELECT count(*) FROM indexindex')
-    start_indexindex_count = int(cur.fetchone()[0])
-    cur.execute('SELECT count(*) FROM relations')
-    start_relations_count = int(cur.fetchone()[0])
-    round_count = 0
-    for namespace, name, url in seed:
-        crawl_link.delay(namespace, name, url, None, start_time,
-                         start_indexindex_count, start_relations_count,
-                         round_count)
-    connection.commit()
+        connection.commit()
+        cur.execute('SELECT count(*) FROM entities')
+        if cur.fetchone()[0] < 1:
+            for name, url in list_pages():
+                save_link.delay(name, url)
+
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS relations
+            (
+            origin_namespace text, origin text,
+            destination_namespace text, destination text,
+            constraint pk_relations primary key(origin_namespace, origin,
+            destination_namespace, destination)
+            )
+            ''')
+        connection.commit()
+        cur.execute('SELECT namespace, name, url FROM entities '
+                    'ORDER BY namespace asc, name asc')
+        seed = cur.fetchall()
+        start_time = datetime.now()
+        cur.execute('SELECT count(*) FROM entities')
+        start_indexindex_count = int(cur.fetchone()[0])
+        cur.execute('SELECT count(*) FROM relations')
+        start_relations_count = int(cur.fetchone()[0])
+        round_count = 0
+        for namespace, name, url in seed:
+            crawl_link.delay(namespace, name, url, None, start_time,
+                             start_indexindex_count, start_relations_count,
+                             round_count)
+        connection.commit()
 
 
 def load_config(filename):
@@ -208,7 +212,8 @@ def main():
     config = load_config(args.config_file)
     worker.config_from_object(config)
     db_file = config['DB_FILENAME']
-    crawl(psycopg2.connect(db_file))
+    with psycopg2.connect(db_file) as conn:
+        crawl(conn)
 
 
 if __name__ == '__main__':
