@@ -14,7 +14,7 @@ from .web.app import app
 from .web.config import config_from_yaml
 from .web.db import get_database_engine
 
-__all__ = ('get_database_engine', 'main', 'manager')
+__all__ = ('get_database_engine', 'initialize_app', 'main', 'manager')
 
 
 ALEMBIC_LOGGING = {
@@ -49,8 +49,7 @@ ALEMBIC_LOGGING = {
 }
 
 
-@Manager
-def manager(config=None):
+def initialize_app(config=None):
     """(:class:`flask.ext.script.Manager`) A Flask-Script manager object."""
     if config is None:
         try:
@@ -69,6 +68,8 @@ def manager(config=None):
         app.config.from_pyfile(config)
     return app
 
+
+manager = Manager(initialize_app)
 
 manager.add_option('-c', '--config',
                    dest='config',

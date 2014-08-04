@@ -1,4 +1,5 @@
 import distutils.core
+import distutils.errors
 import os.path
 import sys
 import warnings
@@ -53,23 +54,38 @@ docs_require = {
 class BaseAlembicCommand(distutils.core.Command):
     """Base class for commands provided by Alembic."""
 
-    user_options = []
+    user_options = [
+        ('config=', 'c', 'Configuration file (YAML or Python)'),
+    ]
 
     def initialize_options(self):
-        pass
+        self.config = None
 
     def finalize_options(self):
-        pass
+        if self.config is None:
+            try:
+                self.config = os.environ['CLICHE_CONFIG']
+            except KeyError:
+                raise distutils.erros.DistutilsOptionError(
+                    'The -c/--config option or CLICHE_CONFIG environment '
+                    'variable is required'
+                )
+        if not os.path.isfile(self.config):
+            raise distutils.erros.DistutilsOptionError(
+                self.config + ' cannot be found'
+            )
 
     def run(self):
         try:
-            from cliche.cli import get_database_engine
+            from cliche.cli import get_database_engine, initialize_app
             from cliche.orm import get_alembic_config, import_all_modules
             import_all_modules()
         except ImportError as e:
             raise ImportError('dependencies are not resolved yet; run '
                               '"setup.py develop" first\n' + str(e))
-        engine = get_database_engine()
+        app = initialize_app(self.config)
+        with app.app_context():
+            engine = get_database_engine()
         config = get_alembic_config(engine)
         self.alembic_process(config)
 
