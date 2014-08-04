@@ -4,5 +4,14 @@ python:
 - 3.4
 install:
 - pip install -e .[tests]
+- pip install pytest-cov coveralls
 script:
-- py.test
+- py.test -v --cov cliche --durations=20
+after_success:
+- coveralls
+notifications:
+  irc:
+    channels:
+    - "irc.ozinger.org#cliche.io"
+    on_success: change
+    on_failure: always
