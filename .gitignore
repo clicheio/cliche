@@ -1,5 +1,6 @@
 *.egg
 *.egg-info
+*.ipynb
 *.pyc
 *.tmp
 *.yml
@@ -7,6 +8,7 @@
 .*.swp
 .DS_Store
 .idea
+.ipynb_checkpoints
 .tox
 __pycache__
 docs/_build
