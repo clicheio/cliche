@@ -1,7 +1,7 @@
 from __future__ import print_function
 
+from argparse import ArgumentParser
 from datetime import datetime, timedelta
-import sys
 import urllib.parse
 
 from celery.utils.log import get_task_logger
@@ -88,7 +88,7 @@ def crawl_link(namespace, name, url, referer, start_time,
     c.execute('SELECT count(*) FROM indexindex '
               'WHERE namespace = %s and name = %s',
               (namespace, name))
-    if cur.fetchone()[0] != 0:
+    if c.fetchone()[0] != 0:
         c.execute('SELECT last_crawled FROM indexindex '
                   'WHERE namespace = %s and name = %s',
                   (namespace, name))
@@ -149,7 +149,7 @@ def crawl_link(namespace, name, url, referer, start_time,
                     elasped)
 
 
-def initialize(connection):
+def crawl(connection):
     cur = connection.cursor()
     cur.execute('''
         CREATE TABLE IF NOT EXISTS indexindex
@@ -163,13 +163,7 @@ def initialize(connection):
     if cur.fetchone()[0] < 1:
         for name, url in list_pages():
             save_link.delay(name, url)
-    # FIXME
-    cur.execute('SELECT count(*) FROM indexindex')
-    print('Total', cur.fetchone()[0])
 
-
-def crawl(connection):
-    cur = connection.cursor()
     cur.execute('''
         CREATE TABLE IF NOT EXISTS relations
         (
@@ -180,7 +174,6 @@ def crawl(connection):
         )
         ''')
     connection.commit()
-    initialize(connection)
     cur.execute('SELECT namespace, name, url FROM indexindex '
                 'ORDER BY namespace asc, name asc')
     seed = cur.fetchall()
@@ -205,61 +198,17 @@ def load_config(filename):
     return loc
 
 
-general_help_string = '''
-Usage: python crawler.py <command> <arguments>
-
-commands:
-
-    init:
-        Usage: python crawler.py init <config-file>
-
-        Crawls indexindex of TVTropes.
-        If an entry already exists, it is updated to new url.
-        If the process is inturruped in the middle, nothing will be saved.
-
-    relation:
-        Usage: python crawler.py relation <config-file>
-
-        Crawls each pages and saves it to a table, using items in
-        indexindex table as seeds. New pages are saved to indexindex table,
-        and relationship of pages are saved to relations table.
-        If indexindex table is not found, an error will be raised.
-
-If a db file is not already present with each commands, one will be
-automatically created.
-'''.strip()
-
-
 def main():
-    if len(sys.argv) > 1:
-        if sys.argv[1] == 'init':
-            if len(sys.argv) != 3:
-                print('Usage: python crawler.py init <config-file>',
-                      file=sys.stderr)
-                raise SystemExit(1)
-            config_file = sys.argv[2]
-            config = load_config(config_file)
-            worker.config_from_object(config)
-            db_file = config['DB_FILENAME']
-            conn = psycopg2.connect(db_file)
-            initialize(conn)
-        elif sys.argv[1] == 'relation':
-            if len(sys.argv) != 3:
-                print('Usage: python crawler.py relation <config-file>',
-                      file=sys.stderr)
-                raise SystemExit(1)
-            config_file = sys.argv[2]
-            config = load_config(config_file)
-            worker.config_from_object(config)
-            db_file = config['DB_FILENAME']
-            conn = psycopg2.connect(db_file)
-            crawl(conn)
-        else:
-            print(general_help_string, file=sys.stderr)
-            raise SystemExit(1)
-    else:
-        print(general_help_string, file=sys.stderr)
-        raise SystemExit(1)
+    parser = ArgumentParser(
+        description='Crawles TVTropes and saves metadata.'
+    )
+    parser.add_argument('config_file')
+    args = parser.parse_args()
+
+    config = load_config(args.config_file)
+    worker.config_from_object(config)
+    db_file = config['DB_FILENAME']
+    crawl(psycopg2.connect(db_file))
 
 
 if __name__ == '__main__':
