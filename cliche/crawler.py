@@ -71,6 +71,22 @@ def crawl_link(namespace, name, url, referer, start_time,
     conn = psycopg2.connect(worker.conf.DB_FILENAME)
     c = conn.cursor()
     logger = get_task_logger(__name__ + '.crawl_link')
+
+    c.execute('SELECT count(*) FROM indexindex '
+              'WHERE url = %s',
+              (url))
+    if c.fetchone()[0] != 0:
+        c.execute('SELECT last_crawled FROM indexindex '
+                  'WHERE url = %s',
+                  (url))
+        last_crawled = c.fetchone()
+        if last_crawled and last_crawled[0]:
+            if (current_time - last_crawled[0]) < CRAWL_INTERVAL:
+                logger.info('Skipping: {} due to'
+                            'recent crawl in {} days'
+                            .format(url, CRAWL_INTERVAL))
+                return
+
     current_time = datetime.now()
     tree = parse(url)
     try:
@@ -85,20 +101,6 @@ def crawl_link(namespace, name, url, referer, start_time,
     name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
     logger.info("Fetching: {}/{} @ {}"
                 .format(namespace, name, url))
-    c.execute('SELECT count(*) FROM indexindex '
-              'WHERE namespace = %s and name = %s',
-              (namespace, name))
-    if c.fetchone()[0] != 0:
-        c.execute('SELECT last_crawled FROM indexindex '
-                  'WHERE namespace = %s and name = %s',
-                  (namespace, name))
-        last_crawled = c.fetchone()
-        if last_crawled and last_crawled[0]:
-            if (current_time - last_crawled[0]) < CRAWL_INTERVAL:
-                logger.info('Skipping: {}/{} @ {} due to'
-                            'recent crawl in {} days'
-                            .format(namespace, name, url, CRAWL_INTERVAL))
-                return
     else:
         try:
             c.execute('INSERT INTO indexindex VALUES (%s, %s, %s, %s)',
