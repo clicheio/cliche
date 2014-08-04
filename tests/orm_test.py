@@ -6,7 +6,7 @@ from pytest import fixture
 from sqlalchemy import create_engine
 
 from cliche.orm import (downgrade_database, get_database_revision,
-                             initialize_database, upgrade_database)
+                        initialize_database, upgrade_database)
 
 
 @fixture

@@ -7,7 +7,7 @@ from sqlalchemy.pool import NullPool, StaticPool
 from cliche.orm import Base, Session
 from cliche.web.app import app
 
-__all__ = 'DB_ERRORS', 'DEFAULT_DATABASE_URL', 'get_engine'
+__all__ = 'DEFAULT_DATABASE_URL', 'get_engine'
 
 
 DEFAULT_DATABASE_URL = 'sqlite://'
