@@ -49,15 +49,15 @@ def save_link(name, url):
     conn = psycopg2.connect(worker.conf.DB_FILENAME)
     cur = conn.cursor()
     try:
-        cur.execute('INSERT INTO indexindex VALUES (%s, %s, %s, NULL)',
+        cur.execute('INSERT INTO entities VALUES (%s, %s, %s, NULL, NULL)',
                     (name[0], name[1], url))
     except psycopg2.IntegrityError:
-        cur.execute('UPDATE indexindex SET url = %s '
+        cur.execute('UPDATE entities SET url = %s '
                     'WHERE namespace = %s and name = %s',
                     (url, name[0], name[1]))
         conn.rollback()
     conn.commit()
-    cur.execute('SELECT count(*) FROM indexindex')
+    cur.execute('SELECT count(*) FROM entities')
     get_task_logger(__name__ + '.save_link').info(
         'Total %d',
         cur.fetchone()[0]
@@ -72,19 +72,20 @@ def crawl_link(namespace, name, url, referer, start_time,
     c = conn.cursor()
     logger = get_task_logger(__name__ + '.crawl_link')
 
-    c.execute('SELECT count(*) FROM indexindex '
+    c.execute('SELECT count(*) FROM entities '
               'WHERE url = %s',
-              (url))
+              (url,))
     if c.fetchone()[0] != 0:
-        c.execute('SELECT last_crawled FROM indexindex '
+        c.execute('SELECT last_crawled FROM entities '
                   'WHERE url = %s',
-                  (url))
+                  (url,))
         last_crawled = c.fetchone()
         if last_crawled and last_crawled[0]:
             if (current_time - last_crawled[0]) < CRAWL_INTERVAL:
                 logger.info('Skipping: {} due to'
                             'recent crawl in {} days'
                             .format(url, CRAWL_INTERVAL))
+                conn.close()
                 return
 
     current_time = datetime.now()
@@ -122,14 +123,14 @@ def crawl_link(namespace, name, url, referer, start_time,
             pass
     if referer is not None:
         try:
-            c.execute('INSERT INTO relations VALUES (%s, %s, %s, %s)',
+            c.execute('INSERT INTO relations VALUES (%s, %s, %s, %s, NULL)',
                       (referer[0], referer[1], namespace, name))
         except psycopg2.IntegrityError:
             conn.rollback()
     logger.info('Crawling {}/{} @ {} completed at {}'
                 .format(namespace, name, url, current_time))
     c.execute('''
-        UPDATE indexindex SET last_crawled = %s
+        UPDATE entities SET last_crawled = %s
         WHERE namespace = %s and name = %s
             ''', (current_time, namespace, name))
     round_count += 1
@@ -137,11 +138,11 @@ def crawl_link(namespace, name, url, referer, start_time,
         round_count = 0
         elasped = datetime.now() - start_time
         elasped_hours = elasped.total_seconds() / 3600
-        c.execute('SELECT count(*) FROM indexindex')
+        c.execute('SELECT count(*) FROM entities')
         indexindex_count = int(c.fetchone()[0]) - start_indexindex_count
         c.execute('SELECT count(*) FROM relations')
         relations_count = int(c.fetchone()[0]) - start_relations_count
-        logger.info('-> indexindex: %s (%s/h) relations: %s (%s/h) '
+        logger.info('-> entities: %s (%s/h) relations: %s (%s/h) '
                     'elasped %s',
                     indexindex_count,
                     int(indexindex_count / elasped_hours),
@@ -153,14 +154,15 @@ def crawl_link(namespace, name, url, referer, start_time,
 def crawl(connection):
     cur = connection.cursor()
     cur.execute('''
-        CREATE TABLE IF NOT EXISTS indexindex
+        CREATE TABLE IF NOT EXISTS entities
         (
         namespace text, name text, url text, last_crawled timestamp,
-        constraint pk_indexindex primary key(namespace, name)
+        type text,
+        constraint pk_entities primary key(namespace, name)
         )
     ''')
     connection.commit()
-    cur.execute('SELECT count(*) FROM indexindex')
+    cur.execute('SELECT count(*) FROM entities')
     if cur.fetchone()[0] < 1:
         for name, url in list_pages():
             save_link.delay(name, url)
@@ -175,11 +177,11 @@ def crawl(connection):
         )
         ''')
     connection.commit()
-    cur.execute('SELECT namespace, name, url FROM indexindex '
+    cur.execute('SELECT namespace, name, url FROM entities '
                 'ORDER BY namespace asc, name asc')
     seed = cur.fetchall()
     start_time = datetime.now()
-    cur.execute('SELECT count(*) FROM indexindex')
+    cur.execute('SELECT count(*) FROM entities')
     start_indexindex_count = int(cur.fetchone()[0])
     cur.execute('SELECT count(*) FROM relations')
     start_relations_count = int(cur.fetchone()[0])
