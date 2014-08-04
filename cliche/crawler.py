@@ -69,18 +69,18 @@ def crawl_link(namespace, name, url, referer, start_time,
                start_indexindex_count, start_relations_count,
                round_count):
     with psycopg2.connect(worker.conf.DB_FILENAME) as conn, \
-            conn.cursor() as c:
+            conn.cursor() as cur:
         logger = get_task_logger(__name__ + '.crawl_link')
         current_time = datetime.now()
 
-        c.execute('SELECT count(*) FROM entities '
-                  'WHERE url = %s',
-                  (url,))
-        if c.fetchone()[0] != 0:
-            c.execute('SELECT last_crawled FROM entities '
-                      'WHERE url = %s',
-                      (url,))
-            last_crawled = c.fetchone()
+        cur.execute('SELECT count(*) FROM entities '
+                    'WHERE url = %s',
+                    (url,))
+        if cur.fetchone()[0] != 0:
+            cur.execute('SELECT last_crawled FROM entities '
+                        'WHERE url = %s',
+                        (url,))
+            last_crawled = cur.fetchone()
             if last_crawled and last_crawled[0]:
                 if (current_time - last_crawled[0]) < CRAWL_INTERVAL:
                     logger.info('Skipping: {} due to'
@@ -103,8 +103,8 @@ def crawl_link(namespace, name, url, referer, start_time,
         logger.info("Fetching: {}/{} @ {}"
                     .format(namespace, name, url))
         try:
-            c.execute('INSERT INTO entities VALUES (%s, %s, %s, NULL, NULL)',
-                      (namespace, name, url))
+            cur.execute('INSERT INTO entities VALUES (%s, %s, %s, NULL, NULL)',
+                        (namespace, name, url))
         except psycopg2.IntegrityError:
             conn.rollback()
         conn.commit()
@@ -123,14 +123,14 @@ def crawl_link(namespace, name, url, referer, start_time,
                 pass
         if referer is not None:
             try:
-                c.execute('INSERT INTO relations VALUES '
-                          '(%s, %s, %s, %s, NULL)',
-                          (referer[0], referer[1], namespace, name))
+                cur.execute('INSERT INTO relations VALUES '
+                            '(%s, %s, %s, %s, NULL)',
+                            (referer[0], referer[1], namespace, name))
             except psycopg2.IntegrityError:
                 conn.rollback()
         logger.info('Crawling {}/{} @ {} completed at {}'
                     .format(namespace, name, url, current_time))
-        c.execute('''
+        cur.execute('''
             UPDATE entities SET last_crawled = %s
             WHERE namespace = %s and name = %s
                 ''', (current_time, namespace, name))
@@ -139,10 +139,10 @@ def crawl_link(namespace, name, url, referer, start_time,
             round_count = 0
             elasped = datetime.now() - start_time
             elasped_hours = elasped.total_seconds() / 3600
-            c.execute('SELECT count(*) FROM entities')
-            indexindex_count = int(c.fetchone()[0]) - start_indexindex_count
-            c.execute('SELECT count(*) FROM relations')
-            relations_count = int(c.fetchone()[0]) - start_relations_count
+            cur.execute('SELECT count(*) FROM entities')
+            indexindex_count = int(cur.fetchone()[0]) - start_indexindex_count
+            cur.execute('SELECT count(*) FROM relations')
+            relations_count = int(cur.fetchone()[0]) - start_relations_count
             logger.info('-> entities: %s (%s/h) relations: %s (%s/h) '
                         'elasped %s',
                         indexindex_count,
