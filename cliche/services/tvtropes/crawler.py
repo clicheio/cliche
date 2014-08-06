@@ -65,7 +65,7 @@ def save_link(name, url):
 
 
 @worker.task
-def crawl_link(namespace, name, url, referer, start_time,
+def crawl_link(url, referer, start_time,
                start_indexindex_count, start_relations_count,
                round_count):
     with psycopg2.connect(worker.conf.DB_FILENAME) as conn, \
@@ -115,7 +115,7 @@ def crawl_link(namespace, name, url, referer, start_time,
                     WIKI_PAGE, a.attrib['href']
                 )
                 # FIXME if next_crawl not in crawl_stack:
-                crawl_link.delay(None, destination_name, destination_url,
+                crawl_link.delay(destination_url,
                                  (namespace, name), start_time,
                                  start_indexindex_count, start_relations_count,
                                  round_count)
@@ -188,7 +188,7 @@ def crawl(connection):
         start_relations_count = int(cur.fetchone()[0])
         round_count = 0
         for namespace, name, url in seed:
-            crawl_link.delay(namespace, name, url, None, start_time,
+            crawl_link.delay(url, None, start_time,
                              start_indexindex_count, start_relations_count,
                              round_count)
         connection.commit()
