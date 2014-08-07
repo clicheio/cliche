@@ -71,6 +71,9 @@ class Team(Base):
                            secondary='team_memberships',
                            collection_class=set)
 
+    #: (:class:`Work`) Authored works.
+    works = relationship('Work')
+
     __tablename__ = 'teams'
     __repr_columns__ = id, name
 
