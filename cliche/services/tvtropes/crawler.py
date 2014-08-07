@@ -15,6 +15,10 @@ WIKI_PAGE = 'http://tvtropes.org/pmwiki/pmwiki.php/'
 CRAWL_INTERVAL = timedelta(days=7)
 
 
+def determine_type(namespace):
+    return 'Trope' if namespace == 'Main' else 'Work'
+
+
 def list_pages(namespace_url=None):
     list_url = namespace_url or INDEX_INDEX
     print('Crawling {}'.format(list_url))
@@ -48,7 +52,7 @@ def save_link(name, url):
     with psycopg2.connect(worker.conf.DATABASE_URL) as conn:
         cur = conn.cursor
         try:
-            type = 'Trope' if name[0] == 'Main' else 'Work'
+            type = determine_type(name[0])
             cur.execute('INSERT INTO entities VALUES (%s, %s, %s, NULL, %s)',
                         (name[0], name[1], url, type))
         except psycopg2.IntegrityError:
@@ -75,7 +79,7 @@ def fetch_link(url, conn, cur):
         namespace = 'Main'
     name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
     try:
-        type = 'Trope' if namespace == 'Main' else 'Work'
+        type = determine_type(namespace)
         cur.execute('INSERT INTO entities VALUES (%s, %s, %s, NULL, %s)',
                     (namespace, name, url, type))
     except psycopg2.IntegrityError:
