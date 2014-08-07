@@ -8,7 +8,7 @@ from celery.utils.log import get_task_logger
 from lxml.html import parse
 import psycopg2
 
-from .worker import worker
+from ...worker import worker
 
 
 INDEX_INDEX = 'http://tvtropes.org/pmwiki/index_report.php'
@@ -46,11 +46,12 @@ def list_pages(namespace_url=None):
 
 @worker.task
 def save_link(name, url):
-    with psycopg2.connect(worker.conf.DB_FILENAME) as conn, \
-            conn.cursor() as cur:
+    with psycopg2.connect(worker.conf.DB_FILENAME) as conn:
+        cur = conn.cursor
         try:
-            cur.execute('INSERT INTO entities VALUES (%s, %s, %s, NULL, NULL)',
-                        (name[0], name[1], url))
+            type = 'Trope' if name[0] == 'Main' else 'Work'
+            cur.execute('INSERT INTO entities VALUES (%s, %s, %s, NULL, %s)',
+                        (name[0], name[1], url, type))
         except psycopg2.IntegrityError:
             cur.execute('UPDATE entities SET url = %s '
                         'WHERE namespace = %s and name = %s',
@@ -64,70 +65,81 @@ def save_link(name, url):
         )
 
 
+def fetch_link(url, conn, cur):
+    tree = parse(url)
+    try:
+        namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
+            .text.strip()[:-1]
+    except (AttributeError, AssertionError, IndexError):
+        return None
+    if namespace == '':
+        namespace = 'Main'
+    name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
+    try:
+        type = 'Trope' if namespace == 'Main' else 'Work'
+        cur.execute('INSERT INTO entities VALUES (%s, %s, %s, NULL, %s)',
+                    (namespace, name, url, type))
+    except psycopg2.IntegrityError:
+        conn.rollback()
+    conn.commit()
+    return tree, namespace, name
+
+
 @worker.task
-def crawl_link(url, referer, start_time,
+def crawl_link(url, start_time,
                start_indexindex_count, start_relations_count,
                round_count):
-    with psycopg2.connect(worker.conf.DB_FILENAME) as conn, \
-            conn.cursor() as cur:
+    with psycopg2.connect(worker.conf.DB_FILENAME) as conn:
+        cur = conn.cursor()
         logger = get_task_logger(__name__ + '.crawl_link')
         current_time = datetime.now()
 
-        cur.execute('SELECT count(*) FROM entities '
+        cur.execute('SELECT last_crawled FROM entities '
                     'WHERE url = %s',
                     (url,))
-        if cur.fetchone()[0] != 0:
-            cur.execute('SELECT last_crawled FROM entities '
-                        'WHERE url = %s',
-                        (url,))
-            last_crawled = cur.fetchone()
-            if last_crawled and last_crawled[0]:
-                if (current_time - last_crawled[0]) < CRAWL_INTERVAL:
-                    logger.info('Skipping: {} due to'
-                                'recent crawl in {} days'
-                                .format(url, CRAWL_INTERVAL))
-                    conn.close()
-                    return
+        last_crawled = cur.fetchone()
+        if last_crawled and last_crawled[0]:
+            if (current_time - last_crawled[0]) < CRAWL_INTERVAL:
+                logger.info('Skipping: {} due to '
+                            'recent crawl in {} days'
+                            .format(url, CRAWL_INTERVAL))
+                conn.close()
+                return
 
-        tree = parse(url)
-        try:
-            namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
-                .text.strip()[:-1]
-        except (AttributeError, AssertionError, IndexError):
+        fetch_result = fetch_link(url, conn, cur)
+        if fetch_result is None:
             logger.warning('Warning: There is no pagetitle on this page. '
                            'Ignoring.')
             return
-        if namespace == '':
-            namespace = 'Main'
-        name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
+        tree, namespace, name = fetch_result
         logger.info("Fetching: {}/{} @ {}"
                     .format(namespace, name, url))
-        try:
-            cur.execute('INSERT INTO entities VALUES (%s, %s, %s, NULL, NULL)',
-                        (namespace, name, url))
-        except psycopg2.IntegrityError:
-            conn.rollback()
-        conn.commit()
         for a in tree.xpath('//a[@class="twikilink"]'):
             try:
-                destination_name = a.text.strip()
                 destination_url = urllib.parse.urljoin(
                     WIKI_PAGE, a.attrib['href']
                 )
+                fetch_result = fetch_link(url, conn, cur)
+                if fetch_result is None:
+                    logger.warning('Warning: There is no pagetitle on '
+                                   'this page. Ignoring.')
+                    return
+                destination_tree, destination_namespace, \
+                    destination_name = fetch_result
+                try:
+                    cur.execute('INSERT INTO relations VALUES '
+                                '(%s, %s, %s, %s)',
+                                (namespace, name,
+                                 destination_namespace,
+                                 destination_name))
+                except psycopg2.IntegrityError:
+                    conn.rollback()
                 # FIXME if next_crawl not in crawl_stack:
-                crawl_link.delay(destination_url,
-                                 (namespace, name), start_time,
+                crawl_link.delay(destination_url, start_time,
                                  start_indexindex_count, start_relations_count,
                                  round_count)
             except AttributeError:
                 pass
-        if referer is not None:
-            try:
-                cur.execute('INSERT INTO relations VALUES '
-                            '(%s, %s, %s, %s, NULL)',
-                            (referer[0], referer[1], namespace, name))
-            except psycopg2.IntegrityError:
-                conn.rollback()
         logger.info('Crawling {}/{} @ {} completed at {}'
                     .format(namespace, name, url, current_time))
         cur.execute('''
