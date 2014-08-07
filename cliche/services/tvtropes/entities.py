@@ -1,55 +1,51 @@
-from sqlalchemy import Column, DateTime, ForeignKey, String
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, DateTime, ForeignKeyConstraint, String
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.expression import and_
+
+from ...orm import Base
 
 
-Base = declarative_base()
-
-
-__all__ = 'Entity'
+__all__ = 'Entity', 'Relation'
 
 
 class Entity(Base):
+    """Representation of a TVTropes page."""
+
     namespace = Column(String, primary_key=True)
     name = Column(String, primary_key=True)
     url = Column(String)
     last_crawled = Column(DateTime)
     type = Column(String)
 
-    relations = relationship('Relation', foreign_keys=[namespace, name],
-                             primaryjoin='and_(Entity.namespace == \
-                                          Relation.origin_namespace, \
-                                          Entity.name == Relation.origin)',
-                             collection_class=set)
+    relations = relationship(
+        'Relation',
+        foreign_keys=[namespace, name],
+        primaryjoin=lambda:
+            and_(Entity.namespace == Relation.origin_namespace,
+                 Entity.name == Relation.origin),
+        collection_class=set)
 
-    def __init__(self, namespace, name, url, last_crawled, type):
-        self.namespace = namespace
-        self.name = name
-        self.url = url
-        self.last_crawled = last_crawled
-        self.type = type
-
-    __tablename__ = 'entities'
+    __tablename__ = 'tvtropes_entities'
     __repr_columns__ = namespace, name
 
 
 class Relation(Base):
-    origin_namespace = Column(String, ForeignKey(Entity.namespace),
-                              primary_key=True)
-    origin = Column(String, ForeignKey(Entity.name), primary_key=True)
+    """Associate :class:`Entity` to other :class:`Entity`."""
+
+    origin_namespace = Column(String, primary_key=True)
+    origin = Column(String, primary_key=True)
     destination_namespace = Column(String, primary_key=True)
     destination = Column(String, primary_key=True)
 
     origin_entity = relationship('Entity',
                                  foreign_keys=[origin_namespace, origin])
 
-    def __init__(self, origin_namespace, origin, destination_namespace,
-                 destination):
-        self.origin_namespace = origin_namespace
-        self.origin = origin
-        self.destination_namespace = destination_namespace
-        self.destination = destination
-
-    __tablename__ = 'relations'
-    __repr_columns__ = origin_namespace, origin, destination_namespace, \
-        destination
+    __table_args__ = (
+        ForeignKeyConstraint(
+            [origin_namespace, origin],
+            [Entity.namespace, Entity.name]
+        ),
+    )
+    __tablename__ = 'tvtropes_relations'
+    __repr_columns__ = (origin_namespace, origin, destination_namespace,
+                        destination)
