@@ -46,7 +46,7 @@ def list_pages(namespace_url=None):
 
 @worker.task
 def save_link(name, url):
-    with psycopg2.connect(worker.conf.DB_FILENAME) as conn:
+    with psycopg2.connect(worker.conf.DATABASE_URL) as conn:
         cur = conn.cursor
         try:
             type = 'Trope' if name[0] == 'Main' else 'Work'
@@ -89,7 +89,7 @@ def fetch_link(url, conn, cur):
 def crawl_link(url, start_time,
                start_indexindex_count, start_relations_count,
                round_count):
-    with psycopg2.connect(worker.conf.DB_FILENAME) as conn:
+    with psycopg2.connect(worker.conf.DATABASE_URL) as conn:
         cur = conn.cursor()
         logger = get_task_logger(__name__ + '.crawl_link')
         current_time = datetime.now()
@@ -166,7 +166,7 @@ def crawl_link(url, start_time,
 
 def crawl(config):
     worker.config_from_object(config)
-    with psycopg2.connect(worker.conf.DB_FILENAME) as conn:
+    with psycopg2.connect(worker.conf.DATABASE_URL) as conn:
         cur = conn.cursor()
         cur.execute('''
             CREATE TABLE IF NOT EXISTS entities
