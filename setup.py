@@ -73,7 +73,7 @@ class BaseAlembicCommand(distutils.core.Command):
                     'variable is required'
                 )
         if not os.path.isfile(self.config):
-            raise distutils.erros.DistutilsOptionError(
+            raise distutils.errors.DistutilsOptionError(
                 self.config + ' cannot be found'
             )
 
