@@ -1,6 +1,5 @@
 from __future__ import print_function
 
-from argparse import ArgumentParser
 from datetime import datetime, timedelta
 import urllib.parse
 

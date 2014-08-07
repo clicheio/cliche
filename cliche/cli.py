@@ -103,10 +103,10 @@ def upgrade(revision):
             else:
                 print(e, file=sys.stderr)
 
+
 @manager.command
 def crawl():
     crawl_tvtropes(app.config)
-
 
 
 if __name__ == '__main__':
