@@ -29,12 +29,6 @@ class Entity(Base):
         self.last_crawled = last_crawled
         self.type = type
 
-    def __repr__(self):
-        return "<Entity('%s', '%s', '%s', '%s', '%s')" % (
-            self.namespace, self.name, self.url, str(self.last_crawled),
-            self.type
-        )
-
     __tablename__ = 'entities'
     __repr_columns__ = namespace, name
 
