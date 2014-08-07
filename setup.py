@@ -68,7 +68,7 @@ class BaseAlembicCommand(distutils.core.Command):
             try:
                 self.config = os.environ['CLICHE_CONFIG']
             except KeyError:
-                raise distutils.erros.DistutilsOptionError(
+                raise distutils.errors.DistutilsOptionError(
                     'The -c/--config option or CLICHE_CONFIG environment '
                     'variable is required'
                 )
