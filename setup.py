@@ -58,10 +58,12 @@ class BaseAlembicCommand(distutils.core.Command):
 
     user_options = [
         ('config=', 'c', 'Configuration file (YAML or Python)'),
+        ('debug', 'd', 'Print debug logs'),
     ]
 
     def initialize_options(self):
         self.config = None
+        self.debug = False
 
     def finalize_options(self):
         if self.config is None:
@@ -73,18 +75,25 @@ class BaseAlembicCommand(distutils.core.Command):
                     'variable is required'
                 )
         if not os.path.isfile(self.config):
-            raise distutils.erros.DistutilsOptionError(
+            raise distutils.errors.DistutilsOptionError(
                 self.config + ' cannot be found'
             )
 
     def run(self):
         try:
             from cliche.cli import get_database_engine, initialize_app
-            from cliche.orm import get_alembic_config, import_all_modules
+            from cliche.orm import Base, get_alembic_config, import_all_modules
             import_all_modules()
         except ImportError as e:
             raise ImportError('dependencies are not resolved yet; run '
-                              '"setup.py develop" first\n' + str(e))
+                              '"pip install -e ." first\n' + str(e))
+        if self.debug:
+            print('These mapping classes are loaded into ORM registry:',
+                  file=sys.stderr)
+            for cls in Base._decl_class_registry.values():
+                if isinstance(cls, type):
+                    print('- {0.__module__}.{0.__name__}'.format(cls),
+                          file=sys.stderr)
         app = initialize_app(self.config)
         with app.app_context():
             engine = get_database_engine()
