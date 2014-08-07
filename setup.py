@@ -171,7 +171,6 @@ setup(
     entry_points='''
         [console_scripts]
         cliche = cliche.cli:main
-        cliche-crawler = cliche.crawler:main
     ''',
     install_requires=install_requires,
     tests_require=tests_require,

@@ -164,8 +164,10 @@ def crawl_link(url, start_time,
                         elasped)
 
 
-def crawl(connection):
-    with connection.cursor() as cur:
+def crawl(config):
+    worker.config_from_object(config)
+    with psycopg2.connect(worker.conf.DB_FILENAME) as conn:
+        cur = conn.cursor()
         cur.execute('''
             CREATE TABLE IF NOT EXISTS entities
             (
@@ -174,7 +176,7 @@ def crawl(connection):
             constraint pk_entities primary key(namespace, name)
             )
         ''')
-        connection.commit()
+        conn.commit()
         cur.execute('SELECT count(*) FROM entities')
         if cur.fetchone()[0] < 1:
             for name, url in list_pages():
@@ -189,7 +191,7 @@ def crawl(connection):
             destination_namespace, destination)
             )
             ''')
-        connection.commit()
+        conn.commit()
         cur.execute('SELECT namespace, name, url FROM entities '
                     'ORDER BY namespace asc, name asc')
         seed = cur.fetchall()
@@ -200,33 +202,7 @@ def crawl(connection):
         start_relations_count = int(cur.fetchone()[0])
         round_count = 0
         for namespace, name, url in seed:
-            crawl_link.delay(url, None, start_time,
+            crawl_link.delay(url, start_time,
                              start_indexindex_count, start_relations_count,
                              round_count)
-        connection.commit()
-
-
-def load_config(filename):
-    with open(filename) as f:
-        code = compile(f.read(), filename, 'exec')
-    loc = {}
-    exec(code, globals(), loc)
-    return loc
-
-
-def main():
-    parser = ArgumentParser(
-        description='Crawles TVTropes and saves metadata.'
-    )
-    parser.add_argument('config_file')
-    args = parser.parse_args()
-
-    config = load_config(args.config_file)
-    worker.config_from_object(config)
-    db_file = config['DB_FILENAME']
-    with psycopg2.connect(db_file) as conn:
-        crawl(conn)
-
-
-if __name__ == '__main__':
-    main()
+        conn.commit()

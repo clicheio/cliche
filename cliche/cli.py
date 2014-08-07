@@ -14,6 +14,8 @@ from .web.app import app
 from .web.config import config_from_yaml
 from .web.db import get_database_engine
 
+from .services.tvtropes.crawler import crawl as crawl_tvtropes
+
 __all__ = ('get_database_engine', 'initialize_app', 'main', 'manager')
 
 
@@ -100,6 +102,11 @@ def upgrade(revision):
                     print(e, file=sys.stderr)
             else:
                 print(e, file=sys.stderr)
+
+@manager.command
+def crawl():
+    crawl_tvtropes(app.config)
+
 
 
 if __name__ == '__main__':
