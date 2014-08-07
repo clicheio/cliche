@@ -6,6 +6,9 @@ Cliche is an ontology of fictional works.
 .. toctree::
    :maxdepth: 3
 
+   start
+   postgresql
+   migration
    cliche
 
 
