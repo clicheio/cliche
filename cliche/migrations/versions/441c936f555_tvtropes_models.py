@@ -1,7 +1,7 @@
 """TVTropes models
  
 Revision ID: 441c936f555
-Revises: 1ed82ef0071
+Revises: 57fc5e85328 # changed from 1ed82ef0071
 Create Date: 2014-08-08 03:42:59.602574
  
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
  
 # revision identifiers, used by Alembic.
 revision = '441c936f555'
-down_revision = '1ed82ef0071'
+down_revision = '57fc5e85328'
  
  
 def upgrade():
