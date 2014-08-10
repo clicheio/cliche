@@ -5,6 +5,7 @@ import types
 from pytest import fixture, yield_fixture
 
 from cliche.people import Person, Team
+from cliche.work import Award, Genre, Work
 from .db import DEFAULT_DATABASE_URL, get_session
 
 
@@ -49,9 +50,21 @@ class FixtureModule(types.ModuleType):
 
 
 @fixture
-def fx_people(fx_session):
-    f = FixtureModule('fx_people')
+def fx_awards(fx_session):
+    f = FixtureModule('fx_awards')
     f.session = fx_session
+    f.award = Award(name='Seiun Award')
+    fx_session.add(f.award)
+    f.award_2 = Award(name='Some Other Award')
+    fx_session.add(f.award_2)
+    fx_session.flush()
+    return f
+
+
+@fixture
+def fx_people(fx_session, fx_awards):
+    f = FixtureModule('fx_people')
+    f += fx_awards
     f.artist = Person(name='Nanase Ohkawa', dob=datetime.date(1967, 5, 2))
     fx_session.add(f.artist)
     f.artist_2 = Person(name='Mokona', dob=datetime.date(1968, 6, 16))
@@ -60,6 +73,9 @@ def fx_people(fx_session):
     fx_session.add(f.artist_3)
     f.artist_4 = Person(name='Satsuki Igarashi', dob=datetime.date(1969, 2, 8))
     fx_session.add(f.artist_4)
+    f.person = Person(name='Some Person', dob=datetime.date(1990, 1, 1))
+    f.person.awards.update({fx_awards.award_2})
+    fx_session.add(f.person)
     fx_session.flush()
     return f
 
@@ -72,5 +88,35 @@ def fx_teams(fx_session, fx_people):
     f.team.members.update({fx_people.artist, fx_people.artist_2,
                            fx_people.artist_3, fx_people.artist_4})
     fx_session.add(f.team)
+    fx_session.flush()
+    return f
+
+
+@fixture
+def fx_genres(fx_session):
+    f = FixtureModule('fx_genres')
+    f.session = fx_session
+    f.genre = Genre(name='Comic')
+    fx_session.add(f.genre)
+    f.genre_2 = Genre(name='Romance')
+    fx_session.add(f.genre_2)
+    fx_session.flush()
+    return f
+
+
+@fixture
+def fx_works(fx_session, fx_teams, fx_awards, fx_genres):
+    f = FixtureModule('fx_works')
+    f += fx_teams
+    f += fx_awards
+    f += fx_genres
+    f.work = Work(name='Cardcaptor Sakura, Volume 1',
+                  publication_date=datetime.date(1996, 11, 22),
+                  number_of_pages=187,
+                  isbn='4063197433')
+    f.work.team = f.team
+    f.work.awards.update({f.award, f.award_2})
+    f.work.genres.update({f.genre, f.genre_2})
+    fx_session.add(f.work)
     fx_session.flush()
     return f
