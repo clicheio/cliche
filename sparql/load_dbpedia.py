@@ -16,18 +16,16 @@ def load_dbpedia(LIMIT, page):
         SELECT DISTINCT 
             STRAFTER( STR(?work), "http://dbpedia.org/resource/") as ?work
             (group_concat(STRAFTER( STR(?author), "http://dbpedia.org/resource/") ; SEPARATOR=", ") as ?author)
-        WHERE {
+        WHERE {{
             ?work ?p ?author
         FILTER(
             ( ?p = dbpprop:author || ?p = dbpedia-owl:author || ?p = dbpedia-owl:writer ) 
             && STRSTARTS(STR(?work), "http://dbpedia.org/")) 
-        }
+        }}
         GROUP BY ?work
-        LIMIT
-        '''
-    query += (' ' + str(LIMIT) + ' OFFSET')
-    query += (' ' + str(LIMIT*page))
-    print(query)
+        LIMIT {}
+        OFFSET {}
+        '''.format(str(LIMIT), str(LIMIT*page))
     sparql.setQuery(query)
     res = sparql.query().convert()
     return res
