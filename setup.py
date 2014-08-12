@@ -46,6 +46,7 @@ install_requires = {
     'Flask-Script >= 0.6.0',
     # Sparql
     'SPARQLWrapper >= 1.6.2',
+    'PyLD >= 0.6.0'
 }
 
 tests_require = {
