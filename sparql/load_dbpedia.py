@@ -1,34 +1,36 @@
 import sqlite3
 import urllib.parse
 
+from pyld import jsonld
 from SPARQLWrapper import SPARQLWrapper, JSON
 
-import pytest
 
-
-def load_dbpedia(LIMIT, page):
+def load_dbpedia(limit, page):
     ''' used OFFSET and LIMIT(40,000) for paging query '''
     sparql = SPARQLWrapper("http://dbpedia.org/sparql")
     sparql.setReturnFormat(JSON)
     query = '''
         PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
         PREFIX dbpprop: <http://dbpedia.org/property/>
-        SELECT DISTINCT 
-            STRAFTER( STR(?work), "http://dbpedia.org/resource/") as ?work
-            (group_concat(STRAFTER( STR(?author), "http://dbpedia.org/resource/") ; SEPARATOR=", ") as ?author)
+        SELECT DISTINCT
+            ?work
+            (group_concat( STR(?author) ; SEPARATOR="\\n") as ?author)
         WHERE {{
             ?work ?p ?author
         FILTER(
-            ( ?p = dbpprop:author || ?p = dbpedia-owl:author || ?p = dbpedia-owl:writer ) 
-            && STRSTARTS(STR(?work), "http://dbpedia.org/")) 
+            (      ?p = dbpprop:author
+                || ?p = dbpedia-owl:author
+                || ?p = dbpedia-owl:writer )
+            && STRSTARTS(STR(?work), "http://dbpedia.org/"))
         }}
         GROUP BY ?work
         LIMIT {}
         OFFSET {}
-        '''.format(str(LIMIT), str(LIMIT*page))
+        '''.format(str(limit), str(limit*page))
     sparql.setQuery(query)
-    res = sparql.query().convert()
-    return res
+    tuples = sparql.query().convert()['results']['bindings']
+    print(len(tuples))
+    return tuples
 
 
 # sqlite3
@@ -43,10 +45,9 @@ def save_db(tuples, table):
             FOREIGN KEY({FOREIGN}) REFERENCES artists(artist)
         )
     '''.format(table['TABLENAME'], table['PRIMARY'], FOREIGN=table['FOREIGN']))
-    for result in tuples["results"]["bindings"]:
-            PRI = urllib.parse.unquote(result[table['PRIMARY']]["value"])
-            FOR = urllib.parse.unquote(result[table['FOREIGN']]["value"])
-            print(PRI)
+    for result in tuples:
+            PRI = urllib.parse.unquote(result[table['PRIMARY']]['value'])
+            FOR = urllib.parse.unquote(result[table['FOREIGN']]['value'])
             cur.execute('INSERT OR IGNORE INTO {} VALUES (?, ?)'
                         .format(table['TABLENAME']), (PRI, FOR))
     conn.commit()
@@ -57,19 +58,9 @@ if __name__ == "__main__":
         'TABLENAME': 'allworks',
         'PRIMARY': 'work',
         'FOREIGN': 'author',
-        'LIMIT': 40000,
-        'COUNT': 7
+        'LIMIT': 30000,
+        'COUNT': 8
     }
 
-    db_file = '{}.tmp'.format(TABLE['TABLENAME'])
-    conn = sqlite3.connect(db_file)
-    c = conn.cursor()
-
-    c.execute('''
-        CREATE TABLE {} (
-            {} text PRIMARY KEY,
-            {FOREIGN} text,
-            FOREIGN KEY({FOREIGN}) REFERENCES artists(artist)
-        )
-    '''.format(TABLE['TABLENAME'], TABLE['PRIMARY'], FOREIGN=TABLE['FOREIGN']))
-    conn.commit()
+    for x in range(0, TABLE['COUNT']):
+        save_db(load_dbpedia(TABLE['LIMIT'], x) ,TABLE)
