@@ -8,6 +8,7 @@ from celery.utils.log import get_task_logger
 from lxml.html import parse
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import FlushError
 
 from .entities import Entity, Relation
 from ...orm import Base, Session
@@ -60,11 +61,7 @@ def list_pages(namespace_url=None):
                 yield (namespace,) + key, value
 
 
-@worker.task
-def save_link(namepair, url):
-    namespace, name = namepair
-    global db_engine
-    session = Session(bind=db_engine)
+def new_or_update_entity(session, namespace, name, url):
     try:
         with session.begin():
             new_entity = Entity(
@@ -74,12 +71,20 @@ def save_link(namepair, url):
                 type=determine_type(namespace)
             )
             session.add(new_entity)
-    except IntegrityError:
+    except (FlushError, IntegrityError):
         with session.begin():
             entity = session.query(Entity) \
                             .filter_by(namespace=namespace, name=name) \
                             .one()
             entity.url = url
+
+
+@worker.task
+def save_link(namepair, url):
+    namespace, name = namepair
+    global db_engine
+    session = Session(bind=db_engine)
+    new_or_update_entity(session, namespace, name, url)
     get_task_logger(__name__ + '.save_link').info(
         'Total %d',
         session.query(Entity).count()
@@ -96,14 +101,7 @@ def fetch_link(url, session):
     if namespace == '':
         namespace = 'Main'
     name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
-    with session.begin():
-        new_entity = Entity(
-            namespace=namespace,
-            name=name,
-            url=url,
-            type=determine_type(namespace)
-        )
-        session.add(new_entity)
+    new_or_update_entity(session, namespace, name, url)
     return tree, namespace, name
 
 
@@ -145,14 +143,17 @@ def crawl_link(url, start_time,
                 return
             destination_tree, destination_namespace, \
                 destination_name = fetch_result
-            with session.begin():
-                new_relation = Relation(
-                    origin_namespace=namespace,
-                    origin_name=name,
-                    destination_namespace=destination_namespace,
-                    destination_name=destination_name
-                )
-                session.add(new_relation)
+            try:
+                with session.begin():
+                    new_relation = Relation(
+                        origin_namespace=namespace,
+                        origin=name,
+                        destination_namespace=destination_namespace,
+                        destination=destination_name
+                    )
+                    session.add(new_relation)
+            except IntegrityError:
+                pass
             # FIXME if next_crawl not in crawl_stack:
             crawl_link.delay(destination_url, start_time,
                              start_indexindex_count, start_relations_count,
@@ -164,7 +165,7 @@ def crawl_link(url, start_time,
     with session.begin():
         entity = session.query(Entity) \
                         .filter_by(url=url) \
-                        .one()
+                        .first()
         entity.last_crawled = current_time
     round_count += 1
     if round_count >= 10:
