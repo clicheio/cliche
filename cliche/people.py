@@ -44,8 +44,8 @@ class Person(Base):
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`cliche.work.Award`\ s that the person won.
     awards = relationship('Award',
-                           secondary='award_winners',
-                           collection_class=set)
+                          secondary='award_winners',
+                          collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of :class:`Team`\ s
     #: he/she belongs to.
