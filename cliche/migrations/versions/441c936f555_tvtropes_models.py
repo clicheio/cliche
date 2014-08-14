@@ -1,41 +1,45 @@
 """TVTropes models
- 
+
 Revision ID: 441c936f555
 Revises: 57fc5e85328 # changed from 1ed82ef0071
 Create Date: 2014-08-08 03:42:59.602574
- 
+
 """
-from alembic import op
-import sqlalchemy as sa
- 
- 
+from alembic.op import create_table, drop_table
+from sqlalchemy.schema import (Column, ForeignKeyConstraint,
+                               PrimaryKeyConstraint)
+from sqlalchemy.types import DateTime, String
+
+
 # revision identifiers, used by Alembic.
 revision = '441c936f555'
 down_revision = '57fc5e85328'
- 
- 
+
+
 def upgrade():
-    op.create_table('tvtropes_entities',
-    sa.Column('namespace', sa.String(), nullable=False),
-    sa.Column('name', sa.String(), nullable=False),
-    sa.Column('url', sa.String(), nullable=True),
-    sa.Column('last_crawled', sa.DateTime(), nullable=True),
-    sa.Column('type', sa.String(), nullable=True),
-    sa.PrimaryKeyConstraint('namespace', 'name')
+    create_table(
+        'tvtropes_entities',
+        Column('namespace', String, nullable=False),
+        Column('name', String, nullable=False),
+        Column('url', String, nullable=True),
+        Column('last_crawled', DateTime, nullable=True),
+        Column('type', String, nullable=True),
+        PrimaryKeyConstraint('namespace', 'name')
     )
-    op.create_table('tvtropes_relations',
-    sa.Column('origin_namespace', sa.String(), nullable=False),
-    sa.Column('origin', sa.String(), nullable=False),
-    sa.Column('destination_namespace', sa.String(), nullable=False),
-    sa.Column('destination', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['origin_namespace', 'origin'], 
-                            ['tvtropes_entities.namespace',
-                            'tvtropes_entities.name'], ),
-    sa.PrimaryKeyConstraint('origin_namespace', 'origin',
-                            'destination_namespace', 'destination')
+    create_table(
+        'tvtropes_relations',
+        Column('origin_namespace', String(), nullable=False),
+        Column('origin', String(), nullable=False),
+        Column('destination_namespace', String(), nullable=False),
+        Column('destination', String, nullable=False),
+        ForeignKeyConstraint(['origin_namespace', 'origin'],
+                             ['tvtropes_entities.namespace',
+                             'tvtropes_entities.name'], ),
+        PrimaryKeyConstraint('origin_namespace', 'origin',
+                             'destination_namespace', 'destination')
     )
- 
- 
+
+
 def downgrade():
-    op.drop_table('tvtropes_relations')
-    op.drop_table('tvtropes_entities')
+    drop_table('tvtropes_relations')
+    drop_table('tvtropes_entities')

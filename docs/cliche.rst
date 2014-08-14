@@ -8,3 +8,4 @@
       cliche/orm
       cliche/people
       cliche/web
+      cliche/work
