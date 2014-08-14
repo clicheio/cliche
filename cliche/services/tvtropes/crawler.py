@@ -3,6 +3,7 @@ from __future__ import print_function
 from datetime import datetime, timedelta
 import urllib.parse
 
+from celery.signals import worker_process_init
 from celery.utils.log import get_task_logger
 from lxml.html import parse
 from sqlalchemy import create_engine
@@ -16,6 +17,15 @@ from ...worker import worker
 INDEX_INDEX = 'http://tvtropes.org/pmwiki/index_report.php'
 WIKI_PAGE = 'http://tvtropes.org/pmwiki/pmwiki.php/'
 CRAWL_INTERVAL = timedelta(days=7)
+
+
+db_engine = None
+
+
+@worker_process_init.connect
+def establish_database_connection(*args, **kwargs):
+    global db_engine
+    db_engine = create_engine(worker.conf.DATABASE_URL)
 
 
 def determine_type(namespace):
@@ -53,8 +63,8 @@ def list_pages(namespace_url=None):
 @worker.task
 def save_link(namepair, url):
     namespace, name = namepair
-    engine = create_engine(worker.conf.DATABASE_URL)
-    session = Session(bind=engine)
+    global db_engine
+    session = Session(bind=db_engine)
     try:
         with session.begin():
             new_entity = Entity(
@@ -101,8 +111,8 @@ def fetch_link(url, session):
 def crawl_link(url, start_time,
                start_indexindex_count, start_relations_count,
                round_count):
-    engine = create_engine(worker.conf.DATABASE_URL)
-    session = Session(bind=engine)
+    global db_engine
+    session = Session(bind=db_engine)
     logger = get_task_logger(__name__ + '.crawl_link')
     current_time = datetime.now()
 
@@ -176,10 +186,11 @@ def crawl_link(url, start_time,
 
 def crawl(config):
     worker.config_from_object(config)
-    engine = create_engine(worker.conf.DATABASE_URL)
-    session = Session(bind=engine)
+    global db_engine
+    db_engine = create_engine(worker.conf.DATABASE_URL)
+    session = Session(bind=db_engine)
 
-    Base.metadata.create_all(engine)
+    Base.metadata.create_all(db_engine)
     if session.query(Entity).count() < 1:
         for name, url in list_pages():
             save_link.delay(name, url)
