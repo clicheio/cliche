@@ -136,7 +136,7 @@ def crawl_link(url, start_time,
             destination_url = urllib.parse.urljoin(
                 WIKI_PAGE, a.attrib['href']
             )
-            fetch_result = fetch_link(url, session)
+            fetch_result = fetch_link(destination_url, session)
             if fetch_result is None:
                 logger.warning('Warning: There is no pagetitle on '
                                'this page. Ignoring.')
