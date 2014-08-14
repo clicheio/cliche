@@ -34,17 +34,17 @@ class Person(Base):
                         index=True)
 
     #: (:class:`collections.abc.MutableSet`) The set of
-    # :class:`TeamMembership` s he/she has.
+    #: :class:`TeamMembership`\ s he/she has.
     memberships = relationship('TeamMembership', collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
-    #:  :class:`cliche.work.PersonAward` s that the person has.
-    person_awards = relationship('PersonAward', collection_class=set)
+    #: :class:`cliche.work.AwardWinner`\ s that the person has.
+    award_winners = relationship('AwardWinner', collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
-    #:  :class:`cliche.work.Award` s that the person won.
+    #: :class:`cliche.work.Award`\ s that the person won.
     awards = relationship('Award',
-                           secondary='person_awards',
+                           secondary='award_winners',
                            collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of :class:`Team`\ s
@@ -73,7 +73,7 @@ class Team(Base):
                         index=True)
 
     #: (:class:`collections.abc.MutableSet`) The set of
-    #: :class:`TeamMembership` s that the team has.
+    #: :class:`TeamMembership`\ s that the team has.
     memberships = relationship('TeamMembership', collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The members :class:`Person` set.

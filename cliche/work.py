@@ -1,5 +1,5 @@
 """:mod:`cliche.work` --- Things associated with a creative work.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
 from sqlalchemy.orm import relationship
@@ -10,7 +10,7 @@ from sqlalchemy.types import Date, DateTime, Integer, String
 from .orm import Base
 from .people import Person, Team
 
-__all__ = 'Award', 'Genre', 'PersonAward', 'Work', 'WorkAward', 'WorkGenre'
+__all__ = 'Award', 'AwardWinner', 'Genre', 'Work', 'WorkAward', 'WorkGenre'
 
 
 class Award(Base):
@@ -23,64 +23,38 @@ class Award(Base):
     name = Column(String, nullable=False, index=True)
 
     #: (:class:`collections.abc.MutableSet`) The set of
-    #:  :class:`PersonAward` s that the award has.
-    person_awards = relationship('PersonAward', collection_class=set)
+    #: :class:`AwardWinner`\ s that the award has.
+    award_winners = relationship('AwardWinner', collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
-    #:  :class:`cliche.people.Person` s that won the award.
+    #: :class:`cliche.people.Person`\ s that won the award.
     persons = relationship(Person,
-                           secondary='person_awards',
+                           secondary='award_winners',
                            collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
-    #:  :class:`WorkAward` s that the award has.
+    #: :class:`WorkAward`\ s that the award has.
     work_awards = relationship('WorkAward', collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
-    #:  :class:`Work` s that won the award.
+    #: :class:`Work`\ s that won the award.
     works = relationship('Work',
-                           secondary='work_awards',
-                           collection_class=set)
+                         secondary='work_awards',
+                         collection_class=set)
 
     #: (:class:`datetime.datetime`) The date and time on which
-    #:  the record was created.
-    created_at = Column(DateTime(timezone=True), nullable=False,
-                        default=now())
+    #: the record was created.
+    created_at = Column(DateTime(timezone=True),
+                        nullable=False,
+                        default=now(),
+                        index=True)
 
     __tablename__ = 'awards'
     __repr_columns__ = id, name
 
 
-class Genre(Base):
-    """Genre of the creative work"""
-
-    #: (:class:`int`) The primary key integer.
-    id = Column(Integer, primary_key=True)
-
-    #: (:class:`str`) The name of the genre.
-    name = Column(String, nullable=False, index=True)
-
-    #: (:class:`collections.abc.MutableSet`) The set of
-    #:  :class:`WorkGenre` s that the genre has.
-    work_genres = relationship('WorkGenre', collection_class=set)
-
-    #: (:class:`collections.abc.MutableSet`) The set of
-    #:  :class:`Work` s that fall into the genre.
-    works = relationship('Work',
-                           secondary='work_genres',
-                           collection_class=set)
-
-    #: (:class:`datetime.datetime`) The date and time on which
-    #:  the record was created.
-    created_at = Column(DateTime(timezone=True), nullable=False,
-                        default=now())
-
-    __tablename__ = 'genres'
-    __repr_columns__ = id, name
-
-
-class PersonAward(Base):
-    """Relationship between the person and the award"""
+class AwardWinner(Base):
+    """Relationship between the person and the award."""
 
     #: (:class:`int`) :class:`cliche.people.Person.id` of :attr:`person`.
     person_id = Column(Integer, ForeignKey(Person.id), primary_key=True)
@@ -95,12 +69,42 @@ class PersonAward(Base):
     award = relationship(Award)
 
     #: (:class:`datetime.datetime`) The date and time on which
-    #:  the record was created.
+    #: the record was created.
     created_at = Column(DateTime(timezone=True), nullable=False,
                         default=now())
 
-    __tablename__ = 'person_awards'
+    __tablename__ = 'award_winners'
     __repr_columns__ = person_id, award_id
+
+
+class Genre(Base):
+    """Genre of the creative work"""
+
+    #: (:class:`int`) The primary key integer.
+    id = Column(Integer, primary_key=True)
+
+    #: (:class:`str`) The name of the genre.
+    name = Column(String, nullable=False, index=True)
+
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`WorkGenre`\ s that the genre has.
+    work_genres = relationship('WorkGenre', collection_class=set)
+
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`Work`\ s that fall into the genre.
+    works = relationship('Work',
+                         secondary='work_genres',
+                         collection_class=set)
+
+    #: (:class:`datetime.datetime`) The date and time on which
+    #: the record was created.
+    created_at = Column(DateTime(timezone=True),
+                        nullable=False,
+                        default=now(),
+                        index=True)
+
+    __tablename__ = 'genres'
+    __repr_columns__ = id, name
 
 
 class Work(Base):
@@ -113,7 +117,7 @@ class Work(Base):
     name = Column(String, nullable=False, index=True)
 
     #: (:class:`datetime.date`) The publication date.
-    publication_date = Column(Date)
+    published_at = Column(Date)
 
     #: (:class:`int`) The number of pages in the book.
     number_of_pages = Column(Integer)
@@ -128,27 +132,27 @@ class Work(Base):
     team = relationship(Team)
 
     #: (:class:`collections.abc.MutableSet`) The set of
-    #:  :class:`WorkAward` s that the work has.
+    #: :class:`WorkAward`\ s that the work has.
     work_awards = relationship('WorkAward', collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
-    #:  :class:`Award` s that the work won.
+    #: :class:`Award`\ s that the work won.
     awards = relationship(Award,
                           secondary='work_awards',
                           collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
-    #:  :class:`WorkGenre` s that the work has.
+    #: :class:`WorkGenre`\ s that the work has.
     work_genres = relationship('WorkGenre', collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
-    #:  :class:`Genre` s that the work falls into.
+    #: :class:`Genre`\ s that the work falls into.
     genres = relationship(Genre,
                           secondary='work_genres',
                           collection_class=set)
 
     #: (:class:`datetime.datetime`) The date and time on which
-    #:  the record was created.
+    #: the record was created.
     created_at = Column(DateTime(timezone=True),
                         nullable=False,
                         default=now(),
@@ -159,7 +163,7 @@ class Work(Base):
 
 
 class WorkAward(Base):
-    """Relationship between the work and the award"""
+    """Relationship between the work and the award."""
 
     #: (:class:`int`) :class:`Work.id` of :attr:`work`.
     work_id = Column(Integer, ForeignKey(Work.id), primary_key=True)
@@ -174,7 +178,7 @@ class WorkAward(Base):
     award = relationship(Award)
 
     #: (:class:`datetime.datetime`) The date and time on which
-    #:  the record was created.
+    #: the record was created.
     created_at = Column(DateTime(timezone=True), nullable=False,
                         default=now())
 
@@ -183,7 +187,7 @@ class WorkAward(Base):
 
 
 class WorkGenre(Base):
-    """Relationship between the work and the genre"""
+    """Relationship between the work and the genre."""
 
     #: (:class:`int`) :class:`Work.id` of :attr:`work`.
     work_id = Column(Integer, ForeignKey(Work.id), primary_key=True)
@@ -198,7 +202,7 @@ class WorkGenre(Base):
     genre = relationship(Genre)
 
     #: (:class:`datetime.datetime`) The date and time on which
-    #:  the record was created.
+    #: the record was created.
     created_at = Column(DateTime(timezone=True), nullable=False,
                         default=now())
 

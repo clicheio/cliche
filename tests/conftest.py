@@ -111,7 +111,7 @@ def fx_works(fx_session, fx_teams, fx_awards, fx_genres):
     f += fx_awards
     f += fx_genres
     f.work = Work(name='Cardcaptor Sakura, Volume 1',
-                  publication_date=datetime.date(1996, 11, 22),
+                  published_at=datetime.date(1996, 11, 22),
                   number_of_pages=187,
                   isbn='4063197433')
     f.work.team = f.team
