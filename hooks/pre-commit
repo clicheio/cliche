@@ -1,3 +1,4 @@
 #!/bin/bash
-flake8 cliche tests
+set -e
+python3 -m flake8 -j auto
 docs/coverage.py

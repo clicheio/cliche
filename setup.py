@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import distutils.core
 import distutils.errors
 import os.path
