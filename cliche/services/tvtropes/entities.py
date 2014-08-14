@@ -13,9 +13,9 @@ class Entity(Base):
 
     namespace = Column(String, primary_key=True)
     name = Column(String, primary_key=True)
-    url = Column(String)
-    last_crawled = Column(DateTime)
-    type = Column(String)
+    url = Column(String, nullable=False)
+    last_crawled = Column(DateTime(timezone=True))
+    type = Column(String, nullable=False)
 
     relations = relationship(
         'Relation',
