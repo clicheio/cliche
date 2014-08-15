@@ -1,7 +1,6 @@
 import sqlite3
 import urllib.parse
 
-from pyld import jsonld
 from SPARQLWrapper import SPARQLWrapper, JSON
 
 
@@ -29,7 +28,6 @@ def load_dbpedia(limit, page):
         '''.format(str(limit), str(limit*page))
     sparql.setQuery(query)
     tuples = sparql.query().convert()['results']['bindings']
-    print(len(tuples))
     return tuples
 
 
@@ -46,10 +44,10 @@ def save_db(tuples, table):
         )
     '''.format(table['TABLENAME'], table['PRIMARY'], FOREIGN=table['FOREIGN']))
     for result in tuples:
-            PRI = urllib.parse.unquote(result[table['PRIMARY']]['value'])
-            FOR = urllib.parse.unquote(result[table['FOREIGN']]['value'])
+            primary = urllib.parse.unquote(result[table['PRIMARY']]['value'])
+            foreign = urllib.parse.unquote(result[table['FOREIGN']]['value'])
             cur.execute('INSERT OR IGNORE INTO {} VALUES (?, ?)'
-                        .format(table['TABLENAME']), (PRI, FOR))
+                        .format(table['TABLENAME']), (primary, foreign))
     conn.commit()
 
 
@@ -63,4 +61,4 @@ if __name__ == "__main__":
     }
 
     for x in range(0, TABLE['COUNT']):
-        save_db(load_dbpedia(TABLE['LIMIT'], x) ,TABLE)
+        save_db(load_dbpedia(TABLE['LIMIT'], x), TABLE)
