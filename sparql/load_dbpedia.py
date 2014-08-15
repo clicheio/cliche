@@ -1,7 +1,7 @@
 import sqlite3
 import urllib.parse
 
-from SPARQLWrapper import SPARQLWrapper, JSON
+from SPARQLWrapper import JSON, SPARQLWrapper
 
 
 def load_dbpedia(limit, page):
