@@ -50,7 +50,7 @@ Install :mod:`psycopg2` using APT (if you're on Ubuntu/Debian):
 
    $ sudo apt-get install python-psycopg2
 
-Or you can install it using :program:`easy_install`, of course.  However you
+Or you can install it using :program:`pip`, of course.  However you
 have to install libpq (including its headers) and CPython headers to link
 first.  These things can be installed using APT as well if you're on Ubuntu or
 Debian:
