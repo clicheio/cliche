@@ -1,3 +1,9 @@
+""":mod:`cliche.services.tvtropes.entities` --- Data entities for TVTropes_
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _TVTropes: http://tvtropes.org/
+
+"""
 from sqlalchemy import Column, DateTime, ForeignKeyConstraint, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import and_

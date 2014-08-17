@@ -1,3 +1,8 @@
 
 .. automodule:: cliche.services.tvtropes
-   :members:
+
+   .. toctree::
+      :maxdepth: 2
+
+      tvtropes/crawler
+      tvtropes/entities
