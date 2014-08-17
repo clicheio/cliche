@@ -3,9 +3,11 @@ from __future__ import print_function
 from datetime import datetime, timedelta
 import urllib.parse
 
+import requests
+
 from celery.signals import worker_process_init
 from celery.utils.log import get_task_logger
-from lxml.html import parse
+from lxml.html import parse, document_fromstring
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
@@ -92,7 +94,8 @@ def save_link(namepair, url):
 
 
 def fetch_link(url, session):
-    tree = parse(url)
+    r = requests.get(url)
+    tree = document_fromstring(r.text)
     try:
         namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
             .text.strip()[:-1]
