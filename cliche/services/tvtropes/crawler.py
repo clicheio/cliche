@@ -150,9 +150,9 @@ def crawl_link(url, start_time,
                 with session.begin():
                     new_relation = Relation(
                         origin_namespace=namespace,
-                        origin=name,
+                        origin_name=name,
                         destination_namespace=destination_namespace,
-                        destination=destination_name
+                        destination_name=destination_name
                     )
                     session.add(new_relation)
             except IntegrityError:
