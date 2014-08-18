@@ -37,6 +37,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
+    'sphinx.ext.extlinks',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -272,4 +273,10 @@ intersphinx_mapping = {
     'python': ('http://docs.python.org/3/', None),
     'sqlalchemy': ('http://docs.sqlalchemy.org/en/rel_0_9/', None),
     'alembic': ('http://alembic.readthedocs.org/en/latest/', None)
+}
+
+extlinks = {
+    'commit': ('https://github.com/clicheio/cliche/commit/%s', 'commit '),
+    'issue': ('https://github.com/clicheio/cliche/issues/%s', 'issue #'),
+    'pypi': ('http://pypi.python.org/pypi/%s', '')
 }

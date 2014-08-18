@@ -1,3 +1,7 @@
 
 .. automodule:: cliche.services
-   :members:
+
+   .. toctree::
+      :maxdepth: 2
+
+      services/tvtropes
