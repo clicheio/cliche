@@ -10,7 +10,7 @@ from celery.utils.log import get_task_logger
 from lxml.html import parse, document_fromstring
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm.exc import FlushError
+from sqlalchemy.orm.exc import FlushError, NoResultFound
 
 from .entities import Entity, Relation, Redirection
 from ...orm import Base, Session
@@ -136,11 +136,14 @@ def fetch_link(url, session):
 
 
 def recently_crawled(current_time, url, session):
-    last_crawled = session.query(Entity).filter_by(url=url) \
-                          .one().last_crawled
-    if last_crawled:
-        if current_time - last_crawled < CRAWL_INTERVAL:
-            return True
+    try:
+        last_crawled = session.query(Entity).filter_by(url=url) \
+                              .one().last_crawled
+        if last_crawled:
+            if current_time - last_crawled < CRAWL_INTERVAL:
+                return True
+    except NoResultFound:
+        pass
     return False
 
 
