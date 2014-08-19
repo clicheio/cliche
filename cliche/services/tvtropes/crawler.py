@@ -125,7 +125,7 @@ def fetch_link(url, session):
         namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
             .text.strip()[:-1]
     except (AttributeError, AssertionError, IndexError):
-        return None
+        return tree, None, None, final_url
     if namespace == '':
         namespace = 'Main'
     name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
@@ -159,11 +159,12 @@ def crawl_link(url):
                     .format(url, CRAWL_INTERVAL))
         return
     fetch_result = fetch_link(url, session)
-    if fetch_result is None:
-        logger.warning('Warning: There is no pagetitle on this page. '
-                       'Ignoring.')
-        return
     tree, namespace, name, url = fetch_result
+    if name is None:
+        logger.warning('Warning on url {}:'.format(url))
+        logger.warning('There is no pagetitle on this page. Ignoring.')
+        return
+    # make sure that if redirected, final url is not also recently crawled.
     if recently_crawled(current_time, url, session):
         logger.info('Skipping: {} due to '
                     'recent crawl in {} days'
@@ -177,12 +178,12 @@ def crawl_link(url):
                 WIKI_PAGE, a.attrib['href']
             )
             fetch_result = fetch_link(destination_url, session)
-            if fetch_result is None:
-                logger.warning('Warning: There is no pagetitle on '
-                               'this page. Ignoring.')
-                return
             destination_tree, destination_namespace, \
                 destination_name, destination_url = fetch_result
+            if destination_name is None:
+                logger.warning('Warning on url {}:'.format(destination_url))
+                logger.warning('There is no pagetitle on this page. Ignoring.')
+                return
             try:
                 with session.begin():
                     new_relation = Relation(
