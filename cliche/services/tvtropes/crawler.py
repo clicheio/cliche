@@ -39,7 +39,7 @@ def determine_type(namespace):
 
 def list_pages(namespace_url=None):
     list_url = namespace_url or INDEX_INDEX
-    print('Crawling {}'.format(list_url))
+    print('Populating seed from {}'.format(list_url))
     tree = parse(list_url)
 
     for a in tree.xpath('//a[@class="twikilink"]'):
