@@ -6,8 +6,7 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.sql.functions import now
-from sqlalchemy.types import (Date, DateTime, Enum,
-                              Integer, String, TypeDecorator)
+from sqlalchemy.types import Date, DateTime, Enum, Integer, String
 
 from .orm import Base
 from .people import Person, Team
@@ -17,29 +16,16 @@ __all__ = (
     'AwardWinner',
     'Credit',
     'Genre',
-    'Role',
     'Work',
     'WorkAward',
     'WorkGenre'
 )
 
-
-class Role(TypeDecorator):
-    """Custom type for individual roles in the work."""
-
-    role_content = (
-        "Artist",
-        "Author",
-        "Editor"
-    )
-
-    impl = Enum(*role_content)
-
-    def process_bind_param(self, value, dialect):
-        return value
-
-    def process_result_value(self, value, dialect):
-        return value
+roles = (
+    "Artist",
+    "Author",
+    "Editor"
+)
 
 
 class Award(Base):
@@ -124,7 +110,7 @@ class Credit(Base):
     person = relationship('Person')
 
     #: The person's role in making the work.
-    role = Column(Role)
+    role = Column(Enum(*roles, name='role'))
 
     #: (:class:`datetime.datetime`) The date and time on which
     #: the record was created.
