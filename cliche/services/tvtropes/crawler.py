@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 from datetime import datetime, timedelta
+import re
 import urllib.parse
 
 import requests
@@ -88,6 +89,8 @@ def save_link(namepair, url):
     namespace, name = namepair
     global db_engine
     session = Session(bind=db_engine)
+    if re.search(r'\bThe\b', name):
+        _, namespace, name, url = fetch_link(url, session)
     new_or_update_entity(session, namespace, name, url)
     get_task_logger(__name__ + '.save_link').info(
         'Total %d',
