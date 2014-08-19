@@ -12,13 +12,15 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
 
-from .entities import Entity, Relation
+from .entities import Entity, Relation, Redirection
 from ...orm import Base, Session
 from ...worker import worker
 
 
 INDEX_INDEX = 'http://tvtropes.org/pmwiki/index_report.php'
 WIKI_PAGE = 'http://tvtropes.org/pmwiki/pmwiki.php/'
+RELATED_SEARCH = 'http://tvtropes.org/pmwiki/relatedsearch.php?term='
+
 CRAWL_INTERVAL = timedelta(days=7)
 
 
@@ -93,8 +95,49 @@ def save_link(namepair, url):
     )
 
 
+def process_redirections(session, original_url, final_url, namespace, name):
+    # note that indirection is not considered:
+    # only the original and final path are saved.
+    *_, original_path = urllib.parse.urlparse(original_url).path.split('/', 3)
+    *_, final_path = urllib.parse.urlparse(final_url).path.split('/', 3)
+    if original_path != final_path:
+        rel = requests.get(RELATED_SEARCH + final_path)
+        reltree = document_fromstring(rel.text)
+        for link in reltree.xpath(
+            "//div[@id='wikimiddle']/div[re:test(text(),"
+            "'This article is the target of [0-9]+ redirect\(s\)\.'"
+            ")]/ul/li/a",
+            namespaces={'re': "http://exslt.org/regular-expressions"}
+        ):
+            alias_namespace = link.text[0:link.text.index('/')]
+            alias_name = link.text[link.text.index('/') + 1:]
+            try:
+                with session.begin():
+                    new_redirection = Redirection(
+                        alias_namespace=alias_namespace,
+                        alias_name=alias_name,
+                        original_namespace=namespace,
+                        original_name=name
+                    )
+                    session.add(new_redirection)
+            except (FlushError, IntegrityError):
+                with session.begin():
+                    redirection = session.query(Redirection) \
+                        .filter_by(
+                            alias_namespace=alias_namespace,
+                            alias_name=alias_name
+                        ) \
+                        .one()
+                    redirection.original_namespace = namespace
+                    redirection.original_name = name
+
+
 def fetch_link(url, session):
     r = requests.get(url)
+    try:
+        final_url = r.url[:r.url.index('?')]
+    except ValueError:
+        final_url = r.url
     tree = document_fromstring(r.text)
     try:
         namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
@@ -104,8 +147,19 @@ def fetch_link(url, session):
     if namespace == '':
         namespace = 'Main'
     name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
-    new_or_update_entity(session, namespace, name, url)
-    return tree, namespace, name
+
+    new_or_update_entity(session, namespace, name, final_url)
+    process_redirections(session, url, final_url, namespace, name)
+    return tree, namespace, name, final_url
+
+
+def recently_crawled(current_time, url, session):
+    last_crawled = session.query(Entity).filter_by(url=url) \
+                          .one().last_crawled
+    if last_crawled:
+        if current_time - last_crawled < CRAWL_INTERVAL:
+            return True
+    return False
 
 
 @worker.task
@@ -116,22 +170,22 @@ def crawl_link(url, start_time,
     session = Session(bind=db_engine)
     logger = get_task_logger(__name__ + '.crawl_link')
     current_time = datetime.now()
-
-    last_crawled = session.query(Entity).filter_by(url=url) \
-                          .first().last_crawled
-    if last_crawled:
-        if current_time - last_crawled < CRAWL_INTERVAL:
-            logger.info('Skipping: {} due to '
-                        'recent crawl in {} days'
-                        .format(url, CRAWL_INTERVAL))
-            return
-
+    if recently_crawled(current_time, url, session):
+        logger.info('Skipping: {} due to '
+                    'recent crawl in {} days'
+                    .format(url, CRAWL_INTERVAL))
+        return
     fetch_result = fetch_link(url, session)
     if fetch_result is None:
         logger.warning('Warning: There is no pagetitle on this page. '
                        'Ignoring.')
         return
-    tree, namespace, name = fetch_result
+    tree, namespace, name, url = fetch_result
+    if recently_crawled(current_time, url, session):
+        logger.info('Skipping: {} due to '
+                    'recent crawl in {} days'
+                    .format(url, CRAWL_INTERVAL))
+        return
     logger.info("Fetching: {}/{} @ {}"
                 .format(namespace, name, url))
     for a in tree.xpath('//a[@class="twikilink"]'):
@@ -145,7 +199,7 @@ def crawl_link(url, start_time,
                                'this page. Ignoring.')
                 return
             destination_tree, destination_namespace, \
-                destination_name = fetch_result
+                destination_name, destination_url = fetch_result
             try:
                 with session.begin():
                     new_relation = Relation(
@@ -168,7 +222,7 @@ def crawl_link(url, start_time,
     with session.begin():
         entity = session.query(Entity) \
                         .filter_by(url=url) \
-                        .first()
+                        .one()
         entity.last_crawled = current_time
     round_count += 1
     if round_count >= 10:
