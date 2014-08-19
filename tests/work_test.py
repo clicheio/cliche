@@ -10,7 +10,3 @@ def test_work_has_genres(fx_works, fx_genres):
     assert fx_works.work.genres == {
         fx_genres.genre, fx_genres.genre_2
     }
-
-
-def test_work_has_team(fx_works, fx_teams):
-    assert fx_works.work.team == fx_teams.team
