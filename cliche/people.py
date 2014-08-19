@@ -37,6 +37,12 @@ class Person(Base):
     #: :class:`TeamMembership`\ s he/she has.
     memberships = relationship('TeamMembership', collection_class=set)
 
+    #: (:class:`collections.abc.MutableSet`) The set of :class:`Team`\ s
+    #: he/she belongs to.
+    teams = relationship('Team',
+                         secondary='team_memberships',
+                         collection_class=set)
+
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`cliche.work.AwardWinner`\ s that the person has.
     award_winners = relationship('AwardWinner', collection_class=set)
@@ -47,11 +53,9 @@ class Person(Base):
                           secondary='award_winners',
                           collection_class=set)
 
-    #: (:class:`collections.abc.MutableSet`) The set of :class:`Team`\ s
-    #: he/she belongs to.
-    teams = relationship('Team',
-                         secondary='team_memberships',
-                         collection_class=set)
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`cliche.work.Credit`\ s that the person has.
+    credits = relationship('Credit', collection_class=set)
 
     __tablename__ = 'people'
     __repr_columns__ = id, name

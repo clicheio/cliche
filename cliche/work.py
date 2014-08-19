@@ -2,15 +2,44 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
+
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.sql.functions import now
-from sqlalchemy.types import Date, DateTime, Integer, String
+from sqlalchemy.types import (Date, DateTime, Enum,
+                              Integer, String, TypeDecorator)
 
 from .orm import Base
 from .people import Person, Team
 
-__all__ = 'Award', 'AwardWinner', 'Genre', 'Work', 'WorkAward', 'WorkGenre'
+__all__ = (
+    'Award',
+    'AwardWinner',
+    'Credit',
+    'Genre',
+    'Role',
+    'Work',
+    'WorkAward',
+    'WorkGenre'
+)
+
+
+class Role(TypeDecorator):
+    """Custom type for individual roles in the work."""
+
+    role_content = (
+        "Artist",
+        "Author",
+        "Editor"
+    )
+
+    impl = Enum(*role_content)
+
+    def process_bind_param(self, value, dialect):
+        return value
+
+    def process_result_value(self, value, dialect):
+        return value
 
 
 class Award(Base):
@@ -75,6 +104,35 @@ class AwardWinner(Base):
 
     __tablename__ = 'award_winners'
     __repr_columns__ = person_id, award_id
+
+
+class Credit(Base):
+    """Relationship between the work and the person.
+    Describe that the person participated in making the work.
+    """
+
+    #: (:class:`int`) :class:`Work.id` of :attr:`work`.
+    work_id = Column(Integer, ForeignKey('works.id'), primary_key=True)
+
+    #: (:class:`Work`) The work which the :attr:`person` made.
+    work = relationship('Work')
+
+    #: (:class:`int`) :class:`cliche.people.Person.id` of :attr:`person`.
+    person_id = Column(Integer, ForeignKey('people.id'), primary_key=True)
+
+    #: (:class:`cliche.people.Person`) The person who made the :attr:`work`.
+    person = relationship('Person')
+
+    #: The person's role in making the work.
+    role = Column(Role)
+
+    #: (:class:`datetime.datetime`) The date and time on which
+    #: the record was created.
+    created_at = Column(DateTime(timezone=True), nullable=False,
+                        default=now())
+
+    __tablename__ = 'credits'
+    __repr_columns__ = person_id, work_id
 
 
 class Genre(Base):
@@ -150,6 +208,10 @@ class Work(Base):
     genres = relationship(Genre,
                           secondary='work_genres',
                           collection_class=set)
+
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`Credit`\ s that the work has.
+    credits = relationship(Credit, collection_class=set)
 
     #: (:class:`datetime.datetime`) The date and time on which
     #: the record was created.
