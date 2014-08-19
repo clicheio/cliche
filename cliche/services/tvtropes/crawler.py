@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 from datetime import datetime, timedelta
-import re
 import urllib.parse
 
 import requests
@@ -44,12 +43,8 @@ def list_pages(namespace_url=None):
     tree = parse(list_url)
 
     for a in tree.xpath('//a[@class="twikilink"]'):
-        name = a.text.strip()
         url = a.attrib['href']
-        if namespace_url:
-            yield (name,), url
-        else:
-            yield ('Main', name), url
+        yield url
 
     if not namespace_url:
         namespaces = tree.xpath(
@@ -57,13 +52,11 @@ def list_pages(namespace_url=None):
         )
 
         for a in namespaces:
-            namespace = a.text.strip()
             url = urllib.parse.urljoin(
                 INDEX_INDEX, a.attrib['href']
             )
-            for key, value in list_pages(url):
-                assert len(key) == 1
-                yield (namespace,) + key, value
+            for value in list_pages(url):
+                yield value
 
 
 def new_or_update_entity(session, namespace, name, url):
@@ -82,20 +75,6 @@ def new_or_update_entity(session, namespace, name, url):
                             .filter_by(namespace=namespace, name=name) \
                             .one()
             entity.url = url
-
-
-@worker.task
-def save_link(namepair, url):
-    namespace, name = namepair
-    global db_engine
-    session = Session(bind=db_engine)
-    if re.search(r'\bThe\b', name):
-        _, namespace, name, url = fetch_link(url, session)
-    new_or_update_entity(session, namespace, name, url)
-    get_task_logger(__name__ + '.save_link').info(
-        'Total %d',
-        session.query(Entity).count()
-    )
 
 
 def process_redirections(session, original_url, final_url, namespace, name):
@@ -233,9 +212,9 @@ def crawl(config):
 
     Base.metadata.create_all(db_engine)
     if session.query(Entity).count() < 1:
-        for name, url in list_pages():
-            save_link.delay(name, url)
-
-    for entity in session.query(Entity) \
-                         .order_by(Entity.namespace, Entity.name):
-        crawl_link.delay(entity.url)
+        for url in list_pages():
+            crawl_link.delay(url)
+    else:
+        for entity in session.query(Entity) \
+                             .order_by(Entity.namespace, Entity.name):
+            crawl_link.delay(entity.url)
