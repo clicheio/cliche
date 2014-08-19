@@ -9,7 +9,7 @@ from alembic.util import CommandError
 from flask.ext.script import Manager
 import sys
 
-from .config import read_config_from_yaml
+from .config import read_config_from_python, read_config_from_yaml
 from .orm import downgrade_database, upgrade_database
 from .web.app import app
 from .web.db import get_database_engine
@@ -65,10 +65,9 @@ def initialize_app(config=None):
         raise SystemExit(1)
     elif os.path.splitext(config)[1] in ('.yml', '.yaml'):
         config = read_config_from_yaml(filename=config)
-        app.config.update(config)
     else:
-        config = os.path.abspath(config)
-        app.config.from_pyfile(config)
+        config = read_config_from_python(filename=config)
+    app.config.update(config)
     return app
 
 

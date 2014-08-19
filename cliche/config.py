@@ -2,9 +2,11 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
+import errno
+
 from yaml import load
 
-__all__ = 'read_config_from_yaml',
+__all__ = 'read_config_from_python', 'read_config_from_yaml'
 
 
 def read_config_from_yaml(*, string=None, file=None, filename=None):
@@ -45,3 +47,52 @@ def read_config_from_yaml(*, string=None, file=None, filename=None):
         with open(filename) as f:
             dictionary = load(f)
     return {k.upper(): v for k, v in dictionary.items()}
+
+
+def read_config_from_python(*, string=None, file=None, filename=None):
+    """Read Cliche app configuration from Python code i.e. Flask-style
+    configuration::
+
+        config = read_config_from_python(filename='dev.cfg.py')
+
+    Note that it takes only one keyword argument at a time.  All parameters
+    are mutually exclusive for each other.
+
+    :param string: read config from a python source code string
+    :type string: :class:`str`
+    :param file: read config from a *file object* of python source code
+    :param filename: read config from a *filename* of python source code
+    :type filename: :class:`str`
+    :returns: the parsed dictionary with uppercase keys
+    :rtype: :class:`collections.abc.Mapping`
+
+    """
+    args_number = sum(a is not None for a in {string, file, filename})
+    if args_number > 1:
+        raise TypeError('it takes a keyword at a time; keywords are '
+                        'exclusive to each other')
+    elif not args_number:
+        raise TypeError('missing keyword')
+    elif string is not None:
+        if not isinstance(string, str):
+            raise TypeError('expected a string, not ' + repr(string))
+        filename = '<string>'
+    elif file is not None:
+        filename = getattr(file, 'name', '<file>')
+        string = file.read()
+    else:
+        if not isinstance(filename, str):
+            raise TypeError('expected a filename string, not ' +
+                            repr(filename))
+        try:
+            with open(filename) as f:
+                string = f.read()
+        except IOError as e:
+            if e.errno in (errno.ENOENT, errno.EISDIR):
+                e.strerror = 'unable to load configuration file ({})'.format(
+                    e.strerror
+                )
+                raise
+    config = {}
+    exec(compile(string, filename, 'exec'), config)
+    return {k: v for k, v in config.items() if k.isupper()}
