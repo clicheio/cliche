@@ -3,6 +3,7 @@
 
 """
 import errno
+import pathlib
 
 from yaml import load
 
@@ -21,7 +22,7 @@ def read_config_from_yaml(*, string=None, file=None, filename=None):
     :type string: :class:`str`
     :param file: read config from a *file object* of yaml
     :param filename: read config from a *filename* of yaml
-    :type filename: :class:`str`
+    :type filename: :class:`pathlib.Path`
     :returns: the parsed dictionary with uppercase keys
     :rtype: :class:`collections.abc.Mapping`
 
@@ -41,10 +42,12 @@ def read_config_from_yaml(*, string=None, file=None, filename=None):
             raise TypeError('expected a file-like object, not ' + repr(file))
         dictionary = load(file)
     else:
-        if not isinstance(filename, str):
-            raise TypeError('expected a filename string, not ' +
-                            repr(filename))
-        with open(filename) as f:
+        if not isinstance(filename, pathlib.Path):
+            raise TypeError(
+                'expected an instance of {0.__module__}.{0.__qualname__}'
+                ', not {1!r}'.format(pathlib.Path, filename)
+            )
+        with filename.open() as f:
             dictionary = load(f)
     return {k.upper(): v for k, v in dictionary.items()}
 
@@ -62,7 +65,7 @@ def read_config_from_python(*, string=None, file=None, filename=None):
     :type string: :class:`str`
     :param file: read config from a *file object* of python source code
     :param filename: read config from a *filename* of python source code
-    :type filename: :class:`str`
+    :type filename: :class:`pathlib.Path`
     :returns: the parsed dictionary with uppercase keys
     :rtype: :class:`collections.abc.Mapping`
 
@@ -81,11 +84,13 @@ def read_config_from_python(*, string=None, file=None, filename=None):
         filename = getattr(file, 'name', '<file>')
         string = file.read()
     else:
-        if not isinstance(filename, str):
-            raise TypeError('expected a filename string, not ' +
-                            repr(filename))
+        if not isinstance(filename, pathlib.Path):
+            raise TypeError(
+                'expected an instance of {0.__module__}.{0.__qualname__}'
+                ', not {1!r}'.format(pathlib.Path, filename)
+            )
         try:
-            with open(filename) as f:
+            with filename.open() as f:
                 string = f.read()
         except IOError as e:
             if e.errno in (errno.ENOENT, errno.EISDIR):
@@ -94,5 +99,5 @@ def read_config_from_python(*, string=None, file=None, filename=None):
                 )
                 raise
     config = {}
-    exec(compile(string, filename, 'exec'), config)
+    exec(compile(string, str(filename), 'exec'), config)
     return {k: v for k, v in config.items() if k.isupper()}

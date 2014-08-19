@@ -1,5 +1,6 @@
 import datetime
 import os
+import pathlib
 import sqlite3
 import types
 
@@ -19,6 +20,15 @@ def pytest_addoption(parser):
                           '[default: %default]')
     parser.addoption('--echo-sql', action='store_true', default=False,
                      help='Print all executed queries for failed tests')
+
+
+@fixture
+def fx_tmpdir(tmpdir):
+    """Equivalent to pytest-builtin ``tmpdir`` fixture except it provides
+    a path as pathlib.Path, instead of py.path.local.
+
+    """
+    return pathlib.Path(str(tmpdir))
 
 
 @yield_fixture

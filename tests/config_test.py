@@ -13,18 +13,20 @@ def test_config_from_yaml_string():
     _assert_config(config)
 
 
-def test_config_from_yaml_file(tmpdir):
-    f = tmpdir.join('test_file.yml')
-    f.write(config_yaml)
+def test_config_from_yaml_file(fx_tmpdir):
+    f = fx_tmpdir / 'test_file.yml'
+    with f.open('w') as fp:
+        fp.write(config_yaml)
     with f.open() as stream:
         config = read_config_from_yaml(file=stream)
     _assert_config(config)
 
 
-def test_config_from_yaml_filename(tmpdir):
-    f = tmpdir.join('test_filename.yml')
-    f.write(config_yaml)
-    config = read_config_from_yaml(filename=str(f))
+def test_config_from_yaml_filename(fx_tmpdir):
+    f = fx_tmpdir / 'test_filename.yml'
+    with f.open('w') as fp:
+        fp.write(config_yaml)
+    config = read_config_from_yaml(filename=f)
     _assert_config(config)
 
 
@@ -40,18 +42,20 @@ def test_config_from_python_string():
     _assert_config(config)
 
 
-def test_config_from_python_file(tmpdir):
-    f = tmpdir.join('test_file.py')
-    f.write(config_py)
+def test_config_from_python_file(fx_tmpdir):
+    f = fx_tmpdir / 'test_file.py'
+    with f.open('w') as fp:
+        fp.write(config_py)
     with f.open() as stream:
         config = read_config_from_python(file=stream)
     _assert_config(config)
 
 
-def test_config_from_python_filename(tmpdir):
-    f = tmpdir.join('test_filename.py')
-    f.write(config_py)
-    config = read_config_from_python(filename=str(f))
+def test_config_from_python_filename(fx_tmpdir):
+    f = fx_tmpdir / 'test_filename.py'
+    with f.open('w') as fp:
+        fp.write(config_py)
+    config = read_config_from_python(filename=f)
     _assert_config(config)
 
 
