@@ -64,8 +64,8 @@ class FixtureModule(types.ModuleType):
 def fx_awards(fx_session):
     f = FixtureModule('fx_awards')
     f.session = fx_session
-    f.award = Award(name='Seiun Award')
-    fx_session.add(f.award)
+    f.seiun_award = Award(name='Seiun Award')
+    fx_session.add(f.seiun_award)
     f.hugo_award = Award(name='Hugo Award')
     fx_session.add(f.hugo_award)
     f.nebula_award = Award(name='Nebula Award')
@@ -117,10 +117,10 @@ def fx_teams(fx_session, fx_people):
 def fx_genres(fx_session):
     f = FixtureModule('fx_genres')
     f.session = fx_session
-    f.genre = Genre(name='Comic')
-    fx_session.add(f.genre)
-    f.genre_2 = Genre(name='Romance')
-    fx_session.add(f.genre_2)
+    f.comic = Genre(name='Comic')
+    fx_session.add(f.comic)
+    f.romance = Genre(name='Romance')
+    fx_session.add(f.romance)
     fx_session.flush()
     return f
 
@@ -132,12 +132,12 @@ def fx_works(fx_session, fx_teams, fx_awards, fx_genres):
     f += fx_awards
     f += fx_genres
     f.cardcaptor_sakura = Work(name='Cardcaptor Sakura, Volume 1',
-                  published_at=datetime.date(1996, 11, 22),
-                  number_of_pages=187,
-                  isbn='4063197433')
+                               published_at=datetime.date(1996, 11, 22),
+                               number_of_pages=187,
+                               isbn='4063197433')
     f.cardcaptor_sakura.team = f.clamp
-    f.cardcaptor_sakura.awards.update({f.award})
-    f.cardcaptor_sakura.genres.update({f.genre, f.genre_2})
+    f.cardcaptor_sakura.awards.update({f.seiun_award})
+    f.cardcaptor_sakura.genres.update({f.comic, f.romance})
     fx_session.add(f.cardcaptor_sakura)
     fx_session.flush()
     return f
