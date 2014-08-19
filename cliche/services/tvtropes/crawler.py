@@ -166,9 +166,7 @@ def recently_crawled(current_time, url, session):
 
 
 @worker.task
-def crawl_link(url, start_time,
-               start_indexindex_count, start_relations_count,
-               round_count):
+def crawl_link(url):
     global db_engine
     session = Session(bind=db_engine)
     logger = get_task_logger(__name__ + '.crawl_link')
@@ -215,9 +213,7 @@ def crawl_link(url, start_time,
             except IntegrityError:
                 pass
             # FIXME if next_crawl not in crawl_stack:
-            crawl_link.delay(destination_url, start_time,
-                             start_indexindex_count, start_relations_count,
-                             round_count)
+            crawl_link.delay(destination_url)
         except AttributeError:
             pass
     logger.info('Crawling {}/{} @ {} completed at {}'
@@ -227,22 +223,6 @@ def crawl_link(url, start_time,
                         .filter_by(url=url) \
                         .one()
         entity.last_crawled = current_time
-    round_count += 1
-    if round_count >= 10:
-        round_count = 0
-        elasped = datetime.now() - start_time
-        elasped_hours = elasped.total_seconds() / 3600
-        indexindex_count = session.query(Entity).count() \
-            - start_indexindex_count
-        relations_count = session.query(Relation).count() \
-            - start_relations_count
-        logger.info('-> entities: %s (%s/h) relations: %s (%s/h) '
-                    'elasped %s',
-                    indexindex_count,
-                    int(indexindex_count / elasped_hours),
-                    relations_count,
-                    int(relations_count / elasped_hours),
-                    elasped)
 
 
 def crawl(config):
@@ -258,7 +238,4 @@ def crawl(config):
 
     for entity in session.query(Entity) \
                          .order_by(Entity.namespace, Entity.name):
-        crawl_link.delay(entity.url, datetime.now(),
-                         session.query(Entity).count(),
-                         session.query(Relation).count(),
-                         0)
+        crawl_link.delay(entity.url)
