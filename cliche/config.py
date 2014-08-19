@@ -1,26 +1,29 @@
-""":mod:`cliche.web.config` --- Reading configurations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+""":mod:`cliche.config` --- Reading configurations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
-from flask import Config
 from yaml import load
 
-__all__ = 'config_from_yaml',
+__all__ = 'read_config_from_yaml',
 
 
-def config_from_yaml(config, *, string=None, file=None, filename=None):
-    """Read Flask app configuration from YAML.  ::
+def read_config_from_yaml(*, string=None, file=None, filename=None):
+    """Read Cliche app configuration from YAML.  ::
 
-        config_from_yaml(app.config, filename='dev.yml')
+        config = read_config_from_yaml(filename='dev.cfg.yml')
 
-    :param config: pass :attr:`Flask.config <flask.Flask.config>` attribute
-                   to this parameter
-    :type config: :class:`flask.Config`
+    Note that it takes only one keyword argument at a time.  All parameters
+    are mutually exclusive for each other.
+
+    :param string: read config from a yaml string
+    :type string: :class:`str`
+    :param file: read config from a *file object* of yaml
+    :param filename: read config from a *filename* of yaml
+    :type filename: :class:`str`
+    :returns: the parsed dictionary with uppercase keys
+    :rtype: :class:`collections.abc.Mapping`
 
     """
-    if not isinstance(config, Config):
-        raise TypeError('expected a {0.__module__}.{0.__qualname__}, not '
-                        '{1!r}'.format(Config, config))
     args_number = sum(a is not None for a in {string, file, filename})
     if args_number > 1:
         raise TypeError('it takes a keyword at a time; keywords are '
@@ -41,4 +44,4 @@ def config_from_yaml(config, *, string=None, file=None, filename=None):
                             repr(filename))
         with open(filename) as f:
             dictionary = load(f)
-    config.update((k.upper(), v) for k, v in dictionary.items())
+    return {k.upper(): v for k, v in dictionary.items()}
