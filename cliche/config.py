@@ -4,10 +4,42 @@
 """
 import errno
 import pathlib
+import warnings
 
 from yaml import load
 
-__all__ = 'read_config_from_python', 'read_config_from_yaml'
+__all__ = 'read_config', 'read_config_from_python', 'read_config_from_yaml'
+
+
+def read_config(filename):
+    """Read Cliche app configuration from the given filename.  ::
+
+        config = read_config(filename='dev.cfg.yml')
+
+    Note that it takes only one keyword argument at a time.  All parameters
+    are mutually exclusive for each other.
+
+    :param filename: read config from a *filename* of yaml or
+                     python source code
+    :type filename: :class:`pathlib.Path`
+    :returns: the parsed dictionary with uppercase keys
+    :rtype: :class:`collections.abc.Mapping`
+
+    """
+    if not isinstance(filename, pathlib.Path):
+        raise TypeError(
+            'expected an instance of {0.__module__}.{0.__qualname__}'
+            ', not {1!r}'.format(pathlib.Path, filename)
+        )
+    if filename.suffix in ('.yml', '.yaml'):
+        return read_config_from_yaml(filename=filename)
+    if filename.suffix != '.py':
+        warnings.warn(
+            'the suffix of {0} represents niether Python (.py) nor '
+            'YAML (.yml/.yaml);  treat it as Python',
+            RuntimeWarning, stacklevel=2
+        )
+    return read_config_from_python(filename=filename)
 
 
 def read_config_from_yaml(*, string=None, file=None, filename=None):
