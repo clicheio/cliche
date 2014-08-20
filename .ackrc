@@ -1,0 +1,8 @@
+--ignore-dir=.idea
+--ignore-dir=.ipynb_checkpoints
+--ignore-dir=.tox
+--ignore-dir=build
+--ignore-dir=Cliche.egg-info
+--ignore-dir=dist
+--ignore-dir=docs/build
+--ignore-dir=htmlcov
