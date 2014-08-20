@@ -9,6 +9,7 @@ Cliche is an ontology of fictional works.
    start
    postgresql
    migration
+   test
    cliche
 
 

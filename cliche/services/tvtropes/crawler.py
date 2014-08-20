@@ -1,3 +1,9 @@
+""":mod:`cliche.services.tvtropes.crawler` --- TVTropes_ crawler
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _TVTropes: http://tvtropes.org/
+
+"""
 from __future__ import print_function
 
 from datetime import datetime, timedelta
