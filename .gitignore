@@ -19,3 +19,6 @@ build
 dist
 docs/_build
 htmlcov
+
+# ignore intellij/pycharm project conf file
+*.iml
