@@ -1,0 +1,6 @@
+database_url: '<database url goes here>'
+
+# http://docs.celeryproject.org/en/latest/configuration.html
+broker_url: 'redis://localhost/1'
+celery_imports:
+- cliche.crawler
