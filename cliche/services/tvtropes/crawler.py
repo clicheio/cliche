@@ -34,7 +34,12 @@ def establish_database_connection(*args, **kwargs):
 
 
 def determine_type(namespace):
-    return 'Trope' if namespace == 'Main' else 'Work'
+    if namespace == 'Main':
+        return 'Trope'
+    elif namespace == 'Administrivia':
+        return 'Administrivia'
+    else:
+        return 'Work'
 
 
 def list_pages(namespace_url=None):
@@ -59,14 +64,14 @@ def list_pages(namespace_url=None):
                 yield value
 
 
-def new_or_update_entity(session, namespace, name, url):
+def new_or_update_entity(session, namespace, name, type, url):
     try:
         with session.begin():
             new_entity = Entity(
                 namespace=namespace,
                 name=name,
                 url=url,
-                type=determine_type(namespace)
+                type=type
             )
             session.add(new_entity)
     except (FlushError, IntegrityError):
@@ -116,6 +121,7 @@ def process_redirections(session, original_url, final_url, namespace, name):
 
 def fetch_link(url, session):
     r = requests.get(url)
+    print(url)
     try:
         final_url = r.url[:r.url.index('?')]
     except ValueError:
@@ -125,14 +131,17 @@ def fetch_link(url, session):
         namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
             .text.strip()[:-1]
     except (AttributeError, AssertionError, IndexError):
-        return tree, None, None, final_url
+        return False, tree, None, None, '!Lost and Found', final_url
     if namespace == '':
         namespace = 'Main'
     name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
 
-    new_or_update_entity(session, namespace, name, final_url)
+    type = determine_type(namespace)
+    if type == 'Administrivia':
+        return False, tree, namespace, name, type, final_url
+    new_or_update_entity(session, namespace, name, type, final_url)
     process_redirections(session, url, final_url, namespace, name)
-    return tree, namespace, name, final_url
+    return True, tree, namespace, name, type, final_url
 
 
 def recently_crawled(current_time, url, session):
@@ -159,10 +168,19 @@ def crawl_link(url):
                     .format(url, CRAWL_INTERVAL))
         return
     fetch_result = fetch_link(url, session)
-    tree, namespace, name, url = fetch_result
+    result, tree, namespace, name, type, url = fetch_result
     if name is None:
         logger.warning('Warning on url {}:'.format(url))
         logger.warning('There is no pagetitle on this page. Ignoring.')
+        return
+    elif not result:
+        logger.warning('Warning on url {}:'.format(url))
+        if type == 'Administrivia':
+            logger.warning('This page is an Administrivia. Ignoring.')
+        elif type == '!Lost and Found':
+            logger.warning('This page is a Lost and Found. Ignoring.')
+        else:
+            logger.warning('This page is not able to be crawled. Ignoring.')
         return
     # make sure that if redirected, final url is not also recently crawled.
     if recently_crawled(current_time, url, session):
@@ -178,12 +196,25 @@ def crawl_link(url):
                 WIKI_PAGE, a.attrib['href']
             )
             fetch_result = fetch_link(destination_url, session)
-            destination_tree, destination_namespace, \
-                destination_name, destination_url = fetch_result
+            destination_result, destination_tree, destination_namespace, \
+                destination_name, destination_type, \
+                destination_url = fetch_result
             if destination_name is None:
-                logger.warning('Warning on url {}:'.format(destination_url))
+                logger.warning('Warning on url {} (child):'
+                               .format(destination_url))
                 logger.warning('There is no pagetitle on this page. Ignoring.')
-                return
+                continue
+            elif not destination_result:
+                logger.warning('Warning on url {} (child):'
+                               .format(destination_url))
+                if destination_type == 'Administrivia':
+                    logger.warning('This page is an Administrivia. Ignoring.')
+                elif destination_type == '!Lost and Found':
+                    logger.warning('This page is a Lost and Found. Ignoring.')
+                else:
+                    logger.warning('This page is not able '
+                                   'to be crawled. Ignoring.')
+                continue
             try:
                 with session.begin():
                     new_relation = Relation(
