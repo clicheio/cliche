@@ -1,5 +1,6 @@
 import datetime
 import os
+import sqlite3
 import types
 
 from pytest import fixture, yield_fixture
