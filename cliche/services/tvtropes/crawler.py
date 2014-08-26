@@ -62,7 +62,7 @@ def list_pages(namespace_url=None):
         namespaces = tree.xpath(
             '//a[starts-with(@href, "index_report.php?groupname=")]'
         )
-        print('{} more.'.format(len(namespaces)), flush=True)
+        print(' {} more.'.format(len(namespaces)), flush=True)
 
         count = 0
         for a in namespaces:
@@ -202,6 +202,8 @@ def crawl_link(url):
         logger.warning('Warning on url {}: This page is not able to be'
                        ' crawled. Ignoring.'.format(url))
         return
+    else:
+        continue
     # make sure that if redirected, final url is not also recently crawled.
     if recently_crawled(current_time, url, session):
         logger.info('Skipping: {} due to '
@@ -235,6 +237,8 @@ def crawl_link(url):
                                'Ignoring.'
                                .format(destination_url))
                 continue
+            else:
+                continue
             try:
                 with session.begin():
                     new_relation = Relation(
@@ -267,7 +271,7 @@ def crawl(config):
 
     Base.metadata.create_all(db_engine)
     if session.query(Entity).count() < 1:
-        print('Populating seeds... ', end="", flush=True)
+        print('Populating seeds...', end="", flush=True)
         for url in list_pages():
             crawl_link.delay(url)
     else:
