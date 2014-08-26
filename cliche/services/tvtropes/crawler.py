@@ -211,7 +211,7 @@ def crawl_link(url):
         return
     logger.info("Fetching: {}/{} @ {}"
                 .format(namespace, name, url))
-    for a in tree.xpath('//a[@class="twikilink"]'):
+    for a in tree.xpath('//div[@id="wikitext"]//a[@class="twikilink"]'):
         try:
             if not is_wiki_page(a.attrib['href']):
                 continue
