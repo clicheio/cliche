@@ -113,6 +113,8 @@ def process_redirections(session, original_url, final_url, namespace, name):
             namespaces={'re': "http://exslt.org/regular-expressions"}
         ):
             alias_namespace = link.text[0:link.text.index('/')]
+            if alias_namespace == 'Administrivia':
+                continue
             alias_name = link.text[link.text.index('/') + 1:]
             try:
                 with session.begin():
