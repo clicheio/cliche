@@ -55,7 +55,8 @@ def list_pages(namespace_url=None):
 
     for a in tree.xpath('//a[@class="twikilink"]'):
         url = a.attrib['href']
-        yield url
+        if WIKI_PAGE in url:
+            yield url
 
     if not namespace_url:
         namespaces = tree.xpath(
@@ -129,7 +130,6 @@ def process_redirections(session, original_url, final_url, namespace, name):
 
 def fetch_link(url, session):
     r = requests.get(url)
-    print(url)
     try:
         final_url = r.url[:r.url.index('?')]
     except ValueError:
