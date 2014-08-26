@@ -145,7 +145,7 @@ command:
 
 .. sourcecode:: console
 
-   $ cliche -c dev.cfg upgrade
+   $ cliche -c dev.cfg.py upgrade
 
 .. _SQLAlchemy: http://www.sqlalchemy.org/
 .. _PostgreSQL: http://www.postgresql.org/
