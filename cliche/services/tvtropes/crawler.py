@@ -198,11 +198,10 @@ def crawl_link(url):
         logger.warning('Warning on url {}:'.format(url))
         logger.warning('There is no pagetitle on this page. Ignoring.')
         return
-    elif not result and not type == 'Administrivia':
-        logger.warning('Warning on url {}: This page is not able to be'
-                       ' crawled. Ignoring.'.format(url))
-        return
-    else:
+    elif not result:
+        if not type == 'Administrivia':
+            logger.warning('Warning on url {}: This page is not able to be'
+                           ' crawled. Ignoring.'.format(url))
         return
     # make sure that if redirected, final url is not also recently crawled.
     if recently_crawled(current_time, url, session):
@@ -230,14 +229,12 @@ def crawl_link(url):
                                .format(destination_url))
                 logger.warning('There is no pagetitle on this page. Ignoring.')
                 continue
-            elif not destination_result and \
-                    not destination_type == 'Administrivia':
-                logger.warning('Warning on url {} (child): '
-                               'This page is not able to be crawled. '
-                               'Ignoring.'
-                               .format(destination_url))
-                continue
-            else:
+            elif not destination_result:
+                if not destination_type == 'Administrivia':
+                    logger.warning('Warning on url {} (child): '
+                                   'This page is not able to be crawled. '
+                                   'Ignoring.'
+                                   .format(destination_url))
                 continue
             try:
                 with session.begin():
