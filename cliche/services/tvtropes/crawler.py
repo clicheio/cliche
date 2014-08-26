@@ -203,7 +203,7 @@ def crawl_link(url):
                        ' crawled. Ignoring.'.format(url))
         return
     else:
-        continue
+        return
     # make sure that if redirected, final url is not also recently crawled.
     if recently_crawled(current_time, url, session):
         logger.info('Skipping: {} due to '
