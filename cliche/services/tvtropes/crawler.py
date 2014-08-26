@@ -187,9 +187,8 @@ def crawl_link(url):
     logger = get_task_logger(__name__ + '.crawl_link')
     current_time = datetime.now()
     if recently_crawled(current_time, url, session):
-        logger.info('Skipping: {} due to '
-                    'recent crawl in {} days'
-                    .format(url, CRAWL_INTERVAL))
+        logger.info('Skipping: %s due to '
+                    'recent crawl in %s days', url, CRAWL_INTERVAL)
         return
     if not is_wiki_page(url):
         return
@@ -198,22 +197,20 @@ def crawl_link(url):
     if not is_wiki_page(url):
         return
     if name is None:
-        logger.warning('Warning on url {}:'.format(url))
+        logger.warning('Warning on url %s:', url)
         logger.warning('There is no pagetitle on this page. Ignoring.')
         return
     elif not result:
         if not type == 'Administrivia':
-            logger.warning('Warning on url {}: This page is not able to be'
-                           ' crawled. Ignoring.'.format(url))
+            logger.warning('Warning on url %s: This page is not able to be'
+                           ' crawled. Ignoring.', url)
         return
     # make sure that if redirected, final url is not also recently crawled.
     if recently_crawled(current_time, url, session):
-        logger.info('Skipping: {} due to '
-                    'recent crawl in {} days'
-                    .format(url, CRAWL_INTERVAL))
+        logger.info('Skipping: %s due to '
+                    'recent crawl in %s days', url, CRAWL_INTERVAL)
         return
-    logger.info("Fetching: {}/{} @ {}"
-                .format(namespace, name, url))
+    logger.info("Fetching: %s/%s @ %s", namespace, name, url)
     for a in tree.xpath('//div[@id="wikitext"]//a[@class="twikilink"]'):
         try:
             if not is_wiki_page(a.attrib['href']):
@@ -228,16 +225,15 @@ def crawl_link(url):
             if not is_wiki_page(destination_url):
                 continue
             if destination_name is None:
-                logger.warning('Warning on url {} (child):'
-                               .format(destination_url))
-                logger.warning('There is no pagetitle on this page. Ignoring.')
+                logger.warning('Warning on url %s (child): '
+                               'There is no pagetitle on this page. '
+                               'Ignoring.', destination_url)
                 continue
             elif not destination_result:
                 if not destination_type == 'Administrivia':
-                    logger.warning('Warning on url {} (child): '
+                    logger.warning('Warning on url %s (child): '
                                    'This page is not able to be crawled. '
-                                   'Ignoring.'
-                                   .format(destination_url))
+                                   'Ignoring.', destination_url)
                 continue
             try:
                 with session.begin():
@@ -254,8 +250,8 @@ def crawl_link(url):
             crawl_link.delay(destination_url)
         except AttributeError:
             pass
-    logger.info('Crawling {}/{} @ {} completed at {}'
-                .format(namespace, name, url, current_time))
+    logger.info('Crawling %s/%s @ %s completed at %s',
+                namespace, name, url, current_time)
     with session.begin():
         entity = session.query(Entity) \
                         .filter_by(url=url) \
