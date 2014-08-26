@@ -51,7 +51,6 @@ def determine_type(namespace):
 
 def list_pages(namespace_url=None):
     list_url = namespace_url or INDEX_INDEX
-    print('Populating seed from {}'.format(list_url))
     tree = parse(list_url)
 
     for a in tree.xpath('//a[@class="twikilink"]'):
@@ -63,8 +62,15 @@ def list_pages(namespace_url=None):
         namespaces = tree.xpath(
             '//a[starts-with(@href, "index_report.php?groupname=")]'
         )
+        print('{} more.'.format(len(namespaces)), flush=True)
 
+        count = 0
         for a in namespaces:
+            count += 1
+            if count % 10 == 0:
+                print('/', end="", flush=True)
+            else:
+                print('.', end="", flush=True)
             if "index_report.php?groupname=Administrivia" in a.attrib['href']:
                 continue
             url = urllib.parse.urljoin(
@@ -261,6 +267,7 @@ def crawl(config):
 
     Base.metadata.create_all(db_engine)
     if session.query(Entity).count() < 1:
+        print('Populating seeds... ', end="", flush=True)
         for url in list_pages():
             crawl_link.delay(url)
     else:
