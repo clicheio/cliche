@@ -168,7 +168,8 @@ def recently_crawled(current_time, url, session):
         last_crawled = session.query(Entity).filter_by(url=url) \
                               .one().last_crawled
         if last_crawled:
-            if current_time - last_crawled < CRAWL_INTERVAL:
+            if current_time.replace(tzinfo=None) - \
+               last_crawled.replace(tzinfo=None) < CRAWL_INTERVAL:
                 return True
     except NoResultFound:
         pass
