@@ -135,12 +135,14 @@ def fetch_link(url, session):
         final_url = r.url[:r.url.index('?')]
     except ValueError:
         final_url = r.url
+    if not is_wiki_page(final_url):
+        return False, None, None, None, None, final_url
     tree = document_fromstring(r.text)
     try:
         namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
             .text.strip()[:-1]
     except (AttributeError, AssertionError, IndexError):
-        return False, tree, None, None, '!Lost and Found', final_url
+        return False, tree, None, None, None, final_url
     if namespace == '':
         namespace = 'Main'
     name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
@@ -191,11 +193,8 @@ def crawl_link(url):
         logger.warning('There is no pagetitle on this page. Ignoring.')
         return
     elif not result and not type == 'Administrivia':
-        logger.warning('Warning on url {}:'.format(url))
-        if type == '!Lost and Found':
-            logger.warning('This page is a Lost and Found. Ignoring.')
-        else:
-            logger.warning('This page is not able to be crawled. Ignoring.')
+        logger.warning('Warning on url {}: This page is not able to be'
+                       ' crawled. Ignoring.'.format(url))
         return
     # make sure that if redirected, final url is not also recently crawled.
     if recently_crawled(current_time, url, session):
@@ -225,13 +224,10 @@ def crawl_link(url):
                 continue
             elif not destination_result and \
                     not destination_type == 'Administrivia':
-                logger.warning('Warning on url {} (child):'
+                logger.warning('Warning on url {} (child): '
+                               'This page is not able to be crawled. '
+                               'Ignoring.'
                                .format(destination_url))
-                if destination_type == '!Lost and Found':
-                    logger.warning('This page is a Lost and Found. Ignoring.')
-                else:
-                    logger.warning('This page is not able '
-                                   'to be crawled. Ignoring.')
                 continue
             try:
                 with session.begin():
