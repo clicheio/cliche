@@ -165,6 +165,10 @@ def recently_crawled(current_time, url, session):
     return False
 
 
+def is_wiki_page(url):
+    return (BASE_URL not in url or WIKI_PAGE in url)
+
+
 @worker.task
 def crawl_link(url):
     global db_engine
@@ -176,8 +180,12 @@ def crawl_link(url):
                     'recent crawl in {} days'
                     .format(url, CRAWL_INTERVAL))
         return
+    if not is_wiki_page(url):
+        return
     fetch_result = fetch_link(url, session)
     result, tree, namespace, name, type, url = fetch_result
+    if not is_wiki_page(url):
+        return
     if name is None:
         logger.warning('Warning on url {}:'.format(url))
         logger.warning('There is no pagetitle on this page. Ignoring.')
@@ -199,8 +207,7 @@ def crawl_link(url):
                 .format(namespace, name, url))
     for a in tree.xpath('//a[@class="twikilink"]'):
         try:
-            if BASE_URL in a.attrib['href'] and \
-                    WIKI_PAGE not in a.attrib['href']:
+            if not is_wiki_page(a.attrib['href']):
                 continue
             destination_url = urllib.parse.urljoin(
                 WIKI_PAGE, a.attrib['href']
@@ -209,8 +216,7 @@ def crawl_link(url):
             destination_result, destination_tree, destination_namespace, \
                 destination_name, destination_type, \
                 destination_url = fetch_result
-            if BASE_URL in destination_url and \
-                    WIKI_PAGE not in destination_url:
+            if not is_wiki_page(destination_url):
                 continue
             if destination_name is None:
                 logger.warning('Warning on url {} (child):'
