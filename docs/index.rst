@@ -10,6 +10,7 @@ Cliche is an ontology of fictional works.
    postgresql
    migration
    test
+   crawler
    cliche
 
 
