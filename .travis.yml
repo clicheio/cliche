@@ -2,11 +2,16 @@ language: python
 python:
 - 3.3
 - 3.4
+addons:
+  postgresql: "9.3"
 install:
 - pip install -e .[tests]
 - pip install pytest-cov flake8 coveralls
+before_script:
+- createdb -U postgres cliche_test
 script:
-- py.test -v --cov cliche --durations=20
+- py.test -v --cov cliche --durations=20 --database-url='postgresql:///cliche_test?user=postgres'
+- py.test -v --durations=20
 - hooks/pre-commit
 after_success:
 - coveralls
