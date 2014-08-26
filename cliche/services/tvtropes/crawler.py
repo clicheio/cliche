@@ -137,39 +137,49 @@ def process_redirections(session, original_url, final_url, namespace, name):
                     redirection.original_name = name
 
 
-def fetch_link(url, session):
+def fetch_link(url, session, *, log_prefix=''):
+    '''Returns result, tree, namespace, name, final_url.'''
+    logger = get_task_logger(__name__ + '.fetch_link')
+    if not is_wiki_page(url):
+        return False, None, None, None, url
     r = requests.get(url)
     try:
         final_url = r.url[:r.url.index('?')]
     except ValueError:
         final_url = r.url
     if not is_wiki_page(final_url):
-        return False, None, None, None, None, final_url
+        return False, None, None, None, final_url
     tree = document_fromstring(r.text)
     try:
         namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
             .text.strip()[:-1]
     except (AttributeError, AssertionError, IndexError):
-        return False, tree, None, None, None, final_url
+        logger.warning('%sWarning on url %s: '
+                       'There is no pagetitle on this page. Ignoring.',
+                       log_prefix, url)
+        return False, tree, None, None, final_url
     if namespace == '':
         namespace = 'Main'
     name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
 
     type = determine_type(namespace)
     if type == 'Administrivia':
-        return False, tree, namespace, name, type, final_url
+        return False, tree, namespace, name, final_url
     new_or_update_entity(session, namespace, name, type, final_url)
     process_redirections(session, url, final_url, namespace, name)
-    return True, tree, namespace, name, type, final_url
+    return True, tree, namespace, name, final_url
 
 
 def recently_crawled(current_time, url, session):
+    logger = get_task_logger(__name__ + '.recently_crawled')
     try:
         last_crawled = session.query(Entity).filter_by(url=url) \
                               .one().last_crawled
         if last_crawled:
             if current_time.replace(tzinfo=None) - \
                last_crawled.replace(tzinfo=None) < CRAWL_INTERVAL:
+                logger.info('%s was recently crawled in %s days.',
+                            url, CRAWL_INTERVAL)
                 return True
     except NoResultFound:
         pass
@@ -187,54 +197,25 @@ def crawl_link(url):
     logger = get_task_logger(__name__ + '.crawl_link')
     current_time = datetime.now()
     if recently_crawled(current_time, url, session):
-        logger.info('Skipping: %s due to '
-                    'recent crawl in %s days', url, CRAWL_INTERVAL)
         return
-    if not is_wiki_page(url):
-        return
-    fetch_result = fetch_link(url, session)
-    result, tree, namespace, name, type, url = fetch_result
-    if not is_wiki_page(url):
-        return
-    if name is None:
-        logger.warning('Warning on url %s:', url)
-        logger.warning('There is no pagetitle on this page. Ignoring.')
-        return
-    elif not result:
-        if not type == 'Administrivia':
-            logger.warning('Warning on url %s: This page is not able to be'
-                           ' crawled. Ignoring.', url)
+    result, tree, namespace, name, url = fetch_link(url, session)
+    if not result:
         return
     # make sure that if redirected, final url is not also recently crawled.
     if recently_crawled(current_time, url, session):
-        logger.info('Skipping: %s due to '
-                    'recent crawl in %s days', url, CRAWL_INTERVAL)
         return
     logger.info("Fetching: %s/%s @ %s", namespace, name, url)
     for a in tree.xpath('//div[@id="wikitext"]//a[@class="twikilink"]'):
         try:
-            if not is_wiki_page(a.attrib['href']):
-                continue
             destination_url = urllib.parse.urljoin(
                 WIKI_PAGE, a.attrib['href']
             )
-            fetch_result = fetch_link(destination_url, session)
             destination_result, destination_tree, destination_namespace, \
                 destination_name, destination_type, \
-                destination_url = fetch_result
-            if not is_wiki_page(destination_url):
-                continue
-            if destination_name is None:
-                logger.warning('Warning on url %s (child): '
-                               'There is no pagetitle on this page. '
-                               'Ignoring.', destination_url)
-                continue
-            elif not destination_result:
-                if not destination_type == 'Administrivia':
-                    logger.warning('Warning on url %s (child): '
-                                   'This page is not able to be crawled. '
-                                   'Ignoring.', destination_url)
-                continue
+                destination_url = fetch_link(destination_url, session,
+                                             log_prefix='(child) ')
+            if not result:
+                return
             try:
                 with session.begin():
                     new_relation = Relation(
