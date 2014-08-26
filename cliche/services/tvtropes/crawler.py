@@ -267,12 +267,14 @@ def crawl(config):
     session = Session(bind=db_engine)
 
     Base.metadata.create_all(db_engine)
+    print('Populating seeds...', end="", flush=True)
     if session.query(Entity).count() < 1:
-        print('Populating seeds...', end="", flush=True)
         for url in show_spinner(list_pages(print_callback=print),
                                 print_callback=print):
             crawl_link.delay(url)
     else:
-        for entity in session.query(Entity) \
-                             .order_by(Entity.namespace, Entity.name):
+        for entity in show_spinner(session.query(Entity)
+                                          .order_by(Entity.namespace,
+                                                    Entity.name),
+                                   print_callback=print):
             crawl_link.delay(entity.url)
