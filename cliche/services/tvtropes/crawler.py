@@ -243,6 +243,23 @@ def crawl_link(url):
         entity.last_crawled = current_time
 
 
+def show_spinner(iterable, *, print_callback):
+    spinner = 0
+    for value in iterable:
+        if spinner == 0:
+            print_callback('/', end="", flush=True)
+        if spinner == 1:
+            print_callback('-', end="", flush=True)
+        if spinner == 2:
+            print_callback('\\', end="", flush=True)
+        if spinner == 3:
+            print_callback('|', end="", flush=True)
+        print_callback('\b', end="", flush=True)
+        spinner += 1
+        spinner %= 4
+        yield value
+
+
 def crawl(config):
     worker.config_from_object(config)
     global db_engine
@@ -252,7 +269,8 @@ def crawl(config):
     Base.metadata.create_all(db_engine)
     if session.query(Entity).count() < 1:
         print('Populating seeds...', end="", flush=True)
-        for url in list_pages(print_callback=print):
+        for url in show_spinner(list_pages(print_callback=print),
+                                print_callback=print):
             crawl_link.delay(url)
     else:
         for entity in session.query(Entity) \
