@@ -13,12 +13,12 @@ import requests
 
 from celery.signals import worker_process_init
 from celery.utils.log import get_task_logger
-from lxml.html import parse, document_fromstring
+from lxml.html import document_fromstring, parse
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError, NoResultFound
 
-from .entities import Entity, Relation, Redirection
+from .entities import Entity, Redirection, Relation
 from ...orm import Base, Session
 from ...worker import worker
 
