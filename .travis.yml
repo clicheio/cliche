@@ -9,9 +9,16 @@ install:
 - pip install pytest-cov flake8 coveralls
 before_script:
 - createdb -U postgres cliche_test
+- createdb -U postgres alembic_test
 script:
+# alembic test
+- echo "DATABASE_URL = 'postgresql:///alembic_test?user=postgres'" > alembic_test.cfg.py
+- cliche -c alembic_test.cfg.py upgrade 27e81ea4d86
+- cliche -c alembic_test.cfg.py upgrade
+# unit test
 - py.test -v --cov cliche --durations=20 --database-url='postgresql:///cliche_test?user=postgres'
 - py.test -v --durations=20
+# lint
 - hooks/pre-commit
 after_success:
 - coveralls
