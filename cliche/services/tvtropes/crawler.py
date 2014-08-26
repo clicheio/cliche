@@ -49,7 +49,7 @@ def determine_type(namespace):
         return 'Work'
 
 
-def list_pages(namespace_url=None):
+def list_pages(namespace_url=None, *, print_callback=None):
     list_url = namespace_url or INDEX_INDEX
     tree = parse(list_url)
 
@@ -62,21 +62,24 @@ def list_pages(namespace_url=None):
         namespaces = tree.xpath(
             '//a[starts-with(@href, "index_report.php?groupname=")]'
         )
-        print(' {} more.'.format(len(namespaces)), flush=True)
+        if print_callback is not None:
+            print_callback(' {} more.'.format(len(namespaces)), flush=True)
 
         count = 0
         for a in namespaces:
             count += 1
             if count % 10 == 0:
-                print('/', end="", flush=True)
+                if print_callback is not None:
+                    print_callback('/', end="", flush=True)
             else:
-                print('.', end="", flush=True)
+                if print_callback is not None:
+                    print_callback('.', end="", flush=True)
             if "index_report.php?groupname=Administrivia" in a.attrib['href']:
                 continue
             url = urllib.parse.urljoin(
                 INDEX_INDEX, a.attrib['href']
             )
-            for value in list_pages(url):
+            for value in list_pages(url, print_callback=print_callback):
                 yield value
 
 
@@ -249,7 +252,7 @@ def crawl(config):
     Base.metadata.create_all(db_engine)
     if session.query(Entity).count() < 1:
         print('Populating seeds...', end="", flush=True)
-        for url in list_pages():
+        for url in list_pages(print_callback=print):
             crawl_link.delay(url)
     else:
         for entity in session.query(Entity) \
