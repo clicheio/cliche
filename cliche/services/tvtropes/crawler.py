@@ -63,6 +63,8 @@ def list_pages(namespace_url=None):
         )
 
         for a in namespaces:
+            if "index_report.php?groupname=Administrivia" in a.attrib['href']:
+                continue
             url = urllib.parse.urljoin(
                 INDEX_INDEX, a.attrib['href']
             )
