@@ -23,9 +23,10 @@ from ...orm import Base, Session
 from ...worker import worker
 
 
-INDEX_INDEX = 'http://tvtropes.org/pmwiki/index_report.php'
-WIKI_PAGE = 'http://tvtropes.org/pmwiki/pmwiki.php/'
-RELATED_SEARCH = 'http://tvtropes.org/pmwiki/relatedsearch.php?term='
+BASE_URL = 'http://tvtropes.org/pmwiki/'
+INDEX_INDEX = urllib.parse.urljoin(BASE_URL, 'index_report.php')
+WIKI_PAGE = urllib.parse.urljoin(BASE_URL, 'pmwiki.php/')
+RELATED_SEARCH = urllib.parse.urljoin(BASE_URL, 'relatedsearch.php?term=')
 
 CRAWL_INTERVAL = timedelta(days=7)
 
@@ -198,6 +199,9 @@ def crawl_link(url):
                 .format(namespace, name, url))
     for a in tree.xpath('//a[@class="twikilink"]'):
         try:
+            if BASE_URL in a.attrib['href'] and \
+                    WIKI_PAGE not in a.attrib['href']:
+                continue
             destination_url = urllib.parse.urljoin(
                 WIKI_PAGE, a.attrib['href']
             )
@@ -205,6 +209,9 @@ def crawl_link(url):
             destination_result, destination_tree, destination_namespace, \
                 destination_name, destination_type, \
                 destination_url = fetch_result
+            if BASE_URL in destination_url and \
+                    WIKI_PAGE not in destination_url:
+                continue
             if destination_name is None:
                 logger.warning('Warning on url {} (child):'
                                .format(destination_url))
