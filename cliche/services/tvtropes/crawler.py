@@ -181,11 +181,9 @@ def crawl_link(url):
         logger.warning('Warning on url {}:'.format(url))
         logger.warning('There is no pagetitle on this page. Ignoring.')
         return
-    elif not result:
+    elif not result and not type == 'Administrivia':
         logger.warning('Warning on url {}:'.format(url))
-        if type == 'Administrivia':
-            logger.warning('This page is an Administrivia. Ignoring.')
-        elif type == '!Lost and Found':
+        if type == '!Lost and Found':
             logger.warning('This page is a Lost and Found. Ignoring.')
         else:
             logger.warning('This page is not able to be crawled. Ignoring.')
@@ -212,12 +210,11 @@ def crawl_link(url):
                                .format(destination_url))
                 logger.warning('There is no pagetitle on this page. Ignoring.')
                 continue
-            elif not destination_result:
+            elif not destination_result and \
+                    not destination_type == 'Administrivia':
                 logger.warning('Warning on url {} (child):'
                                .format(destination_url))
-                if destination_type == 'Administrivia':
-                    logger.warning('This page is an Administrivia. Ignoring.')
-                elif destination_type == '!Lost and Found':
+                if destination_type == '!Lost and Found':
                     logger.warning('This page is a Lost and Found. Ignoring.')
                 else:
                     logger.warning('This page is not able '
