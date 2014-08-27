@@ -16,7 +16,7 @@ class EnumType(TypeDecorator):
     impl = Enum
 
     def __init__(self, enum_class: enum.Enum, **kw):
-        if issubclass(enum_class, enum.Enum):
+        if not issubclass(enum_class, enum.Enum):
             raise TypeError('expected enum.Enum subtype')
         super().__init__(*(m.name for m in enum_class), **kw)
         self._enum_class = enum_class
