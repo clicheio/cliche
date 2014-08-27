@@ -6,193 +6,274 @@
 """
 from __future__ import print_function
 
-from datetime import datetime, timedelta
+import datetime
 import urllib.parse
 
+import requests
+
+from celery.signals import worker_process_init
 from celery.utils.log import get_task_logger
-from lxml.html import parse
+from lxml.html import document_fromstring, parse
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import FlushError, NoResultFound
 
-from .entities import Entity, Relation
+from .entities import Entity, Redirection, Relation
 from ...orm import Base, Session
 from ...worker import worker
 
 
-INDEX_INDEX = 'http://tvtropes.org/pmwiki/index_report.php'
-WIKI_PAGE = 'http://tvtropes.org/pmwiki/pmwiki.php/'
-CRAWL_INTERVAL = timedelta(days=7)
+BASE_URL = 'http://tvtropes.org/pmwiki/'
+INDEX_INDEX = urllib.parse.urljoin(BASE_URL, 'index_report.php')
+WIKI_PAGE = urllib.parse.urljoin(BASE_URL, 'pmwiki.php/')
+RELATED_SEARCH = urllib.parse.urljoin(BASE_URL, 'relatedsearch.php?term=')
+
+CRAWL_INTERVAL = datetime.timedelta(days=7)
+
+
+db_engine = None
+
+
+@worker_process_init.connect
+def establish_database_connection(*args, **kwargs):
+    global db_engine
+    db_engine = create_engine(worker.conf.DATABASE_URL)
 
 
 def determine_type(namespace):
-    return 'Trope' if namespace == 'Main' else 'Work'
+    if namespace == 'Main':
+        return 'Trope'
+    elif namespace == 'Administrivia':
+        return 'Administrivia'
+    else:
+        return 'Work'
 
 
-def list_pages(namespace_url=None):
+def list_pages(namespace_url=None, *, print_callback=None):
     list_url = namespace_url or INDEX_INDEX
-    print('Crawling {}'.format(list_url))
     tree = parse(list_url)
 
     for a in tree.xpath('//a[@class="twikilink"]'):
-        name = a.text.strip()
         url = a.attrib['href']
-        if namespace_url:
-            yield (name,), url
-        else:
-            yield ('Main', name), url
+        if WIKI_PAGE in url:
+            yield url
 
     if not namespace_url:
         namespaces = tree.xpath(
             '//a[starts-with(@href, "index_report.php?groupname=")]'
         )
+        if print_callback is not None:
+            print_callback(' {} more.'.format(len(namespaces)), flush=True)
 
+        count = 0
         for a in namespaces:
-            namespace = a.text.strip()
+            count += 1
+            if count % 10 == 0:
+                if print_callback is not None:
+                    print_callback('/', end="", flush=True)
+            else:
+                if print_callback is not None:
+                    print_callback('.', end="", flush=True)
+            if "index_report.php?groupname=Administrivia" in a.attrib['href']:
+                continue
             url = urllib.parse.urljoin(
                 INDEX_INDEX, a.attrib['href']
             )
-            for key, value in list_pages(url):
-                assert len(key) == 1
-                yield (namespace,) + key, value
+            for value in list_pages(url, print_callback=print_callback):
+                yield value
 
 
-@worker.task
-def save_link(namepair, url):
-    namespace, name = namepair
-    engine = create_engine(worker.conf.DATABASE_URL)
-    session = Session(bind=engine)
+def upsert_entity(session, namespace, name, type, url):
     try:
         with session.begin():
             new_entity = Entity(
                 namespace=namespace,
                 name=name,
                 url=url,
-                type=determine_type(namespace)
+                type=type
             )
             session.add(new_entity)
-    except IntegrityError:
+    except (FlushError, IntegrityError):
         with session.begin():
             entity = session.query(Entity) \
                             .filter_by(namespace=namespace, name=name) \
                             .one()
             entity.url = url
-    get_task_logger(__name__ + '.save_link').info(
-        'Total %d',
-        session.query(Entity).count()
-    )
 
 
-def fetch_link(url, session):
-    tree = parse(url)
+def process_redirections(session, original_url, final_url, namespace, name):
+    # note that indirection is not considered:
+    # only the original and final path are saved.
+    *_, original_path = urllib.parse.urlparse(original_url).path.split('/', 3)
+    *_, final_path = urllib.parse.urlparse(final_url).path.split('/', 3)
+    if original_path != final_path:
+        rel = requests.get(RELATED_SEARCH + final_path)
+        reltree = document_fromstring(rel.text)
+        for link in reltree.xpath(
+            "//div[@id='wikimiddle']/div[re:test(text(),"
+            "'This article is the target of [0-9]+ redirect\(s\)\.'"
+            ")]/ul/li/a",
+            namespaces={'re': "http://exslt.org/regular-expressions"}
+        ):
+            alias_namespace = link.text[0:link.text.index('/')]
+            if alias_namespace == 'Administrivia':
+                continue
+            alias_name = link.text[link.text.index('/') + 1:]
+            try:
+                with session.begin():
+                    new_redirection = Redirection(
+                        alias_namespace=alias_namespace,
+                        alias_name=alias_name,
+                        original_namespace=namespace,
+                        original_name=name
+                    )
+                    session.add(new_redirection)
+            except (FlushError, IntegrityError):
+                with session.begin():
+                    redirection = session.query(Redirection) \
+                        .filter_by(
+                            alias_namespace=alias_namespace,
+                            alias_name=alias_name
+                        ) \
+                        .one()
+                    redirection.original_namespace = namespace
+                    redirection.original_name = name
+
+
+def fetch_link(url, session, *, log_prefix=''):
+    '''Returns result, tree, namespace, name, final_url.'''
+    logger = get_task_logger(__name__ + '.fetch_link')
+    if not is_wiki_page(url):
+        return False, None, None, None, url
+    r = requests.get(url)
+    try:
+        final_url = r.url[:r.url.index('?')]
+    except ValueError:
+        final_url = r.url
+    if not is_wiki_page(final_url):
+        return False, None, None, None, final_url
+    tree = document_fromstring(r.text)
     try:
         namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
             .text.strip()[:-1]
     except (AttributeError, AssertionError, IndexError):
-        return None
+        logger.warning('%sWarning on url %s: '
+                       'There is no pagetitle on this page. Ignoring.',
+                       log_prefix, url)
+        return False, tree, None, None, final_url
     if namespace == '':
         namespace = 'Main'
     name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
-    with session.begin():
-        new_entity = Entity(
-            namespace=namespace,
-            name=name,
-            url=url,
-            type=determine_type(namespace)
-        )
-        session.add(new_entity)
-    return tree, namespace, name
+
+    type = determine_type(namespace)
+    if type == 'Administrivia':
+        return False, tree, namespace, name, final_url
+    upsert_entity(session, namespace, name, type, final_url)
+    process_redirections(session, url, final_url, namespace, name)
+    return True, tree, namespace, name, final_url
+
+
+def recently_crawled(current_time, url, session):
+    logger = get_task_logger(__name__ + '.recently_crawled')
+    try:
+        last_crawled = session.query(Entity).filter_by(url=url) \
+                              .one().last_crawled
+        if last_crawled:
+            if current_time - last_crawled < CRAWL_INTERVAL:
+                logger.info('%s was recently crawled in %s days.',
+                            url, CRAWL_INTERVAL)
+                return True
+    except NoResultFound:
+        pass
+    return False
+
+
+def is_wiki_page(url):
+    return (BASE_URL not in url or WIKI_PAGE in url)
 
 
 @worker.task
-def crawl_link(url, start_time,
-               start_indexindex_count, start_relations_count,
-               round_count):
-    engine = create_engine(worker.conf.DATABASE_URL)
-    session = Session(bind=engine)
+def crawl_link(url):
+    global db_engine
+    session = Session(bind=db_engine)
     logger = get_task_logger(__name__ + '.crawl_link')
-    current_time = datetime.now()
-
-    last_crawled = session.query(Entity).filter_by(url=url) \
-                          .first().last_crawled
-    if last_crawled:
-        if current_time - last_crawled < CRAWL_INTERVAL:
-            logger.info('Skipping: {} due to '
-                        'recent crawl in {} days'
-                        .format(url, CRAWL_INTERVAL))
-            return
-
-    fetch_result = fetch_link(url, session)
-    if fetch_result is None:
-        logger.warning('Warning: There is no pagetitle on this page. '
-                       'Ignoring.')
+    current_time = datetime.datetime.now(datetime.timezone.utc)
+    if recently_crawled(current_time, url, session):
         return
-    tree, namespace, name = fetch_result
-    logger.info("Fetching: {}/{} @ {}"
-                .format(namespace, name, url))
-    for a in tree.xpath('//a[@class="twikilink"]'):
+    result, tree, namespace, name, url = fetch_link(url, session)
+    if not result:
+        return
+    # make sure that if redirected, final url is not also recently crawled.
+    if recently_crawled(current_time, url, session):
+        return
+    logger.info("Fetching: %s/%s @ %s", namespace, name, url)
+    for a in tree.xpath('//div[@id="wikitext"]//a[@class="twikilink"]'):
         try:
             destination_url = urllib.parse.urljoin(
                 WIKI_PAGE, a.attrib['href']
             )
-            fetch_result = fetch_link(url, session)
-            if fetch_result is None:
-                logger.warning('Warning: There is no pagetitle on '
-                               'this page. Ignoring.')
+            destination_result, destination_tree, destination_namespace, \
+                destination_name, destination_type, \
+                destination_url = fetch_link(destination_url, session,
+                                             log_prefix='(child) ')
+            if not result:
                 return
-            destination_tree, destination_namespace, \
-                destination_name = fetch_result
-            with session.begin():
-                new_relation = Relation(
-                    origin_namespace=namespace,
-                    origin_name=name,
-                    destination_namespace=destination_namespace,
-                    destination_name=destination_name
-                )
-                session.add(new_relation)
+            try:
+                with session.begin():
+                    new_relation = Relation(
+                        origin_namespace=namespace,
+                        origin_name=name,
+                        destination_namespace=destination_namespace,
+                        destination_name=destination_name
+                    )
+                    session.add(new_relation)
+            except IntegrityError:
+                pass
             # FIXME if next_crawl not in crawl_stack:
-            crawl_link.delay(destination_url, start_time,
-                             start_indexindex_count, start_relations_count,
-                             round_count)
+            crawl_link.delay(destination_url)
         except AttributeError:
             pass
-    logger.info('Crawling {}/{} @ {} completed at {}'
-                .format(namespace, name, url, current_time))
+    logger.info('Crawling %s/%s @ %s completed at %s',
+                namespace, name, url, current_time)
     with session.begin():
         entity = session.query(Entity) \
                         .filter_by(url=url) \
                         .one()
         entity.last_crawled = current_time
-    round_count += 1
-    if round_count >= 10:
-        round_count = 0
-        elasped = datetime.now() - start_time
-        elasped_hours = elasped.total_seconds() / 3600
-        indexindex_count = session.query(Entity).count() \
-            - start_indexindex_count
-        relations_count = session.query(Relation).count() \
-            - start_relations_count
-        logger.info('-> entities: %s (%s/h) relations: %s (%s/h) '
-                    'elasped %s',
-                    indexindex_count,
-                    int(indexindex_count / elasped_hours),
-                    relations_count,
-                    int(relations_count / elasped_hours),
-                    elasped)
+
+
+def show_spinner(iterable, *, print_callback):
+    spinner = 0
+    for value in iterable:
+        if spinner == 0:
+            print_callback('/', end="", flush=True)
+        if spinner == 1:
+            print_callback('-', end="", flush=True)
+        if spinner == 2:
+            print_callback('\\', end="", flush=True)
+        if spinner == 3:
+            print_callback('|', end="", flush=True)
+        print_callback('\b', end="", flush=True)
+        spinner += 1
+        spinner %= 4
+        yield value
 
 
 def crawl(config):
     worker.config_from_object(config)
-    engine = create_engine(worker.conf.DATABASE_URL)
-    session = Session(bind=engine)
+    global db_engine
+    db_engine = create_engine(worker.conf.DATABASE_URL)
+    session = Session(bind=db_engine)
 
-    Base.metadata.create_all(engine)
+    Base.metadata.create_all(db_engine)
+    print('Populating seeds...', end="", flush=True)
     if session.query(Entity).count() < 1:
-        for name, url in list_pages():
-            save_link.delay(name, url)
-
-    for entity in session.query(Entity) \
-                         .order_by(Entity.namespace, Entity.name):
-        crawl_link.delay(entity.url, datetime.now(),
-                         session.query(Entity).count(),
-                         session.query(Relation).count(),
-                         0)
+        for url in show_spinner(list_pages(print_callback=print),
+                                print_callback=print):
+            crawl_link.delay(url)
+    else:
+        for entity in show_spinner(session.query(Entity)
+                                          .order_by(Entity.namespace,
+                                                    Entity.name),
+                                   print_callback=print):
+            crawl_link.delay(entity.url)

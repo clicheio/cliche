@@ -40,6 +40,7 @@ install_requires = {
     'celery >= 3.1.13',
     'lxml >= 3.3.5',
     'psycopg2 >= 2.5.3',  # FIXME
+    'requests >= 2.3.0',
     # Web
     'Flask >= 0.10',
     'Werkzeug >= 0.9',
