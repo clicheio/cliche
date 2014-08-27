@@ -83,7 +83,7 @@ def list_pages(namespace_url=None, *, print_callback=None):
                 yield value
 
 
-def new_or_update_entity(session, namespace, name, type, url):
+def upsert_entity(session, namespace, name, type, url):
     try:
         with session.begin():
             new_entity = Entity(
@@ -168,7 +168,7 @@ def fetch_link(url, session, *, log_prefix=''):
     type = determine_type(namespace)
     if type == 'Administrivia':
         return False, tree, namespace, name, final_url
-    new_or_update_entity(session, namespace, name, type, final_url)
+    upsert_entity(session, namespace, name, type, final_url)
     process_redirections(session, url, final_url, namespace, name)
     return True, tree, namespace, name, final_url
 
