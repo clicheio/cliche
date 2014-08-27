@@ -6,7 +6,7 @@
 """
 from __future__ import print_function
 
-from datetime import datetime, timedelta
+import datetime
 import urllib.parse
 
 import requests
@@ -28,7 +28,7 @@ INDEX_INDEX = urllib.parse.urljoin(BASE_URL, 'index_report.php')
 WIKI_PAGE = urllib.parse.urljoin(BASE_URL, 'pmwiki.php/')
 RELATED_SEARCH = urllib.parse.urljoin(BASE_URL, 'relatedsearch.php?term=')
 
-CRAWL_INTERVAL = timedelta(days=7)
+CRAWL_INTERVAL = datetime.timedelta(days=7)
 
 
 db_engine = None
@@ -179,8 +179,7 @@ def recently_crawled(current_time, url, session):
         last_crawled = session.query(Entity).filter_by(url=url) \
                               .one().last_crawled
         if last_crawled:
-            if current_time.replace(tzinfo=None) - \
-               last_crawled.replace(tzinfo=None) < CRAWL_INTERVAL:
+            if current_time - last_crawled < CRAWL_INTERVAL:
                 logger.info('%s was recently crawled in %s days.',
                             url, CRAWL_INTERVAL)
                 return True
@@ -198,7 +197,7 @@ def crawl_link(url):
     global db_engine
     session = Session(bind=db_engine)
     logger = get_task_logger(__name__ + '.crawl_link')
-    current_time = datetime.now()
+    current_time = datetime.datetime.now(datetime.timezone.utc)
     if recently_crawled(current_time, url, session):
         return
     result, tree, namespace, name, url = fetch_link(url, session)
