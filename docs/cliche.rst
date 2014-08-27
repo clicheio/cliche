@@ -5,6 +5,7 @@
       :maxdepth: 2
 
       cliche/cli
+      cliche/config
       cliche/orm
       cliche/people
       cliche/services

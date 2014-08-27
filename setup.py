@@ -49,6 +49,11 @@ install_requires = {
     'SPARQLWrapper >= 1.6.2'
 }
 
+if sys.version_info < (3, 4, 0):
+    install_requires |= {
+        'pathlib >= 1.0',
+    }
+
 tests_require = {
     'pytest >= 2.5.0'
 }

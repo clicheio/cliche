@@ -14,7 +14,7 @@ To upgrade the schema to the latest revision, simply run
 
 .. sourcecode:: console
 
-   $ cliche -c dev.cfg upgrade
+   $ cliche -c dev.cfg.py upgrade
    INFO  [alembic.migration] Context impl PostgresqlImpl.
    INFO  [alembic.migration] Will assume transactional DDL.
    INFO  [alembic.migration] Running upgrade 256db34030b7 -> 2a1ebdf4c19e

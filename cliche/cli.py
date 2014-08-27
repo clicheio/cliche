@@ -2,16 +2,17 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
-import os
 import logging.config
+import os
+import pathlib
+import sys
 
 from alembic.util import CommandError
 from flask.ext.script import Manager
-import sys
 
+from .config import read_config
 from .orm import downgrade_database, upgrade_database
 from .web.app import app
-from .web.config import config_from_yaml
 from .web.db import get_database_engine
 
 from .services.tvtropes.crawler import crawl as crawl_tvtropes
@@ -63,11 +64,8 @@ def initialize_app(config=None):
     if not os.path.isfile(config):
         print('The configuration file', config, 'cannot be read.')
         raise SystemExit(1)
-    elif os.path.splitext(config)[1] in ('.yml', '.yaml'):
-        config_from_yaml(app.config, filename=config)
-    else:
-        config = os.path.abspath(config)
-        app.config.from_pyfile(config)
+    config = read_config(filename=pathlib.Path(config))
+    app.config.update(config)
     return app
 
 
