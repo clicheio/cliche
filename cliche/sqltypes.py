@@ -1,14 +1,17 @@
-""":mod:`cliche.sqltypes` --- Collection of custom types
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+""":mod:`cliche.sqltypes` --- Collection of custom types for SQLAlchemy.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
 import enum
 
 from sqlalchemy.types import Enum, TypeDecorator
 
+__all__ = 'EnumType',
+
 
 class EnumType(TypeDecorator):
-    """Enum type for SQLAlchemy to be used like enum.Enum"""
+    """Enum type to be used as :class:`enum.Enum` in Python standard library.
+    """
 
     impl = Enum
 
