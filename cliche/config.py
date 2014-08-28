@@ -8,7 +8,32 @@ import warnings
 
 from yaml import load
 
-__all__ = 'read_config', 'read_config_from_python', 'read_config_from_yaml'
+__all__ = ('ConfigDict', 'ConfigKeyError', 'read_config',
+           'read_config_from_python', 'read_config_from_yaml')
+
+
+class ConfigDict(dict):
+    """Almost the same to the built-in :class:`dict` except it raises
+    :exc:`ConfigKeyError` instead of :exc:`KeyError` with finer error
+    message.
+
+    """
+
+    def __getitem__(self, key):
+        try:
+            return super().__getitem__(key)
+        except KeyError:
+            raise ConfigKeyError(key)
+
+
+class ConfigKeyError(KeyError):
+    """The exception raised when there's no such configured key, that
+    is a subtype of built-in :exc:`KeyError`.
+
+    """
+
+    def __str__(self):
+        return 'missing configuration: ' + super().__str__()
 
 
 def read_config(filename):
@@ -23,7 +48,7 @@ def read_config(filename):
                      python source code
     :type filename: :class:`pathlib.Path`
     :returns: the parsed dictionary with uppercase keys
-    :rtype: :class:`collections.abc.Mapping`
+    :rtype: :class:`ConfigDict`
 
     """
     if not isinstance(filename, pathlib.Path):
@@ -56,7 +81,7 @@ def read_config_from_yaml(*, string=None, file=None, filename=None):
     :param filename: read config from a *filename* of yaml
     :type filename: :class:`pathlib.Path`
     :returns: the parsed dictionary with uppercase keys
-    :rtype: :class:`collections.abc.Mapping`
+    :rtype: :class:`ConfigDict`
 
     """
     args_number = sum(a is not None for a in {string, file, filename})
@@ -81,7 +106,7 @@ def read_config_from_yaml(*, string=None, file=None, filename=None):
             )
         with filename.open() as f:
             dictionary = load(f)
-    return {k.upper(): v for k, v in dictionary.items()}
+    return ConfigDict((k.upper(), v) for k, v in dictionary.items())
 
 
 def read_config_from_python(*, string=None, file=None, filename=None):
@@ -132,4 +157,4 @@ def read_config_from_python(*, string=None, file=None, filename=None):
                 raise
     config = {}
     exec(compile(string, str(filename), 'exec'), config)
-    return {k: v for k, v in config.items() if k.isupper()}
+    return ConfigDict((k, v) for k, v in config.items() if k.isupper())
