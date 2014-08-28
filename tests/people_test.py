@@ -1,3 +1,4 @@
+from cliche.people import TeamMembership
 
 
 def test_team_has_members(fx_people, fx_teams):
@@ -9,14 +10,43 @@ def test_team_has_members(fx_people, fx_teams):
     }
 
 
-def test_person_has_awards(fx_people, fx_awards):
-    assert fx_people.peter_jackson.awards == {
-        fx_awards.hugo_award,
-        fx_awards.nebula_award
-    }
+def test_person_has_teams(fx_people, fx_teams):
+    assert fx_people.clamp_member_1.teams == {fx_teams.clamp}
 
 
-def test_person_made_works(fx_people, fx_works):
-    assert fx_people.clamp_member_1.credits == {
-        fx_works.skura_member_asso_1
-    }
+def test_membership_removed_with_team(fx_session, fx_people, fx_teams):
+    clamp_id = fx_people.clamp_member_1.id
+
+    # before delete the team.
+    num_memberships = fx_session.query(TeamMembership).\
+        filter_by(team_id=clamp_id).\
+        count()
+    assert num_memberships == 4
+
+    fx_session.delete(fx_teams.clamp)
+    fx_session.flush()
+
+    # after delete the team.
+    num_memberships = fx_session.query(TeamMembership).\
+        filter_by(team_id=clamp_id).\
+        count()
+    assert num_memberships == 0
+
+
+def test_membership_removed_with_person(fx_session, fx_people, fx_teams):
+    member_1_id = fx_people.clamp_member_1.id
+
+    # before delete the person.
+    num_memberships = fx_session.query(TeamMembership).\
+        filter_by(member_id=member_1_id).\
+        count()
+    assert num_memberships == 1
+
+    fx_session.delete(fx_people.clamp_member_1)
+    fx_session.flush()
+
+    # after delete the person.
+    num_memberships = fx_session.query(TeamMembership).\
+        filter_by(member_id=member_1_id).\
+        count()
+    assert num_memberships == 0
