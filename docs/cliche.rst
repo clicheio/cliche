@@ -9,6 +9,7 @@
       cliche/orm
       cliche/people
       cliche/services
+      cliche/sqltypes
       cliche/web
       cliche/work
       cliche/worker

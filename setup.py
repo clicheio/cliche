@@ -52,6 +52,7 @@ install_requires = {
 if sys.version_info < (3, 4, 0):
     install_requires |= {
         'pathlib >= 1.0',
+        'enum34 >= 1.0',
     }
 
 tests_require = {
