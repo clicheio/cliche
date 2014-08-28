@@ -2,7 +2,6 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
-
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.sql.functions import now
@@ -11,21 +10,10 @@ from sqlalchemy.types import Date, DateTime, Enum, Integer, String
 from .orm import Base
 from .people import Person, Team
 
-__all__ = (
-    'Award',
-    'AwardWinner',
-    'Credit',
-    'Genre',
-    'Work',
-    'WorkAward',
-    'WorkGenre'
-)
+__all__ = ('Award', 'AwardWinner', 'Credit', 'Genre',
+           'Work', 'WorkAward', 'WorkGenre')
 
-roles = (
-    "Artist",
-    "Author",
-    "Editor"
-)
+roles = ('Artist', 'Author', 'Editor')
 
 
 class Award(Base):
@@ -39,7 +27,9 @@ class Award(Base):
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`AwardWinner`\ s that the award has.
-    award_winners = relationship('AwardWinner', collection_class=set)
+    award_winners = relationship('AwardWinner',
+                                 cascade="delete, merge, save-update",
+                                 collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`cliche.people.Person`\ s that won the award.
@@ -49,7 +39,9 @@ class Award(Base):
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkAward`\ s that the award has.
-    work_awards = relationship('WorkAward', collection_class=set)
+    work_awards = relationship('WorkAward',
+                               cascade="delete, merge, save-update",
+                               collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`Work`\ s that won the award.
@@ -132,7 +124,9 @@ class Genre(Base):
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkGenre`\ s that the genre has.
-    work_genres = relationship('WorkGenre', collection_class=set)
+    work_genres = relationship('WorkGenre',
+                               cascade="delete, merge, save-update",
+                               collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`Work`\ s that fall into the genre.
@@ -177,7 +171,9 @@ class Work(Base):
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkAward`\ s that the work has.
-    work_awards = relationship('WorkAward', collection_class=set)
+    work_awards = relationship('WorkAward',
+                               cascade="delete, merge, save-update",
+                               collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`Award`\ s that the work won.
@@ -187,7 +183,9 @@ class Work(Base):
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkGenre`\ s that the work has.
-    work_genres = relationship('WorkGenre', collection_class=set)
+    work_genres = relationship('WorkGenre',
+                               cascade="delete, merge, save-update",
+                               collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`Genre`\ s that the work falls into.
@@ -197,7 +195,9 @@ class Work(Base):
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`Credit`\ s that the work has.
-    credits = relationship(Credit, collection_class=set)
+    credits = relationship(Credit,
+                           cascade="delete, merge, save-update",
+                           collection_class=set)
 
     #: (:class:`datetime.datetime`) The date and time on which
     #: the record was created.
