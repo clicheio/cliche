@@ -1,8 +1,8 @@
 """add association between work and person with role
 
-Revision ID: 17e0735ec35
-Revises: 2e3e3a9a625
-Create Date: 2014-08-20 01:25:53.368621
+Revision ID: 34381a732e8
+Revises: 7f6fc70526
+Create Date: 2014-08-29 03:58:16.570762
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '17e0735ec35'
-down_revision = '2e3e3a9a625'
+revision = '34381a732e8'
+down_revision = '7f6fc70526'
 
 
 def upgrade():
@@ -31,3 +31,5 @@ def upgrade():
 
 def downgrade():
     op.drop_table('credits')
+    # manually added this line for Enum type since autogenerate doesn't.
+    sa.Enum(name='role').drop(op.get_bind())
