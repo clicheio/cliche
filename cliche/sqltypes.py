@@ -4,13 +4,15 @@
 """
 import enum
 
-from sqlalchemy.types import Enum, TypeDecorator
+from sqlalchemy.types import Enum, SchemaType, TypeDecorator
 
 __all__ = 'EnumType',
 
 
-class EnumType(TypeDecorator):
+class EnumType(TypeDecorator, SchemaType):
     """Enum type to be used as :class:`enum.Enum` in Python standard library.
+    It inherits :class:`sqlalchemy.types.SchemaType` since it requires
+    schema-level DDL. PostgreSQL ENUM type must be explicitly created/dropped.
     """
 
     impl = Enum
@@ -26,6 +28,9 @@ class EnumType(TypeDecorator):
 
     def process_result_value(self, value, dialect):
         return self._enum_class[value]
+
+    def _set_parent(self, column):
+        self.impl._set_parent(column)
 
     @property
     def python_type(self):
