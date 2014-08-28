@@ -62,6 +62,7 @@ class FixtureModule(types.ModuleType):
 
 @fixture
 def fx_awards(fx_session):
+    # create awards: Seiun Awqrd, Hugo Awqrd and Nebula Award.
     f = FixtureModule('fx_awards')
     f.session = fx_session
     f.seiun_award = Award(name='Seiun Award')
@@ -76,6 +77,8 @@ def fx_awards(fx_session):
 
 @fixture
 def fx_people(fx_session, fx_awards):
+    # create people: four artisits and Peter Jackson who won
+    # Hugo and Nebula Award.
     f = FixtureModule('fx_people')
     f += fx_awards
     f.clamp_member_1 = Person(name='Nanase Ohkawa',
@@ -101,6 +104,7 @@ def fx_people(fx_session, fx_awards):
 
 @fixture
 def fx_teams(fx_session, fx_people):
+    # create teams: CLAMP which consists of the four artists.
     f = FixtureModule('fx_teams')
     f += fx_people
     f.clamp = Team(name='CLAMP')
@@ -115,6 +119,7 @@ def fx_teams(fx_session, fx_people):
 
 @fixture
 def fx_genres(fx_session):
+    # create genres: Comic, Romance
     f = FixtureModule('fx_genres')
     f.session = fx_session
     f.comic = Genre(name='Comic')
@@ -127,6 +132,10 @@ def fx_genres(fx_session):
 
 @fixture
 def fx_works(fx_session, fx_teams, fx_awards, fx_genres):
+    # create works: Cardcaptor Sakura which
+    # made by CLAMP team and members of the team
+    # , won Seiun Award
+    # and belongs to comic and romance genres
     f = FixtureModule('fx_works')
     f += fx_teams
     f += fx_awards
