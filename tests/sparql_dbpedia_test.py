@@ -1,3 +1,6 @@
+import logging
+from urllib.error import HTTPError, URLError
+
 from sparql import load_dbpedia as dbpedia
 
 
@@ -12,7 +15,18 @@ def test_load_dbpedia_is_save_db(
     )
     count = 0
     for y in range(0, fx_sparql_dbpedia_table['COUNT']):
-        res = dbpedia.load_dbpedia(fx_sparql_dbpedia_table['LIMIT'], y)
+        try:
+            res = dbpedia.load_dbpedia(fx_sparql_dbpedia_table['LIMIT'], y)
+        except HTTPError as e:
+            logging.exception(
+                'Connected to dbpedia.org but got status code %d: %s.',
+                e.code, e.msg)
+            return
+        except URLError as e:
+            logging.exception(
+                'Failed to connect to dbpedia.org: %s.', e.msg)
+            return
+
         dbpedia.save_db(res, fx_sparql_dbpedia_table)
 
         temp = fx_sparql_dbpedia_cursor.execute(qry)
