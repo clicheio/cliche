@@ -1,5 +1,6 @@
 #!/bin/bash
 # Script to prepare target for deployment
+trap 'exit' ERR
 
 prepare() {
 	echo "This is a stub."
