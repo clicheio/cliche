@@ -36,7 +36,7 @@ class Person(Base):
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`TeamMembership`\ s he/she has.
     memberships = relationship('TeamMembership',
-                               cascade="delete, merge, save-update",
+                               cascade='delete, merge, save-update',
                                collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of :class:`Team`\ s
@@ -48,7 +48,7 @@ class Person(Base):
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`cliche.work.AwardWinner`\ s that the person has.
     award_winners = relationship('AwardWinner',
-                                 cascade="delete, merge, save-update",
+                                 cascade='delete, merge, save-update',
                                  collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
@@ -60,7 +60,7 @@ class Person(Base):
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`cliche.work.Credit`\ s that the person has.
     credits = relationship('Credit',
-                           cascade="delete, merge, save-update",
+                           cascade='delete, merge, save-update',
                            collection_class=set)
 
     __tablename__ = 'people'
@@ -85,7 +85,7 @@ class Team(Base):
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`TeamMembership`\ s that the team has.
     memberships = relationship('TeamMembership',
-                               cascade="delete, merge, save-update",
+                               cascade='delete, merge, save-update',
                                collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The members :class:`Person` set.

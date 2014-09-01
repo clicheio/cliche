@@ -37,7 +37,7 @@ class Award(Base):
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`AwardWinner`\ s that the award has.
     award_winners = relationship('AwardWinner',
-                                 cascade="delete, merge, save-update",
+                                 cascade='delete, merge, save-update',
                                  collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
@@ -49,7 +49,7 @@ class Award(Base):
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkAward`\ s that the award has.
     work_awards = relationship('WorkAward',
-                               cascade="delete, merge, save-update",
+                               cascade='delete, merge, save-update',
                                collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
@@ -134,7 +134,7 @@ class Genre(Base):
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkGenre`\ s that the genre has.
     work_genres = relationship('WorkGenre',
-                               cascade="delete, merge, save-update",
+                               cascade='delete, merge, save-update',
                                collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
@@ -181,7 +181,7 @@ class Work(Base):
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkAward`\ s that the work has.
     work_awards = relationship('WorkAward',
-                               cascade="delete, merge, save-update",
+                               cascade='delete, merge, save-update',
                                collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
@@ -193,7 +193,7 @@ class Work(Base):
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkGenre`\ s that the work has.
     work_genres = relationship('WorkGenre',
-                               cascade="delete, merge, save-update",
+                               cascade='delete, merge, save-update',
                                collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
@@ -205,7 +205,7 @@ class Work(Base):
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`Credit`\ s that the work has.
     credits = relationship(Credit,
-                           cascade="delete, merge, save-update",
+                           cascade='delete, merge, save-update',
                            collection_class=set)
 
     #: (:class:`datetime.datetime`) The date and time on which
