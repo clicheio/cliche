@@ -1,0 +1,6 @@
+python3.4
+python3.4-dev
+build-essential
+libpq-dev
+libxml2-dev
+libxslt1-dev

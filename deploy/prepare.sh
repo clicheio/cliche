@@ -7,7 +7,9 @@ prepare() {
 	sudo apt-get install -y python-software-properties
 	sudo add-apt-repository ppa:fkrull/deadsnakes -y
 	sudo apt-get update
-	sudo apt-get install -y $(cat apt-requirements.txt)
+	packages="$(cat $(dirname $0)/apt-requirements.txt)"
+	echo $packages
+	sudo apt-get install -y $packages
 }
 
 not_compatible_with_os() {
