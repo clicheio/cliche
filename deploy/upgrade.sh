@@ -14,7 +14,7 @@ not_compatible_with_os() {
 }
 
 main() {
-	if [[ -f /etc/os-release ]
+	if [[ -f /etc/os-release ]]
 	then
 		. /etc/os-release
 		if [[ $NAME = "Debian GNU/Linux" ]]
