@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-deploy() {
-	echo "This is a stub."
-	echo "These are lists of parameters."
-	echo "$@"
+upload() {
+	ssh $1 mkdir /tmp/$2
+	scp deploy/prepare.sh deploy/promote.sh deploy/upgrade.sh dist/*.whl $1:/tmp/$2
+	ssh $1 chmod +x /tmp/$2/prepare.sh /tmp/$2/promote.sh /tmp/$2/upgrade.sh
 }
 
 usage() {
@@ -21,7 +21,13 @@ main() {
 		revision=$(cat .git/$(awk '{print $2}' .git/HEAD))
 		python setup.py egg_info -b "-$revision" bdist_wheel
 			for address in "$@"; do
-				deploy $address
+				echo "Deploying to $address."
+				temp=$(upload $address $revision)
+				ssh $address /tmp/$revision/prepare.sh
+				ssh $address /tmp/$revision/upgrade.sh
+			done
+			for address in "$@"; do
+				ssh $address /tmp/$revision/promote.sh
 			done
 	else
 		usage
