@@ -7,10 +7,21 @@ deploy() {
 	echo "$@"
 }
 
+usage() {
+	me=`basename $0`
+	echo "usage: ./$me <list of ip address split by spaces>"
+	exit 1
+}
+
 main() {
-	for address in "$@"; do
-		deploy $address
-	done
+	if [[ $@ ]]; then
+		for address in "$@"; do
+
+			deploy $address
+		done
+	else
+		usage
+	fi
 }
 
 main "$@"
