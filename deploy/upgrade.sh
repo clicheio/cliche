@@ -3,9 +3,8 @@
 set -e
 
 upgrade() {
-	echo "This is a stub."
-	echo "These are lists of parameters."
-	echo "$@"
+	pyvenv $HOME/venv_$(cat revision.txt)
+	$HOME/venv_$(cat revision.txt)/bin/pip install *.whl
 }
 
 not_compatible_with_os() {

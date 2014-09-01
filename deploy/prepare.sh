@@ -3,9 +3,11 @@
 set -e
 
 prepare() {
-	echo "This is a stub."
-	echo "These are lists of parameters."
-	echo "$@"
+	echo "Installing prerequisities."
+	sudo apt-get install -y python-software-properties
+	sudo add-apt-repository ppa:fkrull/deadsnakes | yes
+	sudo apt-get update
+	sudo apt-get install -y $(cat apt-requirements.txt)
 }
 
 not_compatible_with_os() {

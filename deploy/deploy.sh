@@ -3,7 +3,7 @@ set -e
 
 upload() {
 	ssh $1 mkdir /tmp/$2
-	scp deploy/prepare.sh deploy/promote.sh deploy/upgrade.sh dist/*.whl $1:/tmp/$2
+	scp deploy/prepare.sh deploy/promote.sh deploy/upgrade.sh deploy/apt-requirements.txt deploy/revision.txt dist/*.whl $1:/tmp/$2
 	ssh $1 chmod +x /tmp/$2/prepare.sh /tmp/$2/promote.sh /tmp/$2/upgrade.sh
 }
 
@@ -19,6 +19,7 @@ main() {
 		cd $workdir
 		rm -rf dist/
 		revision=$(cat .git/$(awk '{print $2}' .git/HEAD))
+		echo $revision >> deploy/revision.txt
 		python setup.py egg_info -b "_$revision" bdist_wheel
 			for address in "$@"; do
 				echo "Deploying to $address."
