@@ -3,8 +3,8 @@
 set -e
 
 upgrade() {
-	pyvenv $HOME/venv_$(cat revision.txt)
-	$HOME/venv_$(cat revision.txt)/bin/pip install *.whl
+	pyvenv-3.4 $HOME/venv_$(cat $(dirname $0)/revision.txt)
+	$HOME/venv_$(cat $(dirname $0)/revision.txt)/local/bin/pip install *.whl
 }
 
 not_compatible_with_os() {
