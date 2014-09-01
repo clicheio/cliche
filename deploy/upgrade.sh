@@ -8,7 +8,7 @@ upgrade() {
 }
 
 not_compatible_with_os() {
-	echo "This script can only be run on Debian GNU/Linux."
+	echo "This script can only be run on Debian GNU/Linux or Ubuntu."
 	exit 1
 }
 
@@ -16,8 +16,7 @@ main() {
 	if [[ -f /etc/os-release ]]
 	then
 		. /etc/os-release
-		if [[ $NAME = "Debian GNU/Linux" ]]
-		then
+		if [[ $NAME = "Debian GNU/Linux" ]] || [[ $NAME = "Ubuntu" ]]; then
 			upgrade "$@"
 		else
 			not_compatible_with_os
