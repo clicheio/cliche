@@ -19,7 +19,7 @@ main() {
 		cd $workdir
 		rm -rf dist/
 		revision=$(cat .git/$(awk '{print $2}' .git/HEAD))
-		echo $revision >> deploy/revision.txt
+		echo $revision > deploy/revision.txt
 		python setup.py egg_info -b "_$revision" bdist_wheel
 			for address in "$@"; do
 				echo "Deploying to $address."
