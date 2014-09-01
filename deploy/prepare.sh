@@ -5,7 +5,7 @@ set -e
 prepare() {
 	echo "Installing prerequisities."
 	sudo apt-get install -y python-software-properties
-	sudo add-apt-repository ppa:fkrull/deadsnakes | yes
+	sudo add-apt-repository ppa:fkrull/deadsnakes -y
 	sudo apt-get update
 	sudo apt-get install -y $(cat apt-requirements.txt)
 }
