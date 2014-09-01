@@ -1,5 +1,5 @@
 #!/bin/bash
-trap 'exit' ERR
+set -e
 
 deploy() {
 	echo "This is a stub."

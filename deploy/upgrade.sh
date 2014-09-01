@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script to upgrade deployment on the target
-trap 'exit' ERR
+set -e
 
 upgrade() {
 	echo "This is a stub."

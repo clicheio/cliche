@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script to promote target to newly deployed deployments
-trap 'exit' ERR
+set -e
 
 promote() {
 	echo "This is a stub."
