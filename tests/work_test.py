@@ -1,4 +1,4 @@
-from cliche.work import AwardWinner, Credit
+from cliche.work import AwardWinner, Credit, Role
 
 
 def test_work_wins_awards(fx_works, fx_awards):
@@ -43,7 +43,7 @@ def test_work_has_people(fx_works, fx_people):
     for asso in fx_works.cardcaptor_sakura.credits:
         people.add(asso.person)
         assert asso.work == fx_works.cardcaptor_sakura
-        assert asso.role == 'Artist'
+        assert asso.role == Role.artist
     assert people == {
         fx_people.clamp_member_1, fx_people.clamp_member_2,
         fx_people.clamp_member_3, fx_people.clamp_member_4

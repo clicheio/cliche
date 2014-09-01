@@ -2,18 +2,26 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
+import enum
+
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.sql.functions import now
-from sqlalchemy.types import Date, DateTime, Enum, Integer, String
+from sqlalchemy.types import Date, DateTime, Integer, String
 
 from .orm import Base
 from .people import Person, Team
+from .sqltypes import EnumType
 
 __all__ = ('Award', 'AwardWinner', 'Credit', 'Genre',
            'Work', 'WorkAward', 'WorkGenre')
 
-roles = ('Artist', 'Author', 'Editor')
+class Role(enum.Enum):
+    """Python enum type to describe role of him/her in making a work."""
+
+    artist = None
+    author = None
+    editor = None
 
 
 class Award(Base):
@@ -102,7 +110,7 @@ class Credit(Base):
     person = relationship('Person')
 
     #: The person's role in making the work.
-    role = Column(Enum(*roles, name='role'))
+    role = Column(EnumType(Role, name='role'))
 
     #: (:class:`datetime.datetime`) The date and time on which
     #: the record was created.
