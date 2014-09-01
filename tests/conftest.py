@@ -7,7 +7,7 @@ import types
 from pytest import fixture, yield_fixture
 
 from cliche.people import Person, Team
-from cliche.work import Award, Genre, Work
+from cliche.work import Award, Credit, Genre, Role, Work
 from .db import DEFAULT_DATABASE_URL, get_session
 
 
@@ -62,73 +62,117 @@ class FixtureModule(types.ModuleType):
 
 @fixture
 def fx_awards(fx_session):
+    # create awards: Seiun Awqrd, Hugo Awqrd and Nebula Award.
     f = FixtureModule('fx_awards')
     f.session = fx_session
-    f.award = Award(name='Seiun Award')
-    fx_session.add(f.award)
-    f.award_2 = Award(name='Some Other Award')
-    fx_session.add(f.award_2)
+    f.seiun_award = Award(name='Seiun Award')
+    fx_session.add(f.seiun_award)
+    f.hugo_award = Award(name='Hugo Award')
+    fx_session.add(f.hugo_award)
+    f.nebula_award = Award(name='Nebula Award')
+    fx_session.add(f.nebula_award)
     fx_session.flush()
     return f
 
 
 @fixture
 def fx_people(fx_session, fx_awards):
+    # create people: four artisits and Peter Jackson who won
+    # Hugo and Nebula Award.
     f = FixtureModule('fx_people')
     f += fx_awards
-    f.artist = Person(name='Nanase Ohkawa', dob=datetime.date(1967, 5, 2))
-    fx_session.add(f.artist)
-    f.artist_2 = Person(name='Mokona', dob=datetime.date(1968, 6, 16))
-    fx_session.add(f.artist_2)
-    f.artist_3 = Person(name='Tsubaki Nekoi', dob=datetime.date(1969, 1, 21))
-    fx_session.add(f.artist_3)
-    f.artist_4 = Person(name='Satsuki Igarashi', dob=datetime.date(1969, 2, 8))
-    fx_session.add(f.artist_4)
-    f.person = Person(name='Some Person', dob=datetime.date(1990, 1, 1))
-    f.person.awards.update({fx_awards.award_2})
-    fx_session.add(f.person)
+    f.clamp_member_1 = Person(name='Nanase Ohkawa',
+                              dob=datetime.date(1967, 5, 2))
+    fx_session.add(f.clamp_member_1)
+    f.clamp_member_2 = Person(name='Mokona',
+                              dob=datetime.date(1968, 6, 16))
+    fx_session.add(f.clamp_member_2)
+    f.clamp_member_3 = Person(name='Tsubaki Nekoi',
+                              dob=datetime.date(1969, 1, 21))
+    fx_session.add(f.clamp_member_3)
+    f.clamp_member_4 = Person(name='Satsuki Igarashi',
+                              dob=datetime.date(1969, 2, 8))
+    fx_session.add(f.clamp_member_4)
+    f.peter_jackson = Person(name='Peter Jackson',
+                             dob=datetime.date(1961, 10, 31))
+    f.peter_jackson.awards.update({fx_awards.hugo_award,
+                                   fx_awards.nebula_award})
+    fx_session.add(f.peter_jackson)
     fx_session.flush()
     return f
 
 
 @fixture
 def fx_teams(fx_session, fx_people):
+    # create teams: CLAMP which consists of the four artists.
     f = FixtureModule('fx_teams')
     f += fx_people
-    f.team = Team(name='CLAMP')
-    f.team.members.update({fx_people.artist, fx_people.artist_2,
-                           fx_people.artist_3, fx_people.artist_4})
-    fx_session.add(f.team)
+    f.clamp = Team(name='CLAMP')
+    f.clamp.members.update({fx_people.clamp_member_1,
+                            fx_people.clamp_member_2,
+                            fx_people.clamp_member_3,
+                            fx_people.clamp_member_4})
+    fx_session.add(f.clamp)
     fx_session.flush()
     return f
 
 
 @fixture
 def fx_genres(fx_session):
+    # create genres: Comic, Romance
     f = FixtureModule('fx_genres')
     f.session = fx_session
-    f.genre = Genre(name='Comic')
-    fx_session.add(f.genre)
-    f.genre_2 = Genre(name='Romance')
-    fx_session.add(f.genre_2)
+    f.comic = Genre(name='Comic')
+    fx_session.add(f.comic)
+    f.romance = Genre(name='Romance')
+    fx_session.add(f.romance)
     fx_session.flush()
     return f
 
 
 @fixture
 def fx_works(fx_session, fx_teams, fx_awards, fx_genres):
+    # create works: Cardcaptor Sakura which
+    # made by CLAMP team and members of the team
+    # , won Seiun Award
+    # and belongs to comic and romance genres
     f = FixtureModule('fx_works')
     f += fx_teams
     f += fx_awards
     f += fx_genres
-    f.work = Work(name='Cardcaptor Sakura, Volume 1',
-                  published_at=datetime.date(1996, 11, 22),
-                  number_of_pages=187,
-                  isbn='4063197433')
-    f.work.team = f.team
-    f.work.awards.update({f.award, f.award_2})
-    f.work.genres.update({f.genre, f.genre_2})
-    fx_session.add(f.work)
+    f.cardcaptor_sakura = Work(name='Cardcaptor Sakura, Volume 1',
+                               published_at=datetime.date(1996, 11, 22),
+                               number_of_pages=187,
+                               isbn='4063197433')
+    f.cardcaptor_sakura.team = f.clamp
+    f.cardcaptor_sakura.awards.update({f.seiun_award})
+    f.cardcaptor_sakura.genres.update({f.comic, f.romance})
+    fx_session.add(f.cardcaptor_sakura)
+    fx_session.flush()
+    f.skura_member_asso_1 = Credit(
+        work_id=f.cardcaptor_sakura.id,
+        person_id=f.clamp_member_1.id,
+        role=Role.artist
+    )
+    fx_session.add(f.skura_member_asso_1)
+    f.skura_member_asso_2 = Credit(
+        work_id=f.cardcaptor_sakura.id,
+        person_id=f.clamp_member_2.id,
+        role=Role.artist
+    )
+    fx_session.add(f.skura_member_asso_2)
+    f.skura_member_asso_3 = Credit(
+        work_id=f.cardcaptor_sakura.id,
+        person_id=f.clamp_member_3.id,
+        role=Role.artist
+    )
+    fx_session.add(f.skura_member_asso_3)
+    f.skura_member_asso_4 = Credit(
+        work_id=f.cardcaptor_sakura.id,
+        person_id=f.clamp_member_4.id,
+        role=Role.artist
+    )
+    fx_session.add(f.skura_member_asso_4)
     fx_session.flush()
     return f
 

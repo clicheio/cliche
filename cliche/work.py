@@ -2,6 +2,8 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
+import enum
+
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.sql.functions import now
@@ -9,8 +11,18 @@ from sqlalchemy.types import Date, DateTime, Integer, String
 
 from .orm import Base
 from .people import Person, Team
+from .sqltypes import EnumType
 
-__all__ = 'Award', 'AwardWinner', 'Genre', 'Work', 'WorkAward', 'WorkGenre'
+__all__ = ('Award', 'AwardWinner', 'Credit', 'Genre',
+           'Work', 'WorkAward', 'WorkGenre')
+
+
+class Role(enum.Enum):
+    """Python enum type to describe role of him/her in making a work."""
+
+    artist = 'artist'
+    author = 'author'
+    editor = 'editor'
 
 
 class Award(Base):
@@ -24,7 +36,9 @@ class Award(Base):
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`AwardWinner`\ s that the award has.
-    award_winners = relationship('AwardWinner', collection_class=set)
+    award_winners = relationship('AwardWinner',
+                                 cascade='delete, merge, save-update',
+                                 collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`cliche.people.Person`\ s that won the award.
@@ -34,7 +48,9 @@ class Award(Base):
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkAward`\ s that the award has.
-    work_awards = relationship('WorkAward', collection_class=set)
+    work_awards = relationship('WorkAward',
+                               cascade='delete, merge, save-update',
+                               collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`Work`\ s that won the award.
@@ -77,6 +93,35 @@ class AwardWinner(Base):
     __repr_columns__ = person_id, award_id
 
 
+class Credit(Base):
+    """Relationship between the work and the person.
+    Describe that the person participated in making the work.
+    """
+
+    #: (:class:`int`) :class:`Work.id` of :attr:`work`.
+    work_id = Column(Integer, ForeignKey('works.id'), primary_key=True)
+
+    #: (:class:`Work`) The work which the :attr:`person` made.
+    work = relationship('Work')
+
+    #: (:class:`int`) :class:`cliche.people.Person.id` of :attr:`person`.
+    person_id = Column(Integer, ForeignKey('people.id'), primary_key=True)
+
+    #: (:class:`cliche.people.Person`) The person who made the :attr:`work`.
+    person = relationship('Person')
+
+    #: The person's role in making the work.
+    role = Column(EnumType(Role, name='credits_role'))
+
+    #: (:class:`datetime.datetime`) The date and time on which
+    #: the record was created.
+    created_at = Column(DateTime(timezone=True), nullable=False,
+                        default=now())
+
+    __tablename__ = 'credits'
+    __repr_columns__ = person_id, work_id
+
+
 class Genre(Base):
     """Genre of the creative work"""
 
@@ -88,7 +133,9 @@ class Genre(Base):
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkGenre`\ s that the genre has.
-    work_genres = relationship('WorkGenre', collection_class=set)
+    work_genres = relationship('WorkGenre',
+                               cascade='delete, merge, save-update',
+                               collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`Work`\ s that fall into the genre.
@@ -133,7 +180,9 @@ class Work(Base):
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkAward`\ s that the work has.
-    work_awards = relationship('WorkAward', collection_class=set)
+    work_awards = relationship('WorkAward',
+                               cascade='delete, merge, save-update',
+                               collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`Award`\ s that the work won.
@@ -143,13 +192,21 @@ class Work(Base):
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkGenre`\ s that the work has.
-    work_genres = relationship('WorkGenre', collection_class=set)
+    work_genres = relationship('WorkGenre',
+                               cascade='delete, merge, save-update',
+                               collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`Genre`\ s that the work falls into.
     genres = relationship(Genre,
                           secondary='work_genres',
                           collection_class=set)
+
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`Credit`\ s that the work has.
+    credits = relationship(Credit,
+                           cascade='delete, merge, save-update',
+                           collection_class=set)
 
     #: (:class:`datetime.datetime`) The date and time on which
     #: the record was created.
