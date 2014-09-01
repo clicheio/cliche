@@ -16,12 +16,13 @@ from .sqltypes import EnumType
 __all__ = ('Award', 'AwardWinner', 'Credit', 'Genre',
            'Work', 'WorkAward', 'WorkGenre')
 
+
 class Role(enum.Enum):
     """Python enum type to describe role of him/her in making a work."""
 
-    artist = None
-    author = None
-    editor = None
+    artist = 'artist'
+    author = 'author'
+    editor = 'editor'
 
 
 class Award(Base):
@@ -110,7 +111,7 @@ class Credit(Base):
     person = relationship('Person')
 
     #: The person's role in making the work.
-    role = Column(EnumType(Role, name='role'))
+    role = Column(EnumType(Role, name='credits_role'))
 
     #: (:class:`datetime.datetime`) The date and time on which
     #: the record was created.
