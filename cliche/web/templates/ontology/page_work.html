@@ -1,0 +1,61 @@
+{% extends "page.html" %}
+{% block tbody %}
+  <tr>
+    <td>name</td>
+    <td>{{ res.name }}</td>
+  </tr>
+
+  {% if res.published_at %}
+    <tr>
+      <td>published_at</td>
+      <td>{{ res.published_at }}</td>
+    </tr>
+  {% endif %}
+
+  {% if res.number_of_pages %}
+    <tr>
+      <td>number_of_pages</td>
+      <td>{{ res.number_of_pages }}</td>
+    </tr>
+  {% endif %}
+
+  {% if res.isbn %}
+    <tr>
+      <td>isbn</td>
+      <td>{{ res.isbn }}</td>
+    </tr>
+  {% endif %}
+
+  {% if res.team %}
+    <tr>
+      <td>team</td>
+      <td><a href="{{ url_for('.page', type_='team', title=res.team.name) }}">{{ res.team.name }}</a></td>
+    </tr>
+  {% endif %}
+
+  {% if res.awards %}
+    <tr>
+      <td>award</td>
+      <td>
+        <ul>
+          {% for val in res.awards %}
+            <li><a href="{{ url_for('.page', type_='award', title=val.name) }}">{{ val.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </td>
+    </tr>
+  {% endif %}
+
+  {% if res.genres %}
+    <tr>
+      <td>genres</td>
+      <td>
+        <ul>
+          {% for val in res.genres %}
+            <li><a href="{{ url_for('.page', type_='genre', title=val.name) }}">{{ val.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </td>
+    </tr>
+  {% endif %}
+{% endblock %}

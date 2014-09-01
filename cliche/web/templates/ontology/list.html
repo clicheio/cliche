@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block body %}
+  <table>
+    <caption>List of {{ type }}</caption>
+    <thead>
+      <tr>
+        <th>Title</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for line in list %}
+        <tr>
+          <td>{{ line }}</td>
+        </tr>
+      {% else %}
+        <tr>
+          <td>No contents here now.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
