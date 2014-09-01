@@ -9,7 +9,7 @@ upload() {
 
 usage() {
 	me=$(basename $0)
-	echo "usage: ./$me <list of ip address split by spaces>"
+	echo "usage: ./$me <list of ssh connect string split by spaces>"
 	exit 1
 }
 
