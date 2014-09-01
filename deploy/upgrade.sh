@@ -4,7 +4,7 @@ set -e
 
 upgrade() {
 	pyvenv-3.4 $HOME/venv_$(cat $(dirname $0)/revision.txt)
-	$HOME/venv_$(cat $(dirname $0)/revision.txt)/local/bin/pip install *.whl
+	$HOME/venv_$(cat $(dirname $0)/revision.txt)/local/bin/pip install /tmp/$(cat $(dirname $0)/revision.txt)/Cliche-*.whl
 }
 
 not_compatible_with_os() {
