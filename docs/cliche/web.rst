@@ -6,3 +6,4 @@
 
       web/app
       web/db
+      web/ontology
