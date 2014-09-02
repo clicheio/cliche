@@ -29,7 +29,7 @@ def test_work_list(fx_session, fx_flask_client):
 
 def test_work_page(fx_session, fx_flask_client):
     # case 1: non-exists type_
-    rv = fx_flask_client.get('/no_exists_type/')
+    rv = fx_flask_client.get('/no_exists_type/test/')
     assert rv.status_code == 404
 
     # case 2: non-exists document
