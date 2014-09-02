@@ -36,3 +36,4 @@ main() {
 }
 
 main "$@"
+# vim: set filetype=sh ts=4 sw=4 sts=4 noet
