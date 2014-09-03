@@ -3,6 +3,32 @@ import urllib.parse
 
 from SPARQLWrapper import JSON, SPARQLWrapper
 
+def load_dbpedia(limit, page):
+    ''' used OFFSET and LIMIT(40,000) for paging query '''
+    sparql = SPARQLWrapper("http://dbpedia.org/sparql")
+    sparql.setReturnFormat(JSON)
+    query = '''
+        PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
+        PREFIX dbpprop: <http://dbpedia.org/property/>
+        SELECT DISTINCT
+            ?work
+            (group_concat( STR(?author) ; SEPARATOR="\\n") as ?author)
+        WHERE {{
+            ?work ?p ?author
+        FILTER(
+            (      ?p = dbpprop:author
+                || ?p = dbpedia-owl:author
+                || ?p = dbpedia-owl:writer )
+            && STRSTARTS(STR(?work), "http://dbpedia.org/"))
+        }}
+        GROUP BY ?work
+        LIMIT {}
+        OFFSET {}
+        '''.format(str(limit), str(limit*page))
+    sparql.setQuery(query)
+    tuples = sparql.query().convert()['results']['bindings']
+    return tuples
+
 
 def select_dbpedia(query):
     sparql = SPARQLWrapper("http://dbpedia.org/sparql")
@@ -12,7 +38,7 @@ def select_dbpedia(query):
     return[{k: v['value'] for k, v in mydict.items()} for mydict in tuples]
 
 
-def select_property(s='dbpedia-owl:Writer', s_name='property'):
+def select_property(s='dbpedia-owl:Writer', s_name='property', json=False):
     prefix = {
         'owl:': 'http://www.w3.org/2002/07/owl#',
         'xsd:': 'http://www.w3.org/2001/XMLSchema#',
@@ -29,21 +55,28 @@ def select_property(s='dbpedia-owl:Writer', s_name='property'):
         }
 
     query = '''
-    SELECT DISTINCT ?property
-    WHERE {{
-        ?subject a {} .
-        ?subject ?property ?object .
+    select distinct ?property where{{
+        {{
+            ?property rdfs:domain ?class . 
+            {} rdfs:subClassOf+ ?class.
+        }} UNION {{
+            ?property rdfs:domain {}.
+        }}
     }}
-    '''.format(s)
+    '''.format(s, s)
+
     p = select_dbpedia(query)
 
-    for x in p:
-        for k, v in prefix.items():
-            x['property'] = x['property'].replace(v, k)
+    if json is True:
+        return p
+    else:
+        for x in p:
+            for k, v in prefix.items():
+                x['property'] = x['property'].replace(v, k)
 
-    pts = [tu['property'] for tu in p]
+        pts = [tu['property'] for tu in p]
 
-    return pts
+        return pts
 
 
 def select_by_relation(
@@ -111,7 +144,6 @@ def select_by_class(s=['dbpedia-owl:People'],
     '''.format(s_name)
     if limit is not None:
         query += 'LIMIT {}'.format(limit)
-    print(query)
     return select_dbpedia(query)
 
 
