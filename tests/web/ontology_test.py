@@ -9,97 +9,89 @@ def test_index(fx_session, fx_flask_client):
 
 
 def test_work_list(fx_session, fx_flask_client):
-    # case 1: non-exists type_
-    rv = fx_flask_client.get('/no_exists_type/')
-    assert rv.status_code == 404
-
-    # case 2: non-exists document
+    # case 1: non-exists document
     rv = fx_flask_client.get('/work/')
     assert 'No contents here now.' in str(rv.data)
 
-    # case 3: add document
-    work = Work(name='test title')
+    # case 2: add document
+    work = Work(name='Story of Your Life')
 
     with fx_session.begin():
         fx_session.add(work)
 
     rv = fx_flask_client.get('/work/')
-    assert 'test title' in str(rv.data)
+    assert 'Story of Your Life' in str(rv.data)
 
 
 def test_work_page(fx_session, fx_flask_client):
-    # case 1: non-exists type_
-    rv = fx_flask_client.get('/no_exists_type/test/')
+    # case 1: non-exists document
+    rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
     assert rv.status_code == 404
 
-    # case 2: non-exists document
-    rv = fx_flask_client.get('/work/test/')
-    assert rv.status_code == 404
-
-    # case 3: add document
-    work = Work(name='test')
+    # case 2: add document
+    work = Work(name='Story of Your Life')
 
     with fx_session.begin():
         fx_session.add(work)
 
-    rv = fx_flask_client.get('/work/test/')
-    assert 'test</h1>' in str(rv.data)
+    rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
+    assert 'Story of Your Life</h1>' in str(rv.data)
 
-    # case 4: set attributes
-    work.published_at = datetime.date(2014, 7, 1)
+    # case 3: set attributes
+    work.published_at = datetime.date(2010, 10, 26)
     with fx_session.begin():
         fx_session.add(work)
 
-    rv = fx_flask_client.get('/work/test/')
-    assert '2014-07-01' in str(rv.data)
+    rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
+    assert '2010-10-26' in str(rv.data)
 
-    work.number_of_pages = 4321
+    work.number_of_pages = 281
     with fx_session.begin():
         fx_session.add(work)
 
-    rv = fx_flask_client.get('/work/test/')
-    assert '4321' in str(rv.data)
+    rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
+    assert '281' in str(rv.data)
 
-    work.isbn = '1234567890'
+    work.isbn = '1931520720'
     with fx_session.begin():
         fx_session.add(work)
 
-    rv = fx_flask_client.get('/work/test/')
-    assert '1234567890' in str(rv.data)
+    rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
+    assert '1931520720' in str(rv.data)
 
-    work.team = Team(name='MUSE')
+    work.team = Team(name='Ted Chiang')
     with fx_session.begin():
         fx_session.add(work)
 
-    rv = fx_flask_client.get('/work/test/')
-    assert 'MUSE' in str(rv.data)
+    rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
+    assert 'Ted Chiang' in str(rv.data)
 
-    work.awards.add(Award(name='Bob-sang'))
+    work.awards.add(Award(name='Nebula Award'))
     with fx_session.begin():
         fx_session.add(work)
 
-    rv = fx_flask_client.get('/work/test/')
-    assert 'Bob-sang' in str(rv.data)
+    rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
+    assert 'Nebula Award' in str(rv.data)
 
-    work.awards.add(Award(name='Sura-sang'))
+    work.awards.add(Award(name='Sturgeon Award'))
     with fx_session.begin():
         fx_session.add(work)
 
-    rv = fx_flask_client.get('/work/test/')
-    assert 'Bob-sang' in str(rv.data)
-    assert 'Sura-sang' in str(rv.data)
+    rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
+    assert 'Nebula Award' in str(rv.data)
+    assert 'Sturgeon Award' in str(rv.data)
 
-    work.genres.add(Genre(name='Horror'))
+    work.genres.add(Genre(name='Short Stories'))
     with fx_session.begin():
         fx_session.add(work)
 
-    rv = fx_flask_client.get('/work/test/')
-    assert 'Horror' in str(rv.data)
+    rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
+    assert 'Short Stories' in str(rv.data)
 
     work.genres.add(Genre(name='SF'))
     with fx_session.begin():
         fx_session.add(work)
 
-    rv = fx_flask_client.get('/work/test/')
-    assert 'Horror' in str(rv.data)
+    rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
+    assert 'Short Stories' in str(rv.data)
     assert 'SF' in str(rv.data)
