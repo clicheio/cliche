@@ -35,11 +35,21 @@ class Person(Base):
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`TeamMembership`\ s he/she has.
-    memberships = relationship('TeamMembership', collection_class=set)
+    memberships = relationship('TeamMembership',
+                               cascade='delete, merge, save-update',
+                               collection_class=set)
+
+    #: (:class:`collections.abc.MutableSet`) The set of :class:`Team`\ s
+    #: he/she belongs to.
+    teams = relationship('Team',
+                         secondary='team_memberships',
+                         collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`cliche.work.AwardWinner`\ s that the person has.
-    award_winners = relationship('AwardWinner', collection_class=set)
+    award_winners = relationship('AwardWinner',
+                                 cascade='delete, merge, save-update',
+                                 collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`cliche.work.Award`\ s that the person won.
@@ -47,11 +57,11 @@ class Person(Base):
                           secondary='award_winners',
                           collection_class=set)
 
-    #: (:class:`collections.abc.MutableSet`) The set of :class:`Team`\ s
-    #: he/she belongs to.
-    teams = relationship('Team',
-                         secondary='team_memberships',
-                         collection_class=set)
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`cliche.work.Credit`\ s that the person has.
+    credits = relationship('Credit',
+                           cascade='delete, merge, save-update',
+                           collection_class=set)
 
     __tablename__ = 'people'
     __repr_columns__ = id, name
@@ -74,7 +84,9 @@ class Team(Base):
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`TeamMembership`\ s that the team has.
-    memberships = relationship('TeamMembership', collection_class=set)
+    memberships = relationship('TeamMembership',
+                               cascade='delete, merge, save-update',
+                               collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The members :class:`Person` set.
     members = relationship(Person,
@@ -82,7 +94,7 @@ class Team(Base):
                            collection_class=set)
 
     #: (:class:`Work`) The works that created by the team.
-    works = relationship('Work')
+    works = relationship('Work', collection_class=set)
 
     __tablename__ = 'teams'
     __repr_columns__ = id, name
