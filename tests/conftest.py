@@ -144,7 +144,6 @@ def fx_works(fx_session, fx_teams, fx_awards, fx_genres):
                                published_at=datetime.date(1996, 11, 22),
                                number_of_pages=187,
                                isbn='4063197433')
-    f.cardcaptor_sakura.team = f.clamp
     f.cardcaptor_sakura.awards.update({f.seiun_award})
     f.cardcaptor_sakura.genres.update({f.comic, f.romance})
     fx_session.add(f.cardcaptor_sakura)
