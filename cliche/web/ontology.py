@@ -30,11 +30,11 @@ def list_():
 @ontology.route('/work/<path:title>/')
 def page(title):
     try:
-        res = session.query(Work).filter_by(name=title).one()
+        work = session.query(Work).filter_by(name=title).one()
     except NoResultFound:
         abort(404)
     return render_template(
         'page_work.html',
         title=title,
-        res=res
+        res=work
     )
