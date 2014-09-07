@@ -23,7 +23,6 @@ def list_():
     ]
     return render_template(
         'work_list.html',
-        type='Work',
         work_list=res
     )
 
@@ -36,7 +35,6 @@ def page(title):
         abort(404)
     return render_template(
         'page_work.html',
-        type='Work',
         title=title,
         res=res
     )
