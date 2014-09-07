@@ -22,10 +22,9 @@ def list_():
         for line in session.query(Work.name).order_by(Work.name)
     ]
     return render_template(
-        'list.html',
-        page_title='cliche.io - list of Work',
+        'work_list.html',
         type='Work',
-        list=res
+        work_list=res
     )
 
 
@@ -37,7 +36,6 @@ def page(title):
         abort(404)
     return render_template(
         'page_work.html',
-        page_title='cliche.io - contents of ' + title,
         type='Work',
         title=title,
         res=res

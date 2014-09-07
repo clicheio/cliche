@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %} - list of Work{% endblock %}
 {% block body %}
   <table>
     <caption>List of {{ type }}</caption>
@@ -8,7 +9,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for line in list %}
+      {% for line in work_list %}
         <tr>
           <td>{{ line }}</td>
         </tr>
