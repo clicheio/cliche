@@ -11,7 +11,6 @@ from yaml import dump
 from cliche.people import Person, Team
 from cliche.web.app import app
 from cliche.work import Award, Credit, Genre, Role, Work
-
 from .db import DEFAULT_DATABASE_URL, get_session
 
 
