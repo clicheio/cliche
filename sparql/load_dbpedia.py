@@ -3,6 +3,7 @@ import urllib.parse
 
 from SPARQLWrapper import JSON, SPARQLWrapper
 
+
 def load_dbpedia(limit, page):
     ''' used OFFSET and LIMIT(40,000) for paging query '''
     sparql = SPARQLWrapper("http://dbpedia.org/sparql")
@@ -57,7 +58,7 @@ def select_property(s='dbpedia-owl:Writer', s_name='property', json=False):
     query = '''
     select distinct ?property where{{
         {{
-            ?property rdfs:domain ?class . 
+            ?property rdfs:domain ?class .
             {} rdfs:subClassOf+ ?class.
         }} UNION {{
             ?property rdfs:domain {}.
@@ -81,7 +82,7 @@ def select_property(s='dbpedia-owl:Writer', s_name='property', json=False):
 
 def select_by_relation(
     p=['dbpprop:author', 'dbpedia-owl:writer', 'dbpedia-owl:author'],
-        s_name='subject', o_name='object', limit=10):
+        s_name='subject', o_name='object', limit=None):
     if(len(p) < 1):
         raise ValueError('at least one porperty required')
 
@@ -104,11 +105,12 @@ def select_by_relation(
         LIMIT 30
         OFFSET 30
         '''.format(s_name=s_name, o_name=o_name, filt=filt)
+    print(query)
     return select_dbpedia(query)
 
 
-def select_by_class(s=['dbpedia-owl:People'],
-                    s_name='subject', entity=['foaf:name'], limit=10):
+def select_by_class(s=['dbpedia-owl:Person'],
+                    s_name='subject', entity=['foaf:name'], limit=None):
     if(len(s) < 1):
         raise ValueError('at least one class required')
 
@@ -118,8 +120,8 @@ def select_by_class(s=['dbpedia-owl:People'],
     SELECT DISTINCT
         ?{}\n'''.format(s_name)
 
-    sel_qry = ''
-    cnd_qry = ''
+    sel = ''
+    cnd = ''
 
     for x in entity:
         if ':' in x:
@@ -128,20 +130,22 @@ def select_by_class(s=['dbpedia-owl:People'],
                 col_name = x.split('/')[1]
         else:
             col_name = x[:3]
-        sel_qry += '        (group_concat( STR(?{}) ; SEPARATOR="\\n") as ?{})\n'.format(col_name, col_name)
-        cnd_qry += '        ?{} {} ?{} .\n'.format(s_name, x, col_name)
+        sel += '        (group_concat( STR(?{}) ; SEPARATOR="\\n") as ?{})\n' \
+            .format(col_name, col_name)
+        cnd += '        ?{} {} ?{} .\n'.format(s_name, x, col_name)
 
-    query += sel_qry
+    query += sel
     query += '''    WHERE {{
         {{ ?{} a {} . }}'''.format(s_name, s[0])
     for x in s[1:]:
         query += '''UNION
         {{ ?{} a {} . }}'''.format(s_name, x)
     query += '\n'
-    query += cnd_qry
+    query += cnd
     query += '''        }}
     GROUP BY ?{}
     '''.format(s_name)
+    print(query)
     if limit is not None:
         query += 'LIMIT {}'.format(limit)
     return select_dbpedia(query)
@@ -168,7 +172,6 @@ def save_db(tuples, table):
 
 
 if __name__ == "__main__":
-    
     pass
     # TABLE = {
     #     'TABLENAME': 'allworks',

@@ -1,54 +1,44 @@
 import json
-import logging
-from urllib.error import HTTPError, URLError
 
+import pprint
 
 from sparql import load_dbpedia as dbpedia
 
-#def test_load_dbpedia_is_save_db(
-#        fx_sparql_dbpedia_table,
-#        fx_sparql_dbpedia_cursor):
-#    """ Test: Do sparql.load_dbpedia modules's methods
-#                really save data into db? """
-#    qry = 'SELECT COUNT({}) FROM {}'.format(
-#        fx_sparql_dbpedia_table['PRIMARY'],
-#        fx_sparql_dbpedia_table['TABLENAME']
-#    )
-#    count = 0
-#    for y in range(0, fx_sparql_dbpedia_table['COUNT']):
-#        try:
-#            res = dbpedia.load_dbpedia(fx_sparql_dbpedia_table['LIMIT'], y)
-#        except HTTPError as e:
-#            logging.exception(
-#                'Connected to dbpedia.org but got status code %d: %s.',
-#                e.code, e.msg)
-#            return
-#        except URLError as e:
-#            logging.exception(
-#                'Failed to connect to dbpedia.org: %s.', e.msg)
-#            return
-#
-#        dbpedia.save_db(res, fx_sparql_dbpedia_table)
-#
-#        temp = fx_sparql_dbpedia_cursor.execute(qry)
-#        count_current_rows = temp.fetchone()[0]
-#        assert count <= count_current_rows
-#        assert count_current_rows > 0
-#        count = count_current_rows
-
 
 def test_select_property():
-    tst = json.load(open('select_artist.json'))
+    fp = open('select_artist.json')
+    tst = json.load(fp)
     res = dbpedia.select_property(s='dbpedia-owl:Person', json=True)
-    assert pts != res
-    tst.close()
+    assert tst != res
+    fp.close()
 
 
 def test_select_by_relation():
-    pass
+    def mockreturn(f):
+        return 'a'
+    res = dbpedia.select_by_relation(
+        p=[
+            'dbpprop:author',
+            'dbpedia-owl:writer',
+            'dbpedia-owl:author'
+        ],
+        s_name='work',
+        o_name='author',
+        limit=10)
+    pprint.pprint(res)
 
 
 def test_select_by_class():
-    pass
-
-    
+    # fp = open('')
+    # tst = json.load(fp)
+    res = dbpedia.select_by_class(
+        s=['dbpedia-owl:Artist'],
+        s_name='artists',
+        entity=[
+            'foaf:name',
+            'dbpedia-owl:birthDate',
+            'dbpedia-owl:description'
+            ],
+        limit=10)
+    print(res)
+    # fp.close()
