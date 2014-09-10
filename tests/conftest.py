@@ -151,25 +151,29 @@ def fx_works(fx_session, fx_teams, fx_awards, fx_genres):
     f.skura_member_asso_1 = Credit(
         work_id=f.cardcaptor_sakura.id,
         person_id=f.clamp_member_1.id,
-        role=Role.artist
+        role=Role.artist,
+        team_id=f.clamp.id
     )
     fx_session.add(f.skura_member_asso_1)
     f.skura_member_asso_2 = Credit(
         work_id=f.cardcaptor_sakura.id,
         person_id=f.clamp_member_2.id,
-        role=Role.artist
+        role=Role.artist,
+        team_id=f.clamp.id
     )
     fx_session.add(f.skura_member_asso_2)
     f.skura_member_asso_3 = Credit(
         work_id=f.cardcaptor_sakura.id,
         person_id=f.clamp_member_3.id,
-        role=Role.artist
+        role=Role.artist,
+        team_id=f.clamp.id
     )
     fx_session.add(f.skura_member_asso_3)
     f.skura_member_asso_4 = Credit(
         work_id=f.cardcaptor_sakura.id,
         person_id=f.clamp_member_4.id,
-        role=Role.artist
+        role=Role.artist,
+        team_id=f.clamp.id
     )
     fx_session.add(f.skura_member_asso_4)
     fx_session.flush()

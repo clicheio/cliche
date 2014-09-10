@@ -93,6 +93,10 @@ class Team(Base):
                            secondary='team_memberships',
                            collection_class=set)
 
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`cliche.work.Credit`\ s in which the team was involved.
+    credits = relationship('Credit', collection_class=set)
+
     __tablename__ = 'teams'
     __repr_columns__ = id, name
 

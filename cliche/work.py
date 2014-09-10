@@ -94,7 +94,7 @@ class AwardWinner(Base):
 
 
 class Credit(Base):
-    """Relationship between the work and the person.
+    """Relationship between the work, the person, and the team.
     Describe that the person participated in making the work.
     """
 
@@ -113,13 +113,19 @@ class Credit(Base):
     #: The person's role in making the work.
     role = Column(EnumType(Role, name='credits_role'))
 
+    #: (:class:`int`) :class:`Team.id` of :attr:`team`. (optional)
+    team_id = Column(Integer, ForeignKey('teams.id'))
+
+    #: The team which the person belonged when work had been made.
+    team = relationship('Team')
+
     #: (:class:`datetime.datetime`) The date and time on which
     #: the record was created.
     created_at = Column(DateTime(timezone=True), nullable=False,
                         default=now())
 
     __tablename__ = 'credits'
-    __repr_columns__ = person_id, work_id
+    __repr_columns__ = person_id, work_id, team_id
 
 
 class Genre(Base):
