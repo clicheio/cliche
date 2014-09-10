@@ -56,9 +56,6 @@ def test_select_by_class(monkeypatch):
     res = dbpedia.select_by_class(
         s=['dbpedia-owl:Artist'],
         s_name='artists',
-        entity=[
-            'foaf:name',
-            'dbpedia-owl:birthDate'
-            ],
+        entity=['foaf:name', 'dbpedia-owl:birthDate'],
         limit=3)
     assert len(res) == 3
