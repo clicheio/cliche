@@ -6,7 +6,7 @@ def select_dbpedia(query):
     sparql.setReturnFormat(JSON)
     sparql.setQuery(query)
     tuples = sparql.query().convert()['results']['bindings']
-    return[{k: v['value'] for k, v in mydict.items()} for mydict in tuples]
+    return[{k: v['value'] for k, v in tupl.items()} for tupl in tuples]
 
 
 def select_property(s, s_name='property', json=False):
@@ -25,28 +25,25 @@ def select_property(s, s_name='property', json=False):
         'dbpprop:': 'http://dbpedia.org/property/'
         }
 
-    query = '''
-    select distinct ?property where{{
+    query = '''select distinct ?property where{{
         {{
             ?property rdfs:domain ?class .
             {} rdfs:subClassOf+ ?class.
         }} UNION {{
             ?property rdfs:domain {}.
         }}
-    }}
-    '''.format(s, s)
+    }}'''.format(s, s)
 
-    p = select_dbpedia(query)
+    properties = select_dbpedia(query)
 
     if json:
-        return p
+        return properties
     else:
-        for x in p:
+        for p in properties:
             for k, v in prefix.items():
-                x['property'] = x['property'].replace(v, k)
-        pts = [tu['property'] for tu in p]
-
-        return pts
+                p['property'] = p['property'].replace(v, k)
+        tuples = [tupl['property'] for tupl in properties]
+        return tuples
 
 
 def select_by_relation(p, s_name='subject', o_name='object', limit=None):
@@ -56,8 +53,7 @@ def select_by_relation(p, s_name='subject', o_name='object', limit=None):
     filt = '?p = {}'.format(p[0])
     for x in p[1:]:
         filt += '\n            || ?p = {}'.format(x)
-    query = '''
-        PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
+    query = '''PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
         PREFIX dbpprop: <http://dbpedia.org/property/>
         SELECT DISTINCT
             ?{s_name}
@@ -68,59 +64,57 @@ def select_by_relation(p, s_name='subject', o_name='object', limit=None):
             (  {filt}  )
             && STRSTARTS(STR(?{s_name}), "http://dbpedia.org/"))
         }}
-        GROUP BY ?{s_name}
-        '''.format(s_name=s_name, o_name=o_name, filt=filt)
+        GROUP BY ?{s_name}'''.format(s_name=s_name, o_name=o_name, filt=filt)
     return paging_query(query, limit)
 
 
-def select_by_class(s, s_name='subject', entity=None, limit=None):
+def select_by_class(s, s_name='subject', entities=None, limit=None):
     if(len(s) < 1):
         raise ValueError('at least one class required')
-    if entity is None:
-        entity = []
+    if entities is None:
+        entities = []
 
-    query = '''
-        PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
+    query = '''PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
         PREFIX dbpprop: <http://dbpedia.org/property/>
         SELECT DISTINCT
             ?{}\n'''.format(s_name)
 
-    sel = ''
-    cnd = ''
+    group_concat = ''
+    s_property_o = ''
 
-    for x in entity:
-        if ':' in x:
-            col_name = x.split(':')[1]
-            if '/' in x:
-                col_name = x.split('/')[1]
+    for entity in entities:
+        if ':' in entity:
+            col_name = entity.split(':')[1]
+            if '/' in entity:
+                col_name = entity.split('/')[1]
         else:
-            col_name = x[:3]
-        sel += '        (group_concat( STR(?{}) ; SEPARATOR="\\n") as ?{})\n' \
-            .format(col_name, col_name)
-        cnd += '        ?{} {} ?{} .\n'.format(s_name, x, col_name)
+            col_name = entity[:3]
 
-    query += sel
+        group_concat += '        (group_concat( STR(?{}) ; SEPARATOR="\\n") as ?{})\n' \
+            .format(col_name, col_name)
+        s_property_o += '        ?{} {} ?{} .\n' \
+            .format(s_name, entity, col_name)
+
+    query += group_concat
     query += '''    WHERE {{
         {{ ?{} a {} . }}'''.format(s_name, s[0])
     for x in s[1:]:
         query += '''UNION
-        {{ ?{} a {} . }}'''.format(s_name, x)
-    query += '\n'
-    query += cnd
+        {{ ?{} a {} . }}\n'''.format(s_name, x)
+    query += s_property_o
     query += '''        }}
-    GROUP BY ?{}
-    '''.format(s_name)
+    GROUP BY ?{}'''.format(s_name)
 
     return paging_query(query, limit)
 
 
 def paging_query(query, limit):
-    res = []
+    query_results = []
     if limit is not None:
         query += 'LIMIT {}\n'.format(limit)
         for x in range(0, (limit+99)//100):
             oquery = query + 'OFFSET {}\n'.format(x*100)
-            res += select_dbpedia(oquery)
-        return res
+            query_results += select_dbpedia(oquery)
+        return query_results
     else:
         return select_dbpedia(query)
