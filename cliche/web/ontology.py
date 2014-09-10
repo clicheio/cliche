@@ -18,8 +18,8 @@ def index():
 @ontology.route('/work/')
 def list_():
     res = [
-        line[0]
-        for line in session.query(Work.name).order_by(Work.name)
+        name
+        for name, in session.query(Work.name).order_by(Work.name)
     ]
     return render_template(
         'work_list.html',
