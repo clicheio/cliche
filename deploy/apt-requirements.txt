@@ -4,3 +4,5 @@ build-essential
 libpq-dev
 libxml2-dev
 libxslt1-dev
+sysv-rc-conf
+nginx

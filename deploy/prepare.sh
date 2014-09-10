@@ -10,6 +10,11 @@ prepare() {
 	packages="$(cat $(dirname $0)/apt-requirements.txt)"
 	echo $packages
 	sudo apt-get install -y $packages
+	sudo cp $(dirname $0)/cliche.io /etc/nginx/sites-available/cliche.io
+	sudo ln -s /etc/nginx/sites-available/cliche.io /etc/nginx/sites-enabled/cliche.io
+	sudo sysv-rc-conf nginx on
+	sudo sysv-rc-conf --list nginx
+	sudo service nginx start
 }
 
 not_compatible_with_os() {
