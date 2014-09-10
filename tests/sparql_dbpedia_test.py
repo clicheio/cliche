@@ -4,7 +4,7 @@ from sparql import load_dbpedia as dbpedia
 
 
 def test_select_property():
-    fp = open('select_artist.json')
+    fp = open('tests/select_artist.json')
     fakeResult = json.load(fp)
     res = dbpedia.select_property(s='dbpedia-owl:Person', json=True)
     assert fakeResult != res
@@ -16,7 +16,7 @@ def test_select_by_relation(monkeypatch):
         offset = 0
 
         def convert(self):
-            fp = open('select_relation.json')
+            fp = open('tests/select_relation.json')
             offset = fakeQuery.offset
             fakeResult = (json.load(fp))[offset:offset+100:]
             fakeQuery.offset += 100
@@ -42,7 +42,7 @@ def test_select_by_class(monkeypatch):
         offset = 0
 
         def convert(self):
-            fp = open('select_class.json')
+            fp = open('tests/select_class.json')
             offset = fakeQuery.offset
             fakeResult = (json.load(fp))[offset:offset+100:]
             fakeQuery.offset += 100

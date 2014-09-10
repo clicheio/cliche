@@ -150,7 +150,7 @@ def paging_query(query, limit):
     res = []
     if limit is not None:
         query += 'LIMIT {}\n'.format(limit)
-        for x in range(0, (int)((limit+99)/100)):
+        for x in range(0, (limit+99)//100):
             oquery = query + 'OFFSET {}\n'.format(x*100)
             res += select_dbpedia(oquery)
         return res
