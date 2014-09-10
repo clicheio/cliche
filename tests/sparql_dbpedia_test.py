@@ -36,7 +36,8 @@ def test_select_by_relation(monkeypatch):
         ],
         s_name='work',
         o_name='author',
-        limit=101)
+        limit=101
+    )
     assert len(res) == 101
 
 
@@ -47,7 +48,7 @@ def test_select_by_class(monkeypatch):
         def convert(self):
             with open('tests/select_class.json') as fp:
                 offset = fakeQuery.offset
-                fakeResult = (json.load(fp))[offset:offset+100:]
+                fakeResult = json.load(fp)[offset:offset+100:]
                 fakeQuery.offset += 100
                 return {"results": {"bindings": fakeResult}}
 
@@ -57,5 +58,6 @@ def test_select_by_class(monkeypatch):
         s=['dbpedia-owl:Artist'],
         s_name='artists',
         entities=['foaf:name', 'dbpedia-owl:birthDate'],
-        limit=3)
+        limit=3
+    )
     assert len(res) == 3

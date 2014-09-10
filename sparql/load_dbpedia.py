@@ -23,7 +23,7 @@ def select_property(s, s_name='property', json=False):
         'skos:': 'http://www.w3.org/2004/02/skos/core#',
         'dbpedia-owl:': 'http://dbpedia.org/ontology/',
         'dbpprop:': 'http://dbpedia.org/property/'
-        }
+    }
 
     query = '''select distinct ?property where{{
         {{
@@ -47,7 +47,7 @@ def select_property(s, s_name='property', json=False):
 
 
 def select_by_relation(p, s_name='subject', o_name='object', limit=None):
-    if(len(p) < 1):
+    if not p:
         raise ValueError('at least one porperty required')
 
     filt = '?p = {}'.format(p[0])
@@ -69,7 +69,7 @@ def select_by_relation(p, s_name='subject', o_name='object', limit=None):
 
 
 def select_by_class(s, s_name='subject', entities=None, limit=None):
-    if(len(s) < 1):
+    if not s:
         raise ValueError('at least one class required')
     if entities is None:
         entities = []
@@ -90,10 +90,13 @@ def select_by_class(s, s_name='subject', entities=None, limit=None):
         else:
             col_name = entity[:3]
 
-        group_concat += '        (group_concat( STR(?{}) ; SEPARATOR="\\n") as ?{})\n' \
-            .format(col_name, col_name)
-        s_property_o += '        ?{} {} ?{} .\n' \
-            .format(s_name, entity, col_name)
+        group_concat += ('(group_concat( STR(?{}) ; '
+                         'SEPARATOR="\\n") as ?{})\n').format(
+            col_name, col_name
+        )
+        s_property_o += '        ?{} {} ?{} .\n'.format(
+            s_name, entity, col_name
+        )
 
     query += group_concat
     query += '''    WHERE {{
@@ -112,8 +115,8 @@ def paging_query(query, limit):
     query_results = []
     if limit is not None:
         query += 'LIMIT {}\n'.format(limit)
-        for x in range(0, (limit+99)//100):
-            oquery = query + 'OFFSET {}\n'.format(x*100)
+        for x in range((limit + 99) // 100):
+            oquery = query + 'OFFSET {}\n'.format(x * 100)
             query_results += select_dbpedia(oquery)
         return query_results
     else:
