@@ -17,13 +17,13 @@ def index():
 
 @ontology.route('/work/')
 def list_():
-    res = [
+    names = [
         name
         for name, in session.query(Work.name).order_by(Work.name)
     ]
     return render_template(
         'work_list.html',
-        work_list=res
+        work_list=names
     )
 
 
@@ -36,5 +36,5 @@ def page(title):
     return render_template(
         'page_work.html',
         title=title,
-        res=work
+        work=work
     )

@@ -2,43 +2,43 @@
 {% block tbody %}
   <tr>
     <td>name</td>
-    <td>{{ res.name }}</td>
+    <td>{{ work.name }}</td>
   </tr>
 
-  {% if res.published_at %}
+  {% if work.published_at %}
     <tr>
       <td>published_at</td>
-      <td>{{ res.published_at }}</td>
+      <td>{{ work.published_at }}</td>
     </tr>
   {% endif %}
 
-  {% if res.number_of_pages %}
+  {% if work.number_of_pages %}
     <tr>
       <td>number_of_pages</td>
-      <td>{{ res.number_of_pages }}</td>
+      <td>{{ work.number_of_pages }}</td>
     </tr>
   {% endif %}
 
-  {% if res.isbn %}
+  {% if work.isbn %}
     <tr>
       <td>isbn</td>
-      <td>{{ res.isbn }}</td>
+      <td>{{ work.isbn }}</td>
     </tr>
   {% endif %}
 
-  {% if res.team %}
+  {% if work.team %}
     <tr>
       <td>team</td>
-      <td><a href="{{ url_for('.page', type_='team', title=res.team.name) }}">{{ res.team.name }}</a></td>
+      <td><a href="{{ url_for('.page', type_='team', title=work.team.name) }}">{{ work.team.name }}</a></td>
     </tr>
   {% endif %}
 
-  {% if res.awards %}
+  {% if work.awards %}
     <tr>
       <td>award</td>
       <td>
         <ul>
-          {% for val in res.awards %}
+          {% for val in work.awards %}
             <li><a href="{{ url_for('.page', type_='award', title=val.name) }}">{{ val.name }}</a></li>
           {% endfor %}
         </ul>
@@ -46,12 +46,12 @@
     </tr>
   {% endif %}
 
-  {% if res.genres %}
+  {% if work.genres %}
     <tr>
       <td>genres</td>
       <td>
         <ul>
-          {% for val in res.genres %}
+          {% for val in work.genres %}
             <li><a href="{{ url_for('.page', type_='genre', title=val.name) }}">{{ val.name }}</a></li>
           {% endfor %}
         </ul>
