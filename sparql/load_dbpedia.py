@@ -102,11 +102,8 @@ def select_by_relation(
             && STRSTARTS(STR(?{s_name}), "http://dbpedia.org/"))
         }}
         GROUP BY ?{s_name}
-        LIMIT 30
-        OFFSET 30
         '''.format(s_name=s_name, o_name=o_name, filt=filt)
-    print(query)
-    return select_dbpedia(query)
+    return paging_query(query, limit)
 
 
 def select_by_class(s=['dbpedia-owl:Person'],
@@ -145,10 +142,20 @@ def select_by_class(s=['dbpedia-owl:Person'],
     query += '''        }}
     GROUP BY ?{}
     '''.format(s_name)
-    print(query)
+
+    return paging_query(query, limit)
+
+
+def paging_query(query, limit):
+    res = []
     if limit is not None:
-        query += 'LIMIT {}'.format(limit)
-    return select_dbpedia(query)
+        query += 'LIMIT {}\n'.format(limit)
+        for x in range(0, (int)((limit+99)/100)):
+            oquery = query + 'OFFSET {}\n'.format(x*100)
+            res += select_dbpedia(oquery)
+        return res
+    else:
+        return select_dbpedia(query)
 
 
 # sqlite3
