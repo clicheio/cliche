@@ -3,12 +3,16 @@ import json
 from sparql import load_dbpedia as dbpedia
 
 
-def test_select_property():
-    fp = open('tests/select_artist.json')
-    fakeResult = json.load(fp)
+def test_select_property(monkeypatch):
+    class fakeQuery(object):
+        def convert(self):
+            with open('tests/select_property.json') as fp:
+                fakeResult = (json.load(fp))
+                return {"results": {"bindings": fakeResult}}
+
+    monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", fakeQuery)
     res = dbpedia.select_property(s='dbpedia-owl:Person', json=True)
-    assert fakeResult != res
-    fp.close()
+    assert type(res[0]['property']) == str
 
 
 def test_select_by_relation(monkeypatch):
@@ -16,12 +20,11 @@ def test_select_by_relation(monkeypatch):
         offset = 0
 
         def convert(self):
-            fp = open('tests/select_relation.json')
-            offset = fakeQuery.offset
-            fakeResult = (json.load(fp))[offset:offset+100:]
-            fakeQuery.offset += 100
-            fp.close()
-            return {"results": {"bindings": fakeResult}}
+            with open('tests/select_relation.json') as fp:
+                offset = fakeQuery.offset
+                fakeResult = (json.load(fp))[offset:offset+100:]
+                fakeQuery.offset += 100
+                return {"results": {"bindings": fakeResult}}
 
     monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", fakeQuery)
 
@@ -42,12 +45,11 @@ def test_select_by_class(monkeypatch):
         offset = 0
 
         def convert(self):
-            fp = open('tests/select_class.json')
-            offset = fakeQuery.offset
-            fakeResult = (json.load(fp))[offset:offset+100:]
-            fakeQuery.offset += 100
-            fp.close()
-            return {"results": {"bindings": fakeResult}}
+            with open('tests/select_class.json') as fp:
+                offset = fakeQuery.offset
+                fakeResult = (json.load(fp))[offset:offset+100:]
+                fakeQuery.offset += 100
+                return {"results": {"bindings": fakeResult}}
 
     monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", fakeQuery)
 
