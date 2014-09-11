@@ -17,8 +17,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError, NoResultFound
 
 from .entities import Entity, Redirection, Relation
+from ...celery import app, get_database_engine, get_session
 from ...orm import Session
-from ...worker import get_database_engine, get_session, worker
 
 
 BASE_URL = 'http://tvtropes.org/pmwiki/'
@@ -181,7 +181,7 @@ def is_wiki_page(url):
     return (BASE_URL not in url or WIKI_PAGE in url)
 
 
-@worker.task
+@app.task
 def crawl_link(url):
     session = get_session()
     logger = get_task_logger(__name__ + '.crawl_link')

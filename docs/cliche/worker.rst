@@ -1,3 +1,0 @@
-
-.. automodule:: cliche.worker
-   :members:

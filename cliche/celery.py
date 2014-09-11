@@ -1,4 +1,4 @@
-""":mod:`cliche.worker` --- Celery_-backed task queue worker
+""":mod:`cliche.celery` --- Celery_-backed task queue worker
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _Celery: http://www.celeryproject.org/
@@ -15,10 +15,10 @@ from sqlalchemy.engine import create_engine, Engine
 from .config import ConfigDict, read_config
 from .orm import Session, import_all_modules
 
-__all__ = 'Loader', 'get_database_engine', 'get_session', 'worker'
+__all__ = 'Loader', 'get_database_engine', 'get_session', 'app'
 
 
-worker = Celery(__name__, loader=__name__ + ':Loader')
+app = Celery(__name__, loader=__name__ + ':Loader')
 
 
 class Loader(BaseLoader):
