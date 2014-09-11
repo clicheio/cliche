@@ -10,7 +10,7 @@ from sqlalchemy.sql.functions import now
 from sqlalchemy.types import Date, DateTime, Integer, String
 
 from .orm import Base
-from .people import Person, Team
+from .people import Person
 from .sqltypes import EnumType
 
 __all__ = ('Award', 'AwardWinner', 'Credit', 'Genre',
@@ -94,7 +94,7 @@ class AwardWinner(Base):
 
 
 class Credit(Base):
-    """Relationship between the work and the person.
+    """Relationship between the work, the person, and the team.
     Describe that the person participated in making the work.
     """
 
@@ -113,13 +113,19 @@ class Credit(Base):
     #: The person's role in making the work.
     role = Column(EnumType(Role, name='credits_role'))
 
+    #: (:class:`int`) :class:`Team.id` of :attr:`team`. (optional)
+    team_id = Column(Integer, ForeignKey('teams.id'))
+
+    #: The team which the person belonged when work had been made.
+    team = relationship('Team')
+
     #: (:class:`datetime.datetime`) The date and time on which
     #: the record was created.
     created_at = Column(DateTime(timezone=True), nullable=False,
                         default=now())
 
     __tablename__ = 'credits'
-    __repr_columns__ = person_id, work_id
+    __repr_columns__ = person_id, work_id, team_id
 
 
 class Genre(Base):
@@ -171,12 +177,6 @@ class Work(Base):
 
     #: (:class:`str`) The ISBN of the book.
     isbn = Column(String)
-
-    #: (:class:`int`) The :class:`cliche.people.Team.id` of :attr:`team`.
-    team_id = Column(Integer, ForeignKey(Team.id))
-
-    #: (:class:`cliche.people.Team`) The team that created the work.
-    team = relationship(Team)
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkAward`\ s that the work has.

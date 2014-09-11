@@ -38,12 +38,13 @@ def test_person_made_works(fx_people, fx_works):
         fx_works.cardcaptor_sakura
 
 
-def test_work_has_people(fx_works, fx_people):
+def test_credits_of_work(fx_works, fx_people, fx_teams):
     people = set()
-    for asso in fx_works.cardcaptor_sakura.credits:
-        people.add(asso.person)
-        assert asso.work == fx_works.cardcaptor_sakura
-        assert asso.role == Role.artist
+    for credit in fx_works.cardcaptor_sakura.credits:
+        people.add(credit.person)
+        assert credit.work == fx_works.cardcaptor_sakura
+        assert credit.role == Role.artist
+        assert credit.team == fx_teams.clamp
     assert people == {
         fx_people.clamp_member_1, fx_people.clamp_member_2,
         fx_people.clamp_member_3, fx_people.clamp_member_4
