@@ -1,22 +1,63 @@
+import json
+
 from sparql import load_dbpedia as dbpedia
 
 
-def test_load_dbpedia_is_save_db(
-        fx_sparql_dbpedia_table,
-        fx_sparql_dbpedia_cursor):
-    """ Test: Do sparql.load_dbpedia modules's methods
-                really save data into db? """
-    qry = 'SELECT COUNT({}) FROM {}'.format(
-        fx_sparql_dbpedia_table['PRIMARY'],
-        fx_sparql_dbpedia_table['TABLENAME']
-    )
-    count = 0
-    for y in range(0, fx_sparql_dbpedia_table['COUNT']):
-        res = dbpedia.load_dbpedia(fx_sparql_dbpedia_table['LIMIT'], y)
-        dbpedia.save_db(res, fx_sparql_dbpedia_table)
+def test_select_property(monkeypatch):
+    class fakeQuery(object):
+        def convert(self):
+            with open('tests/select_property.json') as fp:
+                fakeResult = (json.load(fp))
+                return {"results": {"bindings": fakeResult}}
 
-        temp = fx_sparql_dbpedia_cursor.execute(qry)
-        count_current_rows = temp.fetchone()[0]
-        assert count <= count_current_rows
-        assert count_current_rows > 0
-        count = count_current_rows
+    monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", fakeQuery)
+    res = dbpedia.select_property(s='dbpedia-owl:Person', json=True)
+    assert type(res[0]['property']) == str
+
+
+def test_select_by_relation(monkeypatch):
+    class fakeQuery(object):
+        offset = 0
+
+        def convert(self):
+            with open('tests/select_relation.json') as fp:
+                offset = fakeQuery.offset
+                fakeResult = (json.load(fp))[offset:offset+100:]
+                fakeQuery.offset += 100
+                return {"results": {"bindings": fakeResult}}
+
+    monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", fakeQuery)
+
+    res = dbpedia.select_by_relation(
+        p=[
+            'dbpprop:author',
+            'dbpedia-owl:writer',
+            'dbpedia-owl:author'
+        ],
+        s_name='work',
+        o_name='author',
+        limit=101
+    )
+    assert len(res) == 101
+
+
+def test_select_by_class(monkeypatch):
+    class fakeQuery(object):
+        offset = 0
+
+        def convert(self):
+            with open('tests/select_class.json') as fp:
+                offset = fakeQuery.offset
+                fakeResult = json.load(fp)[offset:offset+100:]
+                fakeQuery.offset += 100
+                return {"results": {"bindings": fakeResult}}
+
+    monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", fakeQuery)
+
+    res = dbpedia.select_by_class(
+        s=['dbpedia-owl:Artist'],
+        s_name='artists',
+        entities=['foaf:name', 'dbpedia-owl:birthDate'],
+        limit=3
+    )
+    assert len(res) == 3

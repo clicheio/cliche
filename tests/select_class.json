@@ -1,0 +1,44 @@
+[
+    {
+        "artists": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Fran%C3%A7ois_Boucher"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Boucher, François\nFrançois Boucher"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1703-09-29\n1703-09-29"
+        }
+    },
+    {
+        "artists": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Cameron_Muncey"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Cameron Muncey\nCameron Muncey\nMuncey, Cameron\nMuncey, Cameron"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1980-02-04\n1980-02-08\n1980-02-04\n1980-02-08"
+        }
+    },
+    {
+        "artists": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Warren_Smith_(singer)"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Warren Smith\nSmith, Warren"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1932-02-07\n1932-02-07"
+        }
+    }
+]
