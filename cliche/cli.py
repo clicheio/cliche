@@ -14,6 +14,7 @@ from .config import read_config
 from .orm import downgrade_database, upgrade_database
 from .web.app import app
 from .web.db import get_database_engine
+from .worker import worker
 
 from .services.tvtropes.crawler import crawl as crawl_tvtropes
 
@@ -66,6 +67,7 @@ def initialize_app(config=None):
         raise SystemExit(1)
     config = read_config(filename=pathlib.Path(config))
     app.config.update(config)
+    worker.conf.update(config)
     return app
 
 
@@ -104,8 +106,8 @@ def upgrade(revision):
 
 @manager.command
 def crawl():
-    crawl_tvtropes(app.config)
     """Crawls TVTropes and saves entities into database."""
+    crawl_tvtropes()
 
 
 if __name__ == '__main__':

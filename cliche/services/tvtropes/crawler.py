@@ -11,16 +11,14 @@ import urllib.parse
 
 import requests
 
-from celery.signals import worker_process_init
 from celery.utils.log import get_task_logger
 from lxml.html import document_fromstring, parse
-from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError, NoResultFound
 
 from .entities import Entity, Redirection, Relation
-from ...orm import Base, Session
-from ...worker import worker
+from ...orm import Session
+from ...worker import get_database_engine, get_session, worker
 
 
 BASE_URL = 'http://tvtropes.org/pmwiki/'
@@ -29,15 +27,6 @@ WIKI_PAGE = urllib.parse.urljoin(BASE_URL, 'pmwiki.php/')
 RELATED_SEARCH = urllib.parse.urljoin(BASE_URL, 'relatedsearch.php?term=')
 
 CRAWL_INTERVAL = datetime.timedelta(days=7)
-
-
-db_engine = None
-
-
-@worker_process_init.connect
-def establish_database_connection(*args, **kwargs):
-    global db_engine
-    db_engine = create_engine(worker.conf.DATABASE_URL)
 
 
 def determine_type(namespace):
@@ -194,8 +183,7 @@ def is_wiki_page(url):
 
 @worker.task
 def crawl_link(url):
-    global db_engine
-    session = Session(bind=db_engine)
+    session = get_session()
     logger = get_task_logger(__name__ + '.crawl_link')
     current_time = datetime.datetime.now(datetime.timezone.utc)
     if recently_crawled(current_time, url, session):
@@ -259,13 +247,9 @@ def show_spinner(iterable, *, print_callback):
         yield value
 
 
-def crawl(config):
-    worker.config_from_object(config)
-    global db_engine
-    db_engine = create_engine(worker.conf.DATABASE_URL)
+def crawl():
+    db_engine = get_database_engine()
     session = Session(bind=db_engine)
-
-    Base.metadata.create_all(db_engine)
     print('Populating seeds...', end="", flush=True)
     if session.query(Entity).count() < 1:
         for url in show_spinner(list_pages(print_callback=print),
