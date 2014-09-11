@@ -104,8 +104,8 @@ def upgrade(revision):
 
 @manager.command
 def crawl():
-    '''Crawles TVTropes and saves entities into database.'''
     crawl_tvtropes(app.config)
+    """Crawls TVTropes and saves entities into database."""
 
 
 if __name__ == '__main__':
