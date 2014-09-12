@@ -26,13 +26,6 @@
     </tr>
   {% endif %}
 
-  {% if work.team %}
-    <tr>
-      <td>team</td>
-      <td><a href="{{ url_for('.page', type_='team', title=work.team.name) }}">{{ work.team.name }}</a></td>
-    </tr>
-  {% endif %}
-
   {% if work.awards %}
     <tr>
       <td>award</td>

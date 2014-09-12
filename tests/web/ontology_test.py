@@ -3,7 +3,7 @@ import datetime
 from lxml.etree import _ElementUnicodeResult
 from lxml.html import document_fromstring
 
-from cliche.work import Award, Genre, Team, Work
+from cliche.work import Award, Genre, Work
 
 
 def contain_text(text, path, data):
@@ -79,13 +79,6 @@ def test_work_page(fx_session, fx_flask_client):
 
     rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
     assert contain_text('1931520720', '//tbody/tr/td', rv.data)
-
-    work.team = Team(name='Ted Chiang')
-    with fx_session.begin():
-        fx_session.add(work)
-
-    rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
-    assert contain_text('Ted Chiang', '//tbody/tr/td/a', rv.data)
 
     work.awards.add(Award(name='Nebula Award'))
     with fx_session.begin():
