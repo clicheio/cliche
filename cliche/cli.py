@@ -191,6 +191,3 @@ def runserver(host, port, threaded, processes,
 
 #: (:class:`collections.abc.Callable`) The CLI entry point.
 main = cli
-
-if __name__ == '__main__':
-    main()
