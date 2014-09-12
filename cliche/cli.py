@@ -55,6 +55,19 @@ ALEMBIC_LOGGING = {
 }
 
 
+def config(func):
+    def internal(*args, **kwargs):
+        echo(kwargs['config'])
+        initialize_app(kwargs['config'])
+        del kwargs['config']
+        func(*args, **kwargs)
+
+    deco = option('--config', '-c', type=Path(exists=True),
+                  help='Configuration file (YAML or Python)')
+    internal.__name__ = func.__name__
+    return deco(internal)
+
+
 def initialize_app(config=None):
     """(:class:`flask.ext.script.Manager`) A Flask-Script manager object."""
     if config is None:
@@ -80,12 +93,10 @@ def cli():
 
 
 @cli.command()
-@option('--config', '-c', type=Path(exists=True),
-        help='Configuration file (YAML or Python)')
-@argument('revision', default='head') # help='Revision upgrade/downgrade to'
-def upgrade(config, revision):
+@argument('revision', default='head')
+@config
+def upgrade(revision):
     """Creates the database tables, or upgrade it to the latest revision."""
-    initialize_app(config)
 
     logging_config = dict(ALEMBIC_LOGGING)
     logging.config.dictConfig(logging_config)
@@ -107,24 +118,20 @@ def upgrade(config, revision):
 
 
 @cli.command()
-@option('--config', '-c', type=Path(exists=True),
-        help='Configuration file (YAML or Python)')
-def crawl(config):
+@config
+def crawl():
     '''Crawles TVTropes and saves entities into database.'''
-    initialize_app(config)
     crawl_tvtropes(app.config)
 
 
 @cli.command()
-@option('--config', '-c', type=Path(exists=True),
-        help='Configuration file (YAML or Python)')
 @option('--no-ipython', help='Do not use the IPython shell',
         is_flag=True)
 @option('--no-bpython', help='Do not use the BPython shell',
         is_flag=True)
-def shell(config, no_ipython, no_bpython):
+@config
+def shell(no_ipython, no_bpython):
     '''Runs a Python shell inside Flask application context.'''
-    initialize_app(config)
     with app.test_request_context():
         context = dict(app=_request_ctx_stack.top.app)
 
@@ -156,20 +163,21 @@ def shell(config, no_ipython, no_bpython):
 
 
 @cli.command()
-@option('--config', '-c', type=Path(exists=True),
-        help='Configuration file (YAML or Python)')
 @option('--host', '-h')
 @option('--port', '-p', type=int)
 @option('--threaded', is_flag=True)
 @option('--processes', type=int, default=1)
 @option('--passthrough-errors', is_flag=True)
 @option('--debug/--no-debug', '-d/-D', default=False,
-        help='enable the Werkzeug debugger (DO NOT use in production code)')
+        help='enable the Werkzeug debugger'
+             ' (DO NOT use in production code)')
 @option('--reload/--no-reload', '-r/-R', default=False,
-        help='monitor Python files for changes (not 100% safe for production use)')
-def runserver(config, host, port, threaded, processes, passthrough_errors, debug, reload):
+        help='monitor Python files for changes'
+             ' (not 100% safe for production use)')
+@config
+def runserver(host, port, threaded, processes,
+              passthrough_errors, debug, reload):
     '''Runs the Flask development server i.e. app.run()'''
-    initialize_app(config)
     app.run(host=host,
             port=port,
             debug=debug,
