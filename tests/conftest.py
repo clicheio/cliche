@@ -4,6 +4,7 @@ import pathlib
 import sqlite3
 import types
 
+from click.testing import CliRunner
 from pytest import fixture, yield_fixture
 
 from cliche.people import Person, Team
@@ -198,3 +199,15 @@ def fx_sparql_dbpedia_cursor(fx_sparql_dbpedia_table):
     conn = sqlite3.connect(db_file)
     c = conn.cursor()
     return c
+
+
+@fixture
+def fx_cli_runner():
+    return CliRunner()
+
+
+@fixture
+def fx_cfg_py_file(fx_tmpdir):
+    with (fx_tmpdir / 'test.cfg.py').open('w') as f:
+        f.write("DATABASE_URL = 'sqlite:///:memory:'")
+    return fx_tmpdir / 'test.cfg.py'
