@@ -100,21 +100,22 @@ def upgrade(revision):
 
     logging_config = dict(ALEMBIC_LOGGING)
     logging.config.dictConfig(logging_config)
-    try:
-        engine = get_database_engine()
-    except RuntimeError as e:
-        echo(e, file=sys.stderr)
-    else:
+    with app.app_context():
         try:
-            upgrade_database(engine, revision)
-        except CommandError as e:
-            if revision != 'head':
-                try:
-                    downgrade_database(engine, revision)
-                except CommandError as e:
-                    echo(e, file=sys.stderr)
-            else:
-                echo(e, file=sys.stderr)
+            engine = get_database_engine()
+        except RuntimeError as e:
+            echo('RuntimeError: ' + str(e), file=sys.stderr)
+        else:
+            try:
+                upgrade_database(engine, revision)
+            except CommandError as e:
+                if revision != 'head':
+                    try:
+                        downgrade_database(engine, revision)
+                    except CommandError as e:
+                        echo('CommandError: ' + str(e), file=sys.stderr)
+                else:
+                    echo('CommandError: ' + str(e), file=sys.stderr)
 
 
 @cli.command()
