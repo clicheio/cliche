@@ -1,21 +1,14 @@
 import datetime
 
-from lxml.etree import _ElementUnicodeResult
 from lxml.html import document_fromstring
 
 from cliche.work import Award, Genre, Work
 
 
 def assert_contain_text(text, path, data):
-    def inspect(haystack):
-        return haystack is not None and text in haystack
-
-    def traverse(tree):
-        for element in tree:
-            if isinstance(element, _ElementUnicodeResult):
-                yield inspect(element)
-            else:
-                yield inspect(element.text)
+    def traverse(elements):
+        for element in elements:
+            yield text in element.text_content()
 
     tree = document_fromstring(str(data)).xpath(path)
     assert tree
@@ -54,7 +47,7 @@ def test_work_page(fx_session, fx_flask_client):
         fx_session.add(work)
 
     rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
-    assert_contain_text('Story of Your Life', '//h1/text()', rv.data)
+    assert_contain_text('Story of Your Life', '//h1', rv.data)
 
     # case 3: set attributes
     work.published_at = datetime.date(2010, 10, 26)
