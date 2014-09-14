@@ -8,11 +8,14 @@ from cliche.work import Award, Genre, Work
 def assert_contain_text(text, path, data):
     def traverse(elements):
         for element in elements:
-            yield text in element.text_content()
+            if text in element.text_content():
+                return True
+        else:
+            return False
 
     tree = document_fromstring(str(data)).xpath(path)
     assert tree
-    assert any(traverse(tree))
+    assert traverse(tree)
 
 
 def test_index(fx_session, fx_flask_client):
