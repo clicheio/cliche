@@ -1,34 +1,34 @@
 {% extends "page.html" %}
 {% block tbody %}
-  <tr>
-    <td>name</td>
+  <tr class="name">
+    <th scope="row">name</th>
     <td>{{ work.name }}</td>
   </tr>
 
   {% if work.published_at %}
-    <tr>
-      <td>published_at</td>
+    <tr class="published_at">
+      <th scope="row">published_at</th>
       <td>{{ work.published_at }}</td>
     </tr>
   {% endif %}
 
   {% if work.number_of_pages %}
-    <tr>
-      <td>number_of_pages</td>
+    <tr class="number_of_pages">
+      <th scope="row">number_of_pages</th>
       <td>{{ work.number_of_pages }}</td>
     </tr>
   {% endif %}
 
   {% if work.isbn %}
-    <tr>
-      <td>isbn</td>
+    <tr class="isbn">
+      <th scope="row">isbn</th>
       <td>{{ work.isbn }}</td>
     </tr>
   {% endif %}
 
   {% if work.awards %}
-    <tr>
-      <td>award</td>
+    <tr class="awards">
+      <th scope="row">awards</th>
       <td>
         <ul>
           {% for val in work.awards %}
@@ -40,8 +40,8 @@
   {% endif %}
 
   {% if work.genres %}
-    <tr>
-      <td>genres</td>
+    <tr class="genres">
+      <th scope="row">genres</th>
       <td>
         <ul>
           {% for val in work.genres %}
