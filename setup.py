@@ -57,7 +57,8 @@ if sys.version_info < (3, 4, 0):
     }
 
 tests_require = {
-    'pytest >= 2.5.0'
+    'pytest >= 2.5.0',
+    'cssselect >= 0.9.1'
 }
 
 docs_require = {
