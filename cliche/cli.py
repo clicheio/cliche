@@ -21,6 +21,7 @@ from .orm import downgrade_database, upgrade_database
 from .web.app import app as flask_app
 from .web.db import get_database_engine
 
+
 __all__ = ('initialize_app', 'config', 'main')
 
 ALEMBIC_LOGGING = {
@@ -135,6 +136,13 @@ def sync(service):  # FIXME available service listing
         echo('There is no such service \'{}\' suitable for synchronization.'
              .format(service),
              file=sys.stderr)
+
+
+@cli.command
+@config
+def load():
+    '''Loads data from Wikipedia and saves entities into database.'''
+    load_wikipedia(flask_app.config)
 
 
 @cli.command()

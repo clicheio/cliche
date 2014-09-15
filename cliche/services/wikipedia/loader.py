@@ -1,4 +1,35 @@
+""":mod:`cliche.services.wikipedia.loader` --- Wikipedia_ loader
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Loading DBpedia Tables into a Relational Database
+
+.. seealso::
+
+   `Please Follow Mapping Guide`
+     http://mappings.dbpedia.org/index.php/Mapping_Guide
+
+   `The list of dbpedia classes`__
+      This page describes the structure and relation of DBpedia classes.
+
+   __ http://mappings.dbpedia.org/server/ontology/classes/
+
+   `Local Data`
+     http://web.informatik.uni-mannheim.de/DBpediaAsTables/DBpediaClasses.htm
+
+.. _Wikipedia: http://wikipedia.org/
+
+References
+----------
+"""
+from sqlalchemy.exc import IntegrityError
 from SPARQLWrapper import JSON, SPARQLWrapper
+
+from .WorkAuthor import WorkAuthor
+from ...celery import app, get_database_engine, get_session
+from ...orm import Session
+
+
+PAGE_ITEM_COUNT = 100
 
 
 def select_dbpedia(query):
@@ -46,9 +77,10 @@ def select_property(s, s_name='property', json=False):
         return tuples
 
 
-def select_by_relation(p, s_name='subject', o_name='object', limit=None):
+def select_by_relation(p, s_name='subject', o_name='object', page=1):
+    """Find author of somethings"""
     if not p:
-        raise ValueError('at least one porperty required')
+        raise ValueError('at least one property required')
 
     filt = '?p = {}'.format(p[0])
     for x in p[1:]:
@@ -64,11 +96,20 @@ def select_by_relation(p, s_name='subject', o_name='object', limit=None):
             (  {filt}  )
             && STRSTARTS(STR(?{s_name}), "http://dbpedia.org/"))
         }}
-        GROUP BY ?{s_name}'''.format(s_name=s_name, o_name=o_name, filt=filt)
-    return paging_query(query, limit)
+        GROUP BY ?{s_name}
+        LIMIT {limit}
+        OFFSET {offset}'''.format(
+            s_name=s_name,
+            o_name=o_name,
+            filt=filt,
+            limit=PAGE_ITEM_COUNT,
+            offset=PAGE_ITEM_COUNT * (page-1)
+        )
+    return select_dbpedia(query)
 
 
-def select_by_class(s, s_name='subject', entities=None, limit=None):
+def select_by_class(s, s_name='subject', entities=None, page=1):
+    """List of Artist and ComicsCreator"""
     if not s:
         raise ValueError('at least one class required')
     if entities is None:
@@ -106,18 +147,57 @@ def select_by_class(s, s_name='subject', entities=None, limit=None):
         {{ ?{} a {} . }}\n'''.format(s_name, x)
     query += s_property_o
     query += '''        }}
-    GROUP BY ?{}'''.format(s_name)
-
-    return paging_query(query, limit)
+    GROUP BY ?{s_name}
+    LIMIT {limit}
+    OFFSET {offset}'''.format(
+        s_name=s_name,
+        limit=PAGE_ITEM_COUNT,
+        offset=PAGE_ITEM_COUNT * (page-1)
+    )
+    return select_dbpedia(query)
 
 
 def paging_query(query, limit):
     query_results = []
     if limit is not None:
         query += 'LIMIT {}\n'.format(limit)
-        for x in range((limit + 99) // 100):
-            oquery = query + 'OFFSET {}\n'.format(x * 100)
+        for x in range((limit + PAGE_ITEM_COUNT - 1) // PAGE_ITEM_COUNT):
+            oquery = query + 'OFFSET {}\n'.format(x * PAGE_ITEM_COUNT)
             query_results += select_dbpedia(oquery)
         return query_results
     else:
         return select_dbpedia(query)
+
+
+@app.task
+def load_page(page):
+    session = get_session()
+    res = select_by_relation(
+        p=[
+            'dbpprop:author',
+            'dbpedia-owl:writer',
+            'dbpedia-owl:author'
+        ],
+        s_name='work',
+        o_name='author',
+        page=page
+    )
+
+    for item in res:
+        try:
+            with session.begin():
+                new_entity = WorkAuthor(
+                    work=item['work'],
+                    author=item['author'],
+                )
+                session.add(new_entity)
+        except IntegrityError:
+            pass
+
+    load_page.delay(page+1)
+
+
+def load(config):
+    db_engine = get_database_engine()
+    session = Session(bind=db_engine)
+    load_page.delay(1)
