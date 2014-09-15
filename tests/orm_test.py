@@ -1,12 +1,14 @@
 import functools
 import os
+import sys
 import tempfile
 
 from pytest import fixture
 from sqlalchemy import create_engine
 
 from cliche.orm import (downgrade_database, get_database_revision,
-                        initialize_database, upgrade_database)
+                        import_all_modules, initialize_database,
+                        upgrade_database)
 
 
 @fixture
@@ -33,3 +35,10 @@ def test_upgrade_downgrade(tmp_engine):
     downgrade_database(tmp_engine, 'base')
     script = get_database_revision(tmp_engine)
     assert script is None
+
+
+def test_import_all_modules():
+    modules = import_all_modules()
+    for mod in modules:
+        assert mod.startswith('cliche.')
+    assert modules <= frozenset(sys.modules)

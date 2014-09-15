@@ -201,13 +201,19 @@ def downgrade_database(engine, revision):
     downgrade(config, revision)
 
 
-def import_all_modules():
+def import_all_modules(dry_run=False):
     """Import all submodules of :mod:`cliche` to ensure every ORM
     entity classes are ready to use.  It's useful for being ready to
     auto-generate a migration script.
 
+    :return: the set of module names
+    :rtype: :class:`collections.abc.Set`
+
     """
     current_dir = os.path.join(os.path.dirname(__file__), '..')
-    for _, mod, __ in pkgutil.walk_packages(current_dir):
-        if mod.startswith('cliche.'):
-            __import__(mod)
+    modules = frozenset(mod
+                        for _, mod, __ in pkgutil.walk_packages(current_dir)
+                        if mod.startswith('cliche.'))
+    for mod in modules:
+        __import__(mod)
+    return modules

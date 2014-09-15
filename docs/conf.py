@@ -272,7 +272,10 @@ texinfo_documents = [
 intersphinx_mapping = {
     'python': ('http://docs.python.org/3/', None),
     'sqlalchemy': ('http://docs.sqlalchemy.org/en/rel_0_9/', None),
-    'alembic': ('http://alembic.readthedocs.org/en/latest/', None)
+    'alembic': ('http://alembic.readthedocs.org/en/latest/', None),
+    'celery': ('http://docs.celeryproject.org/en/latest/', None),
+    'werkzeug': ('http://werkzeug.pocoo.org/docs/', None),
+    'flask': ('http://flask.pocoo.org/docs/', None),
 }
 
 extlinks = {

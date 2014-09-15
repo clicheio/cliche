@@ -1,7 +1,21 @@
-from pytest import mark
+from pytest import mark, raises
 
-from cliche.config import (read_config, read_config_from_python,
+from cliche.config import (ConfigDict, ConfigKeyError,
+                           read_config, read_config_from_python,
                            read_config_from_yaml)
+
+
+def test_config_dict():
+    c = ConfigDict(A=1)
+    assert c['A'] == 1
+    with raises(ConfigKeyError):
+        c['B']
+
+
+def test_config_key_error():
+    e = ConfigKeyError('key')
+    assert isinstance(e, KeyError)
+    assert str(e) == "missing configuration: 'key'"
 
 
 config_yaml = '''

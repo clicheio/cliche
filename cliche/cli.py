@@ -10,9 +10,10 @@ import sys
 from alembic.util import CommandError
 from flask.ext.script import Manager
 
+from .celery import app as celery_app
 from .config import read_config
 from .orm import downgrade_database, upgrade_database
-from .web.app import app
+from .web.app import app as flask_app
 from .web.db import get_database_engine
 
 from .services.tvtropes.crawler import crawl as crawl_tvtropes
@@ -65,8 +66,9 @@ def initialize_app(config=None):
         print('The configuration file', config, 'cannot be read.')
         raise SystemExit(1)
     config = read_config(filename=pathlib.Path(config))
-    app.config.update(config)
-    return app
+    flask_app.config.update(config)
+    celery_app.conf.update(config)
+    return flask_app
 
 
 manager = Manager(initialize_app)
@@ -104,8 +106,8 @@ def upgrade(revision):
 
 @manager.command
 def crawl():
-    '''Crawles TVTropes and saves entities into database.'''
-    crawl_tvtropes(app.config)
+    """Crawls TVTropes and saves entities into database."""
+    crawl_tvtropes()
 
 
 if __name__ == '__main__':

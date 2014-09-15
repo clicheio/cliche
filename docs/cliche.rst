@@ -4,6 +4,7 @@
    .. toctree::
       :maxdepth: 2
 
+      cliche/celery
       cliche/cli
       cliche/config
       cliche/orm
@@ -12,4 +13,3 @@
       cliche/sqltypes
       cliche/web
       cliche/work
-      cliche/worker

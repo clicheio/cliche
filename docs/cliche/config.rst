@@ -1,3 +1,3 @@
 
-.. automodule:: cliche.web.config
+.. automodule:: cliche.config
    :members:
