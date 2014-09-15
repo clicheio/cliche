@@ -87,6 +87,7 @@ Execute the following command in the shell:
 
 .. sourcecode:: console
 
+   $ celery worker -A cliche --config dev.cfg.yml
     -------------- celery@localhost v3.1.13 (Cipater)
    ---- **** -----
    --- * ***  * -- Darwin-13.3.0-x86_64-i386-64bit
