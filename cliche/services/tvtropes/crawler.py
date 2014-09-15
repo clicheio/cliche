@@ -38,7 +38,7 @@ def determine_type(namespace):
         return 'Work'
 
 
-def list_pages(namespace_url=None, *, print_callback=None):
+def list_pages(namespace_url=None):
     list_url = namespace_url or INDEX_INDEX
     tree = parse(list_url)
 
@@ -51,24 +51,14 @@ def list_pages(namespace_url=None, *, print_callback=None):
         namespaces = tree.xpath(
             '//a[starts-with(@href, "index_report.php?groupname=")]'
         )
-        if print_callback is not None:
-            print_callback(' {} more.'.format(len(namespaces)), flush=True)
 
-        count = 0
         for a in namespaces:
-            count += 1
-            if count % 10 == 0:
-                if print_callback is not None:
-                    print_callback('/', end="", flush=True)
-            else:
-                if print_callback is not None:
-                    print_callback('.', end="", flush=True)
             if "index_report.php?groupname=Administrivia" in a.attrib['href']:
                 continue
             url = urllib.parse.urljoin(
                 INDEX_INDEX, a.attrib['href']
             )
-            for value in list_pages(url, print_callback=print_callback):
+            for value in list_pages(url):
                 yield value
 
 
@@ -201,9 +191,11 @@ def crawl_link(url):
                 WIKI_PAGE, a.attrib['href']
             )
             destination_result, destination_tree, destination_namespace, \
-                destination_name, destination_type, \
-                destination_url = fetch_link(destination_url, session,
-                                             log_prefix='(child) ')
+                destination_name, destination_url = fetch_link(
+                    destination_url,
+                    session,
+                    log_prefix='(child) '
+                )
             if not result:
                 return
             try:
@@ -230,34 +222,14 @@ def crawl_link(url):
         entity.last_crawled = current_time
 
 
-def show_spinner(iterable, *, print_callback):
-    spinner = 0
-    for value in iterable:
-        if spinner == 0:
-            print_callback('/', end="", flush=True)
-        if spinner == 1:
-            print_callback('-', end="", flush=True)
-        if spinner == 2:
-            print_callback('\\', end="", flush=True)
-        if spinner == 3:
-            print_callback('|', end="", flush=True)
-        print_callback('\b', end="", flush=True)
-        spinner += 1
-        spinner %= 4
-        yield value
-
-
+@app.task
 def crawl():
-    db_engine = get_database_engine()
-    session = Session(bind=db_engine)
-    print('Populating seeds...', end="", flush=True)
+    session = get_session()
     if session.query(Entity).count() < 1:
-        for url in show_spinner(list_pages(print_callback=print),
-                                print_callback=print):
+        seeds = list(list_pages())
+        for url in seeds:
             crawl_link.delay(url)
     else:
-        for entity in show_spinner(session.query(Entity)
-                                          .order_by(Entity.namespace,
-                                                    Entity.name),
-                                   print_callback=print):
+        for entity in session.query(Entity) \
+                             .order_by(Entity.namespace,Entity.name):
             crawl_link.delay(entity.url)

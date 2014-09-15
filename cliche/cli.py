@@ -119,7 +119,7 @@ def sync(service):  # FIXME available service listing
     '''Sync to services.'''
     package = 'cliche.services.' + service[0]
     if package in find_packages():
-        import_string(package + ':sync')()
+        import_string(package + ':sync').delay()
 
 
 @cli.command()
