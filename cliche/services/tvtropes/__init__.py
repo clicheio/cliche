@@ -4,3 +4,5 @@
 .. _TVTropes: http://tvtropes.org/
 
 """
+
+from .crawler import crawl as sync

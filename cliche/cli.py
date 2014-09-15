@@ -12,14 +12,14 @@ import sys
 from alembic.util import CommandError
 from click import Path, argument, echo, group, option
 from flask import _request_ctx_stack
+from setuptools import find_packages
+from werkzeug.utils import import_string
 
 from .celery import app as celery_app
 from .config import read_config
 from .orm import downgrade_database, upgrade_database
 from .web.app import app as flask_app
 from .web.db import get_database_engine
-
-from .services.tvtropes.crawler import crawl as crawl_tvtropes
 
 __all__ = ('get_database_engine', 'initialize_app', 'main')
 
@@ -113,10 +113,13 @@ def upgrade(revision):
 
 
 @cli.command()
+@argument('service', help='Service to sync with')
 @config
-def crawl():
-    """Crawls TVTropes and saves entities into database."""
-    crawl_tvtropes()
+def sync(service):  # FIXME available service listing
+    '''Sync to services.'''
+    package = 'cliche.services.' + service[0]
+    if package in find_packages():
+        import_string(package + ':sync')()
 
 
 @cli.command()
