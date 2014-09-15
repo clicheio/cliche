@@ -1,32 +1,32 @@
 import json
 
-from sparql import load_dbpedia as dbpedia
+from cliche.services.wikipedia import loader as dbpedia
 
 
 def test_select_property(monkeypatch):
-    class fakeQuery(object):
+    class FakeQuery(object):
         def convert(self):
             with open('tests/select_property.json') as fp:
                 fakeResult = (json.load(fp))
                 return {"results": {"bindings": fakeResult}}
 
-    monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", fakeQuery)
+    monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", FakeQuery)
     res = dbpedia.select_property(s='dbpedia-owl:Person', json=True)
     assert type(res[0]['property']) == str
 
 
 def test_select_by_relation(monkeypatch):
-    class fakeQuery(object):
+    class FakeQuery(object):
         offset = 0
 
         def convert(self):
             with open('tests/select_relation.json') as fp:
-                offset = fakeQuery.offset
+                offset = FakeQuery.offset
                 fakeResult = (json.load(fp))[offset:offset+100:]
-                fakeQuery.offset += 100
+                FakeQuery.offset += 100
                 return {"results": {"bindings": fakeResult}}
 
-    monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", fakeQuery)
+    monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", FakeQuery)
 
     res = dbpedia.select_by_relation(
         p=[
@@ -36,28 +36,28 @@ def test_select_by_relation(monkeypatch):
         ],
         s_name='work',
         o_name='author',
-        limit=101
+        page=1
     )
-    assert len(res) == 101
+    assert len(res) == 100
 
 
 def test_select_by_class(monkeypatch):
-    class fakeQuery(object):
+    class FakeQuery(object):
         offset = 0
 
         def convert(self):
             with open('tests/select_class.json') as fp:
-                offset = fakeQuery.offset
+                offset = FakeQuery.offset
                 fakeResult = json.load(fp)[offset:offset+100:]
-                fakeQuery.offset += 100
+                FakeQuery.offset += 100
                 return {"results": {"bindings": fakeResult}}
 
-    monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", fakeQuery)
+    monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", FakeQuery)
 
     res = dbpedia.select_by_class(
         s=['dbpedia-owl:Artist'],
         s_name='artists',
         entities=['foaf:name', 'dbpedia-owl:birthDate'],
-        limit=3
+        page=1
     )
-    assert len(res) == 3
+    assert len(res) == 100

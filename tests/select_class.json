@@ -1,44 +1,1402 @@
 [
     {
-        "artists": {
+        "subject": {
             "type": "uri",
-            "value": "http://dbpedia.org/resource/Fran%C3%A7ois_Boucher"
+            "value": "http://dbpedia.org/resource/Dawn-Michelle_Baude"
         },
         "name": {
             "type": "literal",
-            "value": "Boucher, François\nFrançois Boucher"
+            "value": "Dawn-Michelle Baude\nBaude, Dawn-Michelle"
         },
         "birthDate": {
             "type": "literal",
-            "value": "1703-09-29\n1703-09-29"
+            "value": "1959-01-15\n1959-01-15"
         }
     },
     {
-        "artists": {
+        "subject": {
             "type": "uri",
-            "value": "http://dbpedia.org/resource/Cameron_Muncey"
+            "value": "http://dbpedia.org/resource/Robert_Alan_Mowbray_Stevenson"
         },
         "name": {
             "type": "literal",
-            "value": "Cameron Muncey\nCameron Muncey\nMuncey, Cameron\nMuncey, Cameron"
+            "value": "Robert Alan Mowbray Stevenson\nStevenson, Robert Alan Mowbray"
         },
         "birthDate": {
             "type": "literal",
-            "value": "1980-02-04\n1980-02-08\n1980-02-04\n1980-02-08"
+            "value": "1847+02:00\n1847+02:00"
         }
     },
     {
-        "artists": {
+        "subject": {
             "type": "uri",
-            "value": "http://dbpedia.org/resource/Warren_Smith_(singer)"
+            "value": "http://dbpedia.org/resource/Brigitte_Kronauer"
         },
         "name": {
             "type": "literal",
-            "value": "Warren Smith\nSmith, Warren"
+            "value": "Brigitte Kronauer\nKronauer, Brigitte"
         },
         "birthDate": {
             "type": "literal",
-            "value": "1932-02-07\n1932-02-07"
+            "value": "1940-12-29\n1940-12-29"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/David_Nobbs"
+        },
+        "name": {
+            "type": "literal",
+            "value": "David Nobbs\nNobbs, David"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1935-03-13\n1935-03-13"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Michel_Butor"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Butor, Michel\nMichel Butor"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1926-09-14\n1926-09-14"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Jose_Panachippuram"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Jose Panachippuram\nPanachippuram, Jose"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1951-08-24\n1951-08-24"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Isobel_Gowdie"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Gowdie, Isobel\nIsobel Gowdie"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1632+02:00\n1632+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Moez_Surani"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Moez Surani\nSurani, Moez"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1979-04-10\n1979-04-10"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Robert_Nathan"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Robert Nathan\nNathan, Robert"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1894-01-02\n1894-01-02"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Chris_Womersley"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Chris Womersley\nWomersley, Chris"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1968+02:00\n1968+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Jan_Mehlum"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Jan Mehlum\nMehlum, Jan"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1945+02:00\n1945+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Mary_van_der_Valk"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Mary van der Valk\nMary van der Valk\nvan de Valk, Mary\nvan de Valk, Mary\nMary van de Valk\nMary van de Valk"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1958-07-07\n1958-07-13\n1958-07-07\n1958-07-13\n1958-07-07\n1958-07-13"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Aleksey_Pleshcheyev"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Aleksey Pleshcheyev\nPleshcheyev"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1825-12-04\n1825-12-04"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Antoni_Ballero"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Ballero Candia, Antoni\nAntoni Ballero Candia"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1927+02:00\n1927+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/George_Alec_Effinger"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Effinger, George Alec\nGeorge Alec Effinger"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1947-01-10\n1947-01-10"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Alu%C3%ADsio_Azevedo"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Aluísio Azevedo\nAzevedo, Aluísio"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1857-04-14\n1857-04-14"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/M._K._Hobson"
+        },
+        "name": {
+            "type": "literal",
+            "value": "M. K. Hobson\nHobson, M. K."
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1969-01-21\n1969-01-21"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Aslaug_L%C3%A5stad_Lygre"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Lygre, Aslaug Laastad\nAslaug Laastad Lygre"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1910-12-12\n1910-12-12"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Adam_Johnson_(writer)"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Adam Johnson\nJohnson, Adam"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1967-07-12\n1967-07-12"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/David_Mathison"
+        },
+        "name": {
+            "type": "literal",
+            "value": "David Mathison\nMathison, David"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1960-08-10\n1960-08-10"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Edward_Chitty"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Edward Chitty\nChitty, Edward"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1804+02:00\n1804+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Iryna_Khalip"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Iryna Khalip\nKhalip, Iryna"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1967-11-12\n1967-11-12"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Robert_Bloomfield"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Bloomfield, Robert\nRobert Bloomfield"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1766-12-03\n1766-12-03"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Carolyn_Kreiter-Foronda"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Carolyn Kreiter-Foronda\nKreiter-Foronda, Carolyn"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1946+02:00\n1946+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Matsuo_Bash%C5%8D"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Matsuo Bashō\nMatsuo Bashō (松尾 芭蕉)"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1644+02:00\n1644+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Saladin_Ahmed"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Saladin Ahmed\nAhmed, Saladin"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1975+02:00\n1975+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/William_Arthur_Satchell"
+        },
+        "name": {
+            "type": "literal",
+            "value": "William Arthur Satchell\nSatchell, William Arthur"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1861+02:00\n1861+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Reiner_Stach"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Reiner Stach\nStach, Reiner"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1951+02:00\n1951+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Alan_Hollinghurst"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Alan Hollinghurst\nHollinghurst, Alan"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1954-05-26\n1954-05-26"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Richard_Greenblatt_(playwright)"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Greenblatt, Richard\nRichard Greenblatt"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1953+02:00\n1953+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/William_S._Yellow_Robe,_Jr."
+        },
+        "name": {
+            "type": "literal",
+            "value": "William S. Yellow Robe\nWilliam S. Yellow Robe, Jr.\nYellow Robe, William S."
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1950+02:00\n1950+02:00\n1950+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/J._T._Lindroos"
+        },
+        "name": {
+            "type": "literal",
+            "value": "J. T. Lindroos\nLindroos, J. T."
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1971-07-01\n1971-07-01"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Whitney_Balliett"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Whitney Balliett\nBalliett, Whitney"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1926-04-17\n1926-04-17"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Rodney_Hall"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Rodney Hall\nHall, Rodney"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1935-11-18\n1935-11-18"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Dan_Fraga"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Dan Fraga\nFraga, Dan"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1973-06-19\n1973-06-19"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Grass_Green"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Grass Green\nRichard Eugene Green"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1939-05-07\n1939-05-07"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Adil_Mansuri"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Adil Mansuri"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1936-05-18"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Vasyl_Stefanyk"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Vasyl Stefanyk\n(Василь Семенович Стефаник)\nStefanyk, Vasyl"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1871-05-14\n1871-05-14\n1871-05-14"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Jir%C5%8D_Osaragi"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Jirō Osaragi\nJiro Osaragi\nOsaragi, Jiro"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1897-10-04\n1897-10-04\n1897-10-04"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Maureen_Boyle"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Maureen Boyle\nBoyle, Maureen"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1961+02:00\n1961+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/H%C3%A9l%C3%A8ne_Dorion"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Hélène Dorion\nHelene Dorion\nDorion, Helene"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1958-04-21\n1958-04-21\n1958-04-21"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Trent_Hayes"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Trent Hayes\nHayes, Trent"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1969+02:00\n1969+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Miranda_Shearer"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Miranda Shearer\nShearer, Miranda"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1982-05-11\n1982-05-11"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/George_Bacovia"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Bacovia, George\nGeorge Bacovia"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1881-09-17\n1881-09-17"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Alcante"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Didier Swysen\nSwysen, Didier"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1970-11-21\n1970-11-21"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Robert_William_Griffiths"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Robert William Griffiths\nGriffiths, Robert William"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1896-05-28\n1896-05-28"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Clifford_Webb"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Clifford Webb\nWebb, Clifford"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1895-02-14\n1895-02-14"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Stephanie_Strickland"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Stephanie Strickland\nStrickland, Stephanie"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1942-02-22\n1942-02-22"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Gordon_Van_Gelder"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Gordon Van Gelder\nVan Gelder, Gordon"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1966+02:00\n1966+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Alice_Perrers"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Alice Perrers\nPerrers, Alice"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1348+02:00\n1348+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Barry_Maitland"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Barry Maitland\nMaitland, Barry"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1941+02:00\n1941+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Giovanni_Pascoli"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Giovanni Pascoli\nPascolo, Giovanni\nGiovanni Pascolo"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1855-12-31\n1855-12-31\n1855-12-31"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Scott_Symons"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Scott Symons\nSymons, Scott"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1933-07-13\n1933-07-13"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/John_Barton_(poet)"
+        },
+        "name": {
+            "type": "literal",
+            "value": "John Barton\nBarton, John"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1957+02:00\n1957+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Richard_F._Outcault"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Outcault, Richard F.\nRichard Outcault\nRichard F. Outcault"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1863-01-14\n1863-01-14\n1863-01-14"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Lal_Mani_Joshi"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Lal Mani Joshi\nJoshi, Lal Mani"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1935-07-27\n1935-07-27"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Binyavanga_Wainaina"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Binyavanga Wainaina\nWainaina, Binyavanga"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1971-01-18\n1971-01-18"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Sam_Lipsyte"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Lipsyte, Sam\nSam Lipsyte"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1968+02:00\n1968+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Virgil_Mazilescu"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Virgil Mazilescu\nMazilescu, Virgil"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1942-04-11\n1942-04-11"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/K._Kalyan"
+        },
+        "name": {
+            "type": "literal",
+            "value": "K. Kalyan\nKalyan, K."
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1975-01-01\n1975-01-01"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Alison_Wearing"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Wearing, Alison\nAlison Wearing"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1967+02:00\n1967+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Mary_Hartwell_Catherwood"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Mary Hartwell Catherwood\nCatherwood, Mary Hartwell"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1847+02:00\n1847+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Namiki_Gohei_I"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Namiki Gohei I\nNamiki, Gohei 01\n並木五瓶初代\nGohei 01 Namiki"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1747+02:00\n1747+02:00\n1747+02:00\n1747+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Patricia_Verdugo"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Patricia Verdugo\nPatricia Verdugo\nVerdugo, Patricia\nVerdugo, Patricia"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1947-10-20\n1947-11-30\n1947-10-20\n1947-11-30"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Kevin_Dooley"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Kevin Dooley\nDooley, Kevin"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1953-01-07\n1953-01-07"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Krishan_Kumar_Sharma_%22Rasik%22"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Krishan Kumar Sharma \"Rasik\""
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "--11-14+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Rhianna_Pratchett"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Pratchett, Rhianna\nRhianna Pratchett"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1976-12-30\n1976-12-30"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Mercedes_Negr%C3%B3n_Mu%C3%B1oz"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Mercedes Negrón Muñoz\nNegron Munoz, Mercedes\nMercedes Negron Munoz"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1895-03-08\n1895-03-08\n1895-03-08"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Sheldon_Brown_(artist)"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Brown, Sheldon\nSheldon Brown"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1962-07-13\n1962-07-13"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Olivier_Rolin"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Olivier Rolin\nRolin, Olivier"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1947-05-14\n1947-05-14"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Tsering_Wangmo_Dhompa"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Tsering Wangmo Dhompa\nDhompa, Tsering Wangmo"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "--03-16+02:00\n--03-16+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Jorge_Marchant_Lazcano"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Jorge Marchant Lazcano\nMarchant Lazcano, Jorge"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1950-03-09\n1950-03-09"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Dexter_Filkins"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Dexter Filkins\nFilkins, Dexter"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1961+02:00\n1961+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Reed_Whittemore"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Reed Whittemore\nWhittemore, Reed"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1919-09-11\n1919-09-11"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Gertrude_Friedberg"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Friedberg\nGertrude Tonkonogy Friedberg"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1908-03-17\n1908-03-17"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Jaishankar_Prasad"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Jaishankar Prasad\nPrasad, Jaishankar"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1889-01-30\n1889-01-30"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Jan_Pie%C5%84kowski"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Jan Pienkowski\nPienkowski, Jan"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1936-08-08\n1936-08-08"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Mumtaz_Mufti"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Mumtaz Mufti\nMufti, Mumtaz\nممتاز مفتی"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1905-09-11\n1905-09-11\n1905-09-11"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Zofia_Kossak-Szczucka"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Kossak-Szczucka, Zofia\nZofia Kossak-Szczucka"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1889-08-10\n1889-08-10"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Hector_Cant%C3%BA"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Hector Cantú\nHector Cantu\nCantu, Hector"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1961-09-16\n1961-09-16\n1961-09-16"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Richard_Russell_(Dow_Theory)"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Richard Russell\nRussell, Richard"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1924+02:00\n1924+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/%C3%98ystein_%C3%98yst%C3%A5"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Oeystaa, Oeystein\nOeystein Oeystaa"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1934-10-25\n1934-10-25"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Chris_Oxlade"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Chris Oxlade\nOxlade, Chris"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1961+02:00\n1961+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Sam_Campbell_(writer)"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Sam Campbell\nCampbell, Sam"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1895-08-01\n1895-08-01"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Beau_Smith"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Beau Smith\nSmith, Beau"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1954-12-17\n1954-12-17"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Ron_Turner_(illustrator)"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Ron Turner\nTurner, Ron"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1922+02:00\n1922+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Warren_Murphy"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Murphy, Warren\nWarren Murphy"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1933-09-13\n1933-09-13"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Thomas_Bracken"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Bracken, Thomas\nThomas Bracken"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1843-12-21\n1843-12-21"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Daniel_Adam_z_Veleslav%C3%ADna"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Adam, Daniel Z Veleslavina\nDaniel Adam z Veleslavína\nDaniel Z Veleslavina Adam"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1546-08-31\n1546-08-31\n1546-08-31"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Jean-Louis_Pesch"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Jean-Louis Pesch\nPesch, Jean-Louis"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1928-06-29\n1928-06-29"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Tor_Bomann-Larsen"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Tor Bomann-Larsen\nBomann-Larsen, Tor"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1951-04-26\n1951-04-26"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Donald_Adamson"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Donald Adamson\nAdamson, Donald"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1939-03-30\n1939-03-30"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Jess_Stearn"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Jess Stearn\nStearn, Jess"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1914-04-26\n1914-04-26"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Matija_Barl"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Josip Vandot\nMatija Barl\nVandot, Josip"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1940-02-17\n1940-02-17\n1940-02-17"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Dan_Morgan_(writer)"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Dan Morgan\nMorgan, Dan"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1925-12-24\n1925-12-24"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Jay_Wiseman"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Jay Joseph Wiseman\nWiseman, Jay\nJay Wiseman"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1949-06-16\n1949-06-16\n1949-06-16"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Jean_Chapman"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Jean Chapman\nChapman, Jean"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1939-10-30\n1939-10-30"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Clement_Gordon_Watson"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Clement Gordon Watson\nWatson, Clement Gordon"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1912+02:00\n1912+02:00"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/John_Eric_Holmes"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Holmes, John Eric\nJohn Eric Holmes"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1930-02-16\n1930-02-16"
+        }
+    },
+    {
+        "subject": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Isidora_Bjelica"
+        },
+        "name": {
+            "type": "literal",
+            "value": "Bjelica, Isidora\nIsidora Bjelica"
+        },
+        "birthDate": {
+            "type": "literal",
+            "value": "1967-12-10\n1967-12-10"
         }
     }
 ]
