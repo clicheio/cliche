@@ -15,7 +15,7 @@ cannot "immediately" respond.
    :ref:`faq-when-to-use` --- Celery FAQ
       Answer to what kinds of benefits are there in Celery.
 
-   `Queue everything and delight everone`__
+   `Queue everything and delight everyone`__
       This article describes why you should use a queue in a web application.
 
    __ http://decafbad.com/blog/2008/07/04/queue-everything-and-delight-everyone
