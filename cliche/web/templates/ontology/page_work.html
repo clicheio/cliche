@@ -51,4 +51,44 @@
       </td>
     </tr>
   {% endif %}
+
+  {% if grouped_credits %}
+    <tr class="credits">
+      <th role="row">credits</th>
+      <td>
+        <table>
+          <caption>Credits of {{ title }}</caption>
+          <thead>
+            <tr>
+              <th>Team</th>
+              <th>Name</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for team_id, credits in grouped_credits %}
+              {% for credit in credits %}
+                {% if team_id is none %}
+                  <tr>
+                    <td colspan="2">{{ credit.person.name }}</td>
+                    <td>{{ credit.role.value }}</td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    {% if loop.first %}
+                      <td rowspan="{{ loop.length }}">
+                        {{- credit.team.name -}}
+                      </td>
+                    {% endif %}
+                    <td>{{ credit.person.name }}</td>
+                    <td>{{ credit.role.value }}</td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  {% endif %}
 {% endblock %}
