@@ -100,7 +100,7 @@ def upgrade(revision):
 
     logging_config = dict(ALEMBIC_LOGGING)
     logging.config.dictConfig(logging_config)
-    with app.app_context():
+    with flask_app.app_context():
         engine = get_database_engine()
         try:
             upgrade_database(engine, revision)
@@ -118,14 +118,14 @@ def upgrade(revision):
 @config
 def crawl():
     '''Crawles TVTropes and saves entities into database.'''
-    crawl_tvtropes(app.config)
+    crawl_tvtropes()
 
 
 @cli.command()
 @config
 def shell():
     '''Runs a Python shell inside Flask application context.'''
-    with app.test_request_context():
+    with flask_app.test_request_context():
         context = dict(app=_request_ctx_stack.top.app)
 
         # Use basic python shell
@@ -148,7 +148,7 @@ def shell():
 def runserver(host, port, threaded, processes,
               passthrough_errors, debug, reload):
     '''Runs the Flask development server i.e. app.run()'''
-    app.run(host=host,
+    flask_app.run(host=host,
             port=port,
             debug=debug,
             use_debugger=debug,
