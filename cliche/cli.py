@@ -122,39 +122,12 @@ def crawl():
 
 
 @cli.command()
-@option('--no-ipython', help='Do not use the IPython shell',
-        is_flag=True)
-@option('--no-bpython', help='Do not use the BPython shell',
-        is_flag=True)
 @config
-def shell(no_ipython, no_bpython):
+def shell():
     '''Runs a Python shell inside Flask application context.'''
     with app.test_request_context():
         context = dict(app=_request_ctx_stack.top.app)
 
-        if not no_bpython:
-            # Try BPython
-            try:
-                from bpython import embed
-                embed(locals_=context)
-                return
-            except ImportError:
-                pass
-        if not no_ipython:
-            # Try IPython
-            try:
-                try:
-                    # 0.10.x
-                    from IPython.Shell import IPShellEmbed
-                    ipshell = IPShellEmbed()
-                    ipshell(global_ns=dict(), local_ns=context)
-                except ImportError:
-                    # 0.12+
-                    from IPython import embed
-                    embed(user_ns=context)
-                    return
-            except ImportError:
-                pass
         # Use basic python shell
         code.interact(local=context)
 

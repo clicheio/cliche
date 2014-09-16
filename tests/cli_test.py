@@ -68,8 +68,7 @@ def test_shell_wrong_path(fx_cli_runner):
 
 def test_shell_fine(fx_cli_runner, fx_cfg_py_file):
     # case 3: give -c/--config and correct path
-    result = fx_cli_runner.invoke(shell, ['-c', str(fx_cfg_py_file),
-                                          '--no-ipython', '--no-bpython'])
+    result = fx_cli_runner.invoke(shell, ['-c', str(fx_cfg_py_file)])
     assert result.exit_code == 0
     assert '(InteractiveConsole)' in result.output
 
