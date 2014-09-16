@@ -70,18 +70,36 @@
               {% for credit in credits %}
                 {% if team_id is none %}
                   <tr>
-                    <td colspan="2">{{ credit.person.name }}</td>
-                    <td>{{ credit.role.value }}</td>
+                    <td colspan="2" class="name">
+                      <a href="{{ url_for('.page', type_='person', title=credit.person.name) }}">
+                        {{- credit.person.name -}}
+                      </a>
+                    </td>
+                    <td class="role">
+                      <a href="{{ url_for('.page', type_='role', title=credit.role.value) }}">
+                        {{- credit.role.value -}}
+                      </a>
+                    </td>
                   </tr>
                 {% else %}
                   <tr>
                     {% if loop.first %}
-                      <td rowspan="{{ loop.length }}">
-                        {{- credit.team.name -}}
+                      <td rowspan="{{ loop.length }}" class="team">
+                        <a href="{{ url_for('.page', type_='team', title=credit.team.name) }}">
+                          {{- credit.team.name -}}
+                        </a>
                       </td>
                     {% endif %}
-                    <td>{{ credit.person.name }}</td>
-                    <td>{{ credit.role.value }}</td>
+                    <td class="name">
+                      <a href="{{ url_for('.page', type_='person', title=credit.person.name) }}">
+                        {{- credit.person.name -}}
+                      </a>
+                    </td>
+                    <td class="role">
+                      <a href="{{ url_for('.page', type_='role', title=credit.role.value) }}">
+                        {{- credit.role.value -}}
+                      </a>
+                    </td>
                   </tr>
                 {% endif %}
               {% endfor %}
