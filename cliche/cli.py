@@ -88,7 +88,7 @@ def initialize_app(config=None):
 
 @group()
 def cli():
-    '''cliche for intergrated command for cliche.io service.'''
+    """cliche for intergrated command for cliche.io service."""
     pass
 
 
@@ -117,14 +117,14 @@ def upgrade(revision):
 @cli.command()
 @config
 def crawl():
-    '''Crawles TVTropes and saves entities into database.'''
+    """Crawles TVTropes and saves entities into database."""
     crawl_tvtropes()
 
 
 @cli.command()
 @config
 def shell():
-    '''Runs a Python shell inside Flask application context.'''
+    """Runs a Python shell inside Flask application context."""
     with flask_app.test_request_context():
         context = dict(app=_request_ctx_stack.top.app)
 
@@ -147,15 +147,15 @@ def shell():
 @config
 def runserver(host, port, threaded, processes,
               passthrough_errors, debug, reload):
-    '''Runs the Flask development server i.e. app.run()'''
+    """Runs the Flask development server i.e. app.run()"""
     flask_app.run(host=host,
-            port=port,
-            debug=debug,
-            use_debugger=debug,
-            use_reloader=reload,
-            threaded=threaded,
-            processes=processes,
-            passthrough_errors=passthrough_errors)
+                  port=port,
+                  debug=debug,
+                  use_debugger=debug,
+                  use_reloader=reload,
+                  threaded=threaded,
+                  processes=processes,
+                  passthrough_errors=passthrough_errors)
 
 
 #: (:class:`collections.abc.Callable`) The CLI entry point.
