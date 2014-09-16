@@ -123,3 +123,58 @@ def test_work_page(fx_session, fx_flask_client):
         '//tr/td[@class="name"]/a[text()="Ted Chiang"]'
         '/../../td[@class="role"]/a[text()="{}"]'.format(Role.author.value)
     )
+
+
+def test_complex_credits(fx_session, fx_flask_client):
+    """Data: http://www.animenewsnetwork.com/encyclopedia/anime.php?id=12376"""
+    work = Work(name='Fate/Zero')
+    author_credit = Credit(person=Person(name='Akihiko Uda'), work=work,
+                           role=Role.author)
+    ufotable = Team(name='ufotable')
+    easter = Team(name='Studio Easter')
+    artist_credits = [
+        Credit(person=Person(name="Aki In'yama"), work=work,
+               role=Role.artist, team=ufotable),
+        Credit(person=Person(name='Erika Okazaki'), work=work,
+               role=Role.artist, team=easter),
+        Credit(person=Person(name='Eun Kyung Seo'), work=work,
+               role=Role.artist, team=easter),
+        Credit(person=Person(name='Jeong Ji Kim'), work=work,
+               role=Role.artist, team=ufotable)
+    ]
+
+    with fx_session.begin():
+        fx_session.add(author_credit)
+        fx_session.add_all(artist_credits)
+
+    rv = fx_flask_client.get('/work/Fate%2FZero/')
+    assert document_fromstring(rv.data).xpath(
+        '//tr/td[@class="name"]/a[text()="Akihiko Uda"]'
+        '/../../td[@class="role"]/a[text()="{}"]'.format(Role.author.value)
+    )
+
+    assert document_fromstring(rv.data).xpath(
+        '//tr/td[@class="name"]/a[text()="Aki In\'yama"]'
+        '/../../td[@class="team"]/a[text()="ufotable"]'
+        '/../../td[@class="role"]/a[text()="{}"]'.format(Role.artist.value)
+    )
+    assert document_fromstring(rv.data).xpath(
+        '//tr/td[@class="name"]/a[text()="Jeong Ji Kim"]'
+        '/../../td[@class="role"]/a[text()="{}"]'.format(Role.artist.value)
+    )
+    assert len(document_fromstring(rv.data).xpath(
+        '//tr/td[@class="name"]/a[text()="Jeong Ji Kim"]'
+        '/../../td')) == 2
+
+    assert document_fromstring(rv.data).xpath(
+        '//tr/td[@class="name"]/a[text()="Erika Okazaki"]'
+        '/../../td[@class="team"]/a[text()="Studio Easter"]'
+        '/../../td[@class="role"]/a[text()="{}"]'.format(Role.artist.value)
+    )
+    assert document_fromstring(rv.data).xpath(
+        '//tr/td[@class="name"]/a[text()="Eun Kyung Seo"]'
+        '/../../td[@class="role"]/a[text()="{}"]'.format(Role.artist.value)
+    )
+    assert len(document_fromstring(rv.data).xpath(
+        '//tr/td[@class="name"]/a[text()="Eun Kyung Seo"]'
+        '/../../td')) == 2
