@@ -44,7 +44,6 @@ install_requires = {
     # Web
     'Flask >= 0.10',
     'Werkzeug >= 0.9',
-    'Flask-Script >= 0.6.0',
     # Sparql
     'SPARQLWrapper >= 1.6.2',
     # CLI
