@@ -115,7 +115,7 @@ def upgrade(revision):
 @cli.command()
 @config
 def crawl():
-    """Crawles TVTropes and saves entities into database."""
+    """Crawls TVTropes and saves entities into database."""
     crawl_tvtropes()
 
 
