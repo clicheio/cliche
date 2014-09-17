@@ -208,6 +208,7 @@ def fx_cli_runner():
 
 @fixture
 def fx_cfg_py_file(fx_tmpdir):
-    with (fx_tmpdir / 'test.cfg.py').open('w') as f:
+    cfg_file = fx_tmpdir / 'test.cfg.py'
+    with cfg_file.open('w') as f:
         f.write("DATABASE_URL = 'sqlite:///:memory:'")
-    return fx_tmpdir / 'test.cfg.py'
+    return cfg_file
