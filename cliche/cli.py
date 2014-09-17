@@ -88,7 +88,6 @@ def initialize_app(config=None):
 @group()
 def cli():
     """cliche for intergrated command for cliche.io service."""
-    pass
 
 
 @cli.command()
