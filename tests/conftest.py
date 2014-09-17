@@ -219,6 +219,7 @@ def fx_cfg_yml_file(fx_tmpdir):
     return cfg_file
 
 
+@fixture
 def fx_flask_client():
     app.config['TESTING'] = True
     return app.test_client()
