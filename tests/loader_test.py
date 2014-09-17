@@ -1,15 +1,8 @@
-# import requests
-# from sure import expect
-# import httpretty
+from sqlalchemy.exc import IntegrityError
+from cliche.services.wikipedia import loader as dbpedia
+from cliche.services.wikipedia.WorkAuthor import WorkAuthor
 
-
-# @httpretty.activate
-# def test_loader():
-#     httpretty.enable()
-#     httpretty.register_uri(httpretty.GET, 'http://dbpedia.org/sparql/',
-#                            body='[{"title": "Test Deal"}]',
-#                            content_type='application/json')
-#     response = resquests.get('http://dbpedia.org/sparql')
-#     expect(response.json()).to.equal([{"title": "test Deal"}])
-#     httpretty.disable()
-#     httpretty.reset()
+def test_loader(fx_session):
+    dbpedia.load_page(1)
+    num = fx_session.query(WorkAuthor).count()
+    assert num == 100

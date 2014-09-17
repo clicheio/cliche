@@ -5,16 +5,10 @@ Loading DBpedia Tables into a Relational Database
 
 .. seealso::
 
-   `Please Follow Mapping Guide`
-     http://mappings.dbpedia.org/index.php/Mapping_Guide
-
    `The list of dbpedia classes`__
       This page describes the structure and relation of DBpedia classes.
 
    __ http://mappings.dbpedia.org/server/ontology/classes/
-
-   `Local Data`
-     http://web.informatik.uni-mannheim.de/DBpediaAsTables/DBpediaClasses.htm
 
 .. _Wikipedia: http://wikipedia.org/
 
@@ -157,18 +151,6 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
     return select_dbpedia(query)
 
 
-def paging_query(query, limit):
-    query_results = []
-    if limit is not None:
-        query += 'LIMIT {}\n'.format(limit)
-        for x in range((limit + PAGE_ITEM_COUNT - 1) // PAGE_ITEM_COUNT):
-            oquery = query + 'OFFSET {}\n'.format(x * PAGE_ITEM_COUNT)
-            query_results += select_dbpedia(oquery)
-        return query_results
-    else:
-        return select_dbpedia(query)
-
-
 @app.task
 def load_page(page):
     session = get_session()
@@ -194,10 +176,14 @@ def load_page(page):
         except IntegrityError:
             pass
 
-    load_page.delay(page+1)
+    # total number of res will be 149051
+    # if len(res) == 100:
+    #     load_page.delay(page+1)
+    # else:
+    #     return
 
 
 def load(config):
     db_engine = get_database_engine()
-    session = Session(bind=db_engine)
+    Session(bind=db_engine)
     load_page.delay(1)
