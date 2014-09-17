@@ -47,7 +47,7 @@ install_requires = {
     # Sparql
     'SPARQLWrapper >= 1.6.2',
     # CLI
-    'click >= 3.3'
+    'click >= 3.3',
 }
 
 if sys.version_info < (3, 4, 0):
