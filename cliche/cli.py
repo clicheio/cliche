@@ -59,7 +59,6 @@ ALEMBIC_LOGGING = {
 def config(func):
     @functools.wraps(func)
     def internal(*args, **kwargs):
-        echo(kwargs['config'])
         initialize_app(kwargs['config'])
         del kwargs['config']
         func(*args, **kwargs)
