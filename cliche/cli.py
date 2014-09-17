@@ -3,6 +3,7 @@
 
 """
 import code
+import functools
 import logging.config
 import os
 import pathlib
@@ -56,6 +57,7 @@ ALEMBIC_LOGGING = {
 
 
 def config(func):
+    @functools.wraps(func)
     def internal(*args, **kwargs):
         echo(kwargs['config'])
         initialize_app(kwargs['config'])
@@ -64,7 +66,6 @@ def config(func):
 
     deco = option('--config', '-c', type=Path(exists=True),
                   help='Configuration file (YAML or Python)')
-    internal.__name__ = func.__name__
     return deco(internal)
 
 
