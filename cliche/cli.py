@@ -59,8 +59,7 @@ ALEMBIC_LOGGING = {
 def config(func):
     @functools.wraps(func)
     def internal(*args, **kwargs):
-        initialize_app(kwargs['config'])
-        del kwargs['config']
+        initialize_app(kwargs.pop('config'))
         func(*args, **kwargs)
 
     deco = option('--config', '-c', type=Path(exists=True),
