@@ -4,7 +4,9 @@ import pathlib
 import sqlite3
 import types
 
+from click.testing import CliRunner
 from pytest import fixture, yield_fixture
+from yaml import dump
 
 from cliche.people import Person, Team
 from cliche.work import Award, Credit, Genre, Role, Work
@@ -198,3 +200,19 @@ def fx_sparql_dbpedia_cursor(fx_sparql_dbpedia_table):
     conn = sqlite3.connect(db_file)
     c = conn.cursor()
     return c
+
+
+@fixture
+def fx_cli_runner():
+    return CliRunner()
+
+
+@fixture
+def fx_cfg_yml_file(fx_tmpdir):
+    cfg_file = fx_tmpdir / 'test.cfg.yml'
+    cfg = {
+        'DATABASE_URL': 'sqlite:///:memory:'
+    }
+    with cfg_file.open('w') as f:
+        dump(cfg, stream=f)
+    return cfg_file

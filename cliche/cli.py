@@ -2,13 +2,16 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
+import code
+import functools
 import logging.config
 import os
 import pathlib
 import sys
 
 from alembic.util import CommandError
-from flask.ext.script import Manager
+from click import Path, argument, echo, group, option
+from flask import _request_ctx_stack
 
 from .celery import app as celery_app
 from .config import read_config
@@ -18,7 +21,7 @@ from .web.db import get_database_engine
 
 from .services.tvtropes.crawler import crawl as crawl_tvtropes
 
-__all__ = ('get_database_engine', 'initialize_app', 'main', 'manager')
+__all__ = ('get_database_engine', 'initialize_app', 'main')
 
 
 ALEMBIC_LOGGING = {
@@ -53,6 +56,17 @@ ALEMBIC_LOGGING = {
 }
 
 
+def config(func):
+    @functools.wraps(func)
+    def internal(*args, **kwargs):
+        initialize_app(kwargs.pop('config'))
+        func(*args, **kwargs)
+
+    deco = option('--config', '-c', type=Path(exists=True),
+                  help='Configuration file (YAML or Python)')
+    return deco(internal)
+
+
 def initialize_app(config=None):
     """(:class:`flask.ext.script.Manager`) A Flask-Script manager object."""
     if config is None:
@@ -71,27 +85,21 @@ def initialize_app(config=None):
     return flask_app
 
 
-manager = Manager(initialize_app)
-
-manager.add_option('-c', '--config',
-                   dest='config',
-                   help='Configuration file (YAML or Python)')
-
-#: (:class:`collections.abc.Callable`) The CLI entry point.
-main = manager.run
+@group()
+def cli():
+    """cliche for intergrated command for cliche.io service."""
 
 
-@manager.option('revision', nargs='?', default='head',
-                help='Revision upgrade/downgrade to')
+@cli.command()
+@argument('revision', default='head')
+@config
 def upgrade(revision):
     """Creates the database tables, or upgrade it to the latest revision."""
+
     logging_config = dict(ALEMBIC_LOGGING)
     logging.config.dictConfig(logging_config)
-    try:
+    with flask_app.app_context():
         engine = get_database_engine()
-    except RuntimeError as e:
-        print(e, file=sys.stderr)
-    else:
         try:
             upgrade_database(engine, revision)
         except CommandError as e:
@@ -99,16 +107,54 @@ def upgrade(revision):
                 try:
                     downgrade_database(engine, revision)
                 except CommandError as e:
-                    print(e, file=sys.stderr)
+                    echo(e, file=sys.stderr)
             else:
-                print(e, file=sys.stderr)
+                echo(e, file=sys.stderr)
 
 
-@manager.command
+@cli.command()
+@config
 def crawl():
     """Crawls TVTropes and saves entities into database."""
     crawl_tvtropes()
 
 
-if __name__ == '__main__':
-    main()
+@cli.command()
+@config
+def shell():
+    """Runs a Python shell inside Flask application context."""
+    with flask_app.test_request_context():
+        context = dict(app=_request_ctx_stack.top.app)
+
+        # Use basic python shell
+        code.interact(local=context)
+
+
+@cli.command()
+@option('--host', '-h')
+@option('--port', '-p', type=int)
+@option('--threaded', is_flag=True)
+@option('--processes', type=int, default=1)
+@option('--passthrough-errors', is_flag=True)
+@option('--debug/--no-debug', '-d/-D', default=False,
+        help='enable the Werkzeug debugger'
+             ' (DO NOT use in production code)')
+@option('--reload/--no-reload', '-r/-R', default=False,
+        help='monitor Python files for changes'
+             ' (not 100% safe for production use)')
+@config
+def runserver(host, port, threaded, processes,
+              passthrough_errors, debug, reload):
+    """Runs the Flask development server i.e. app.run()"""
+    flask_app.run(host=host,
+                  port=port,
+                  debug=debug,
+                  use_debugger=debug,
+                  use_reloader=reload,
+                  threaded=threaded,
+                  processes=processes,
+                  passthrough_errors=passthrough_errors)
+
+
+#: (:class:`collections.abc.Callable`) The CLI entry point.
+main = cli

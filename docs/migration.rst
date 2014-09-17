@@ -14,7 +14,7 @@ To upgrade the schema to the latest revision, simply run
 
 .. sourcecode:: console
 
-   $ cliche -c dev.cfg.py upgrade
+   $ cliche upgrade -c dev.cfg.py
    INFO  [alembic.migration] Context impl PostgresqlImpl.
    INFO  [alembic.migration] Will assume transactional DDL.
    INFO  [alembic.migration] Running upgrade 256db34030b7 -> 2a1ebdf4c19e
@@ -104,7 +104,7 @@ migrations if there are two or more heads at a time:
 
 .. sourcecode:: console
 
-   $ cliche -c dev.cfg.py upgrade
+   $ cliche upgrade -c dev.cfg.py
    INFO  [alembic.context] Context class PostgresqlContext.
    INFO  [alembic.context] Will assume transactional DDL.
    Exception: Only a single head supported so far...

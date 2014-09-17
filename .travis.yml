@@ -13,8 +13,8 @@ before_script:
 script:
 # alembic test
 - echo "DATABASE_URL = 'postgresql:///alembic_test?user=postgres'" > alembic_test.cfg.py
-- cliche -c alembic_test.cfg.py upgrade 27e81ea4d86
-- cliche -c alembic_test.cfg.py upgrade
+- cliche upgrade -c alembic_test.cfg.py 27e81ea4d86
+- cliche upgrade -c alembic_test.cfg.py
 # unit test
 - py.test -v --cov cliche --durations=20 --database-url='postgresql:///cliche_test?user=postgres'
 - py.test -v --durations=20
