@@ -113,13 +113,17 @@ def upgrade(revision):
 
 
 @cli.command()
-@argument('service', help='Service to sync with')
+@argument('service')
 @config
 def sync(service):  # FIXME available service listing
     '''Sync to services.'''
-    package = 'cliche.services.' + service[0]
+    package = 'cliche.services.' + service
     if package in find_packages():
         import_string(package + ':sync').delay()
+    else:
+        echo('There is no such service \'{}\' suitable for synchronization.'
+             .format(service),
+             file=sys.stderr)
 
 
 @cli.command()
