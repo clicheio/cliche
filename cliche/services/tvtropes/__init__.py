@@ -5,4 +5,4 @@
 
 """
 
-from .crawler import crawl as sync
+from .crawler import crawl as sync  # noqa

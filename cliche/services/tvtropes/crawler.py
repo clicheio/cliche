@@ -17,8 +17,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError, NoResultFound
 
 from .entities import Entity, Redirection, Relation
-from ...celery import app, get_database_engine, get_session
-from ...orm import Session
+from ...celery import app, get_session
 
 
 BASE_URL = 'http://tvtropes.org/pmwiki/'
@@ -231,5 +230,5 @@ def crawl():
             crawl_link.delay(url)
     else:
         for entity in session.query(Entity) \
-                             .order_by(Entity.namespace,Entity.name):
+                             .order_by(Entity.namespace, Entity.name):
             crawl_link.delay(entity.url)
