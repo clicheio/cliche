@@ -21,33 +21,33 @@ def test_upgrade_wrong_path(fx_cli_runner):
     assert 'Invalid value for "--config"' in result.output
 
 
-def test_upgrade_fine(fx_cli_runner, fx_cfg_py_file):
+def test_upgrade_fine(fx_cli_runner, fx_cfg_yml_file):
     """work normally, no additional options"""
-    result = fx_cli_runner.invoke(upgrade, ['-c', str(fx_cfg_py_file)])
+    result = fx_cli_runner.invoke(upgrade, ['-c', str(fx_cfg_yml_file)])
     assert result.exit_code == 0
     assert 'INFO  [alembic.migration]' in result.output
 
 
-def test_upgrade_downgrade_fine(fx_cli_runner, fx_cfg_py_file):
+def test_upgrade_downgrade_fine(fx_cli_runner, fx_cfg_yml_file):
     """downgrade work normally"""
     result = fx_cli_runner.invoke(upgrade,
-                                  ['-c', str(fx_cfg_py_file), '27e81ea4d86'])
+                                  ['-c', str(fx_cfg_yml_file), '27e81ea4d86'])
     assert result.exit_code == 0
     assert 'Running upgrade None -> 27e81ea4d86' in result.output
 
 
-def test_upgrade_downgrade_fail(fx_cli_runner, fx_cfg_py_file):
+def test_upgrade_downgrade_fail(fx_cli_runner, fx_cfg_yml_file):
     """downgrade work incorrectly"""
     result = fx_cli_runner.invoke(upgrade,
-                                  ['-c', str(fx_cfg_py_file), 'zzzzzzzzzzz'])
+                                  ['-c', str(fx_cfg_yml_file), 'zzzzzzzzzzz'])
     assert result.exit_code == 0
     assert "No such revision 'zzzzzzzzzzz'" in result.output
 
 
-def test_upgrade_downup_fine(fx_cli_runner, fx_cfg_py_file):
+def test_upgrade_downup_fine(fx_cli_runner, fx_cfg_yml_file):
     """down/upgrade work normally"""
-    fx_cli_runner.invoke(upgrade, ['-c', str(fx_cfg_py_file), '27e81ea4d86'])
-    result = fx_cli_runner.invoke(upgrade, ['-c', str(fx_cfg_py_file)])
+    fx_cli_runner.invoke(upgrade, ['-c', str(fx_cfg_yml_file), '27e81ea4d86'])
+    result = fx_cli_runner.invoke(upgrade, ['-c', str(fx_cfg_yml_file)])
     assert result.exit_code == 0
     assert 'INFO  [alembic.migration]' in result.output
 
@@ -66,9 +66,9 @@ def test_shell_wrong_path(fx_cli_runner):
     assert 'Invalid value for "--config"' in result.output
 
 
-def test_shell_fine(fx_cli_runner, fx_cfg_py_file):
+def test_shell_fine(fx_cli_runner, fx_cfg_yml_file):
     # case 3: give -c/--config and correct path
-    result = fx_cli_runner.invoke(shell, ['-c', str(fx_cfg_py_file)])
+    result = fx_cli_runner.invoke(shell, ['-c', str(fx_cfg_yml_file)])
     assert result.exit_code == 0
     assert '(InteractiveConsole)' in result.output
 

@@ -6,6 +6,7 @@ import types
 
 from click.testing import CliRunner
 from pytest import fixture, yield_fixture
+from yaml import dump
 
 from cliche.people import Person, Team
 from cliche.work import Award, Credit, Genre, Role, Work
@@ -207,8 +208,11 @@ def fx_cli_runner():
 
 
 @fixture
-def fx_cfg_py_file(fx_tmpdir):
-    cfg_file = fx_tmpdir / 'test.cfg.py'
+def fx_cfg_yml_file(fx_tmpdir):
+    cfg_file = fx_tmpdir / 'test.cfg.yml'
+    cfg = {
+        'DATABASE_URL': 'sqlite:///:memory:'
+    }
     with cfg_file.open('w') as f:
-        f.write("DATABASE_URL = 'sqlite:///:memory:'")
+        dump(cfg, stream=f)
     return cfg_file
