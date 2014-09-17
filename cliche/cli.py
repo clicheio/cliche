@@ -138,7 +138,7 @@ def sync(service):  # FIXME available service listing
              file=sys.stderr)
 
 
-@cli.command
+@cli.command()
 @config
 def load():
     '''Loads data from Wikipedia and saves entities into database.'''
