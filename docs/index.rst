@@ -11,6 +11,7 @@ Cliche is an ontology of fictional works.
    migration
    test
    crawler
+   loader
    cliche
 
 
