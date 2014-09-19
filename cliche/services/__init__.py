@@ -13,7 +13,8 @@ Interfaces needed to be exposed
 
 - :func:`sync()`: Method to delay a main crawling task to the queue. It should
   be decorated with :code:`@app.task` to be defined as a celery app worker
-  task.
+  task. It should have no arguments and no return. Every output should be made
+  as a log to celery logger.
 
 Example :file:`__init__.py`
 ---------------------------
