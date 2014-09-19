@@ -116,7 +116,7 @@ def upgrade(revision):
 @argument('service')
 @config
 def sync(service):  # FIXME available service listing
-    '''Sync to services.'''
+    """Sync to services."""
     package = 'cliche.services.' + service
     if package in find_packages():
         import_string(package + ':sync').delay()
