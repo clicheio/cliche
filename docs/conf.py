@@ -276,6 +276,7 @@ intersphinx_mapping = {
     'celery': ('http://docs.celeryproject.org/en/latest/', None),
     'werkzeug': ('http://werkzeug.pocoo.org/docs/', None),
     'flask': ('http://flask.pocoo.org/docs/', None),
+    'click': ('http://click.pocoo.org/3/', None),
 }
 
 extlinks = {
