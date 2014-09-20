@@ -54,7 +54,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Cliche'
-copyright = '2014, Hong Minhee'
+copyright = '2014, Cliche.io'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
