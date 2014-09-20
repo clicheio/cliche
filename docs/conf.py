@@ -207,7 +207,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   ('index', 'Cliche.tex', 'Cliche Documentation',
-   'Hong Minhee', 'manual'),
+   'Cliche.io', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
