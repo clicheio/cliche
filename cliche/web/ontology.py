@@ -13,11 +13,13 @@ ontology = Blueprint('ontology', __name__,
 
 @ontology.route('/')
 def index():
+    """The root page. Currently no contents preserved yet."""
     return 'Hello cliche!'
 
 
 @ontology.route('/work/')
 def list_():
+    """A list of works."""
     names = [
         name
         for name, in session.query(Work.name).order_by(Work.name)
@@ -30,6 +32,7 @@ def list_():
 
 @ontology.route('/work/<path:title>/')
 def page(title):
+    """More detailed data of a work."""
     try:
         work = session.query(Work).filter_by(name=title).one()
     except NoResultFound:
