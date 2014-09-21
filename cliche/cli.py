@@ -98,7 +98,6 @@ def initialize_app(config=None):
     config = read_config(filename=pathlib.Path(config))
     flask_app.config.update(config)
     celery_app.conf.update(config)
-    return flask_app
 
 
 @group()
