@@ -78,7 +78,13 @@ def config(func):
 
 
 def initialize_app(config=None):
-    """(:class:`flask.ext.script.Manager`) A Flask-Script manager object."""
+    """Initialize celery/flask app.
+
+    :param config: a config file path. accept .py, .yml file. default value is
+                  None and this function get values from environment
+                  variable.
+
+    """
     if config is None:
         try:
             config = os.environ['CLICHE_CONFIG']
