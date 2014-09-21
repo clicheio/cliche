@@ -58,6 +58,15 @@ ALEMBIC_LOGGING = {
 
 
 def config(func):
+    """Provide supporting
+    :option:`--config` or :option:`-c` option and running
+    (:func:`initialize_app`) automatically.
+
+    :param func: a command function that want to decorate.
+    :type func: :class:`collections.abc.Callable`
+    :returns: Decorated ``func``
+
+    """
     @functools.wraps(func)
     def internal(*args, **kwargs):
         initialize_app(kwargs.pop('config'))
