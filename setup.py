@@ -58,11 +58,11 @@ if sys.version_info < (3, 4, 0):
 
 tests_require = {
     'pytest >= 2.5.0',
-    'cssselect >= 0.9.1'
+    'cssselect >= 0.9.1',
 }
 
 docs_require = {
-    'Sphinx >= 1.2'
+    'Sphinx >= 1.2',
 }
 
 
