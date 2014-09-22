@@ -141,7 +141,7 @@ def sync(service):  # FIXME available service listing
 @cli.command()
 @config
 def load():
-    '''Loads data from Wikipedia and saves entities into database.'''
+    """Loads data from Wikipedia and saves entities into database."""
     load_wikipedia(flask_app.config)
 
 
