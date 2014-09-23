@@ -164,7 +164,9 @@ class Genre(Base):
 
 
 class Work(Base):
-    """Creative work i.e. book."""
+    """Creative work(s) that could be a single work such as a film, or
+    a series of works such as a combic book series and a television series.
+    """
 
     #: (:class:`int`) The primary key integer.
     id = Column(Integer, primary_key=True)
