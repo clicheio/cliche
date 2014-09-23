@@ -15,12 +15,12 @@ Loading DBpedia tables into a telational database
 References
 ----------
 """
+from celery import Task
 from sqlalchemy.exc import IntegrityError
 from SPARQLWrapper import JSON, SPARQLWrapper
 
 from .WorkAuthor import WorkAuthor
-from ...celery import app, get_database_engine, get_session
-from ...orm import Session
+from ...celery import app, get_session
 
 
 PAGE_ITEM_COUNT = 100
@@ -74,7 +74,7 @@ def select_property(s, s_name='property', json=False):
 def select_by_relation(p, s_name='subject', o_name='object', page=1):
     """Find author of somethings
 
-    Retrieves the list of s_name and o_name, the relation is 
+    Retrieves the list of s_name and o_name, the relation is
     a kind of ontology properties.
 
     Args:
@@ -91,10 +91,11 @@ def select_by_relation(p, s_name='subject', o_name='object', page=1):
             p=['dbpprop:author', 'dbpedia-owl:writer', 'dbpedia-owl:author'],
             o_name='author', page=0)
 
-            [{  
+            [{
                   'work':'http://dbpedia.org/resource/The_Frozen_Child',
-                  'author': 'http://dbpedia.org/resource/József_Eötvös\nhttp://dbpedia.org/resource/Ede_Sas'
-               },{  
+                  'author': 'http://dbpedia.org/resource/József_Eötvös
+                  http://dbpedia.org/resource/Ede_Sas'
+               },{
                   'work':'http://dbpedia.org/resource/Slaves_of_Sleep',
                   'author': 'http://dbpedia.org/resource/L._Ron_Hubbard'
             }]
@@ -180,6 +181,17 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
     return select_dbpedia(query)
 
 
+class MyTask(Task):
+    abstract = True
+
+    def after_return(self, status, retval, task_id, args, kwargs, einfo):
+        print(args)
+        if retval == 100:
+            self.delay(args+1)
+        else:
+            print(retval)
+
+
 @app.task
 def load_page(page):
     session = get_session()
@@ -205,14 +217,12 @@ def load_page(page):
         except IntegrityError:
             pass
 
-    # total number of res will be 149051
-    # if len(res) == 100:
-    #     load_page.delay(page+1)
-    # else:
-    #     return
+    if app.conf['CELERY_ALWAYS_EAGER']:
+        return
+
+    load_page.delay(page+1)
 
 
-def load(config):
-    db_engine = get_database_engine()
-    Session(bind=db_engine)
+@app.task
+def load():
     load_page.delay(1)

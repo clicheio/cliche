@@ -140,13 +140,6 @@ def sync(service):  # FIXME available service listing
 
 @cli.command()
 @config
-def load():
-    """Loads data from Wikipedia and saves entities into database."""
-    load_wikipedia(flask_app.config)
-
-
-@cli.command()
-@config
 def shell():
     """Run a Python shell inside Flask application context."""
     with flask_app.test_request_context():

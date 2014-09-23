@@ -4,3 +4,8 @@
 .. _Wikipedia: http://wikipedia.org/
 
 """
+
+from .loader import load as sync  # noqa
+
+
+__all__ = 'sync',

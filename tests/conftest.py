@@ -12,6 +12,7 @@ from cliche.web.app import app
 from cliche.work import Credit, Franchise, Genre, Role, Work, World
 
 from .db import DEFAULT_DATABASE_URL, get_session
+from .celery import get_celery_always_eager_app
 
 
 def pytest_addoption(parser):
@@ -252,3 +253,8 @@ def fx_cfg_yml_file(fx_tmpdir):
 def fx_flask_client():
     app.config['TESTING'] = True
     return app.test_client()
+
+
+@fixture
+def fx_celery_always_eager_app():
+    return get_celery_always_eager_app()
