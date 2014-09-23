@@ -36,6 +36,11 @@ def test_person_made_works(fx_people, fx_works):
     }
     assert fx_works.skura_member_asso_1.work == \
         fx_works.cardcaptor_sakura
+    assert fx_people.peter_jackson.credits == {
+        fx_works.lor_film_asso_1
+    }
+    assert fx_works.lor_film_asso_1.work == \
+        fx_works.lord_of_rings_film
 
 
 def test_credits_of_work(fx_works, fx_people, fx_teams):
@@ -49,6 +54,32 @@ def test_credits_of_work(fx_works, fx_people, fx_teams):
         fx_people.clamp_member_1, fx_people.clamp_member_2,
         fx_people.clamp_member_3, fx_people.clamp_member_4
     }
+
+
+def test_franchise_has_works(fx_works, fx_franchises):
+    assert fx_franchises.lord_of_rings.works == {
+        fx_works.lord_of_rings_film
+    }
+    assert fx_franchises.iron_man.works == {
+        fx_works.avengers
+    }
+
+
+def test_work_belongs_to_franchise(fx_works, fx_franchises):
+    assert fx_works.lord_of_rings_film.franchises == {
+        fx_franchises.lord_of_rings
+    }
+    assert fx_works.avengers.franchises == {
+        fx_franchises.iron_man,
+        fx_franchises.captain_america,
+        fx_franchises.hulk,
+        fx_franchises.thor
+    }
+
+
+def test_franchise_belongs_to_world(fx_franchises, fx_worlds):
+    assert fx_franchises.lord_of_rings.world == fx_worlds.middle_earth
+    assert fx_franchises.iron_man.world == fx_worlds.marvel_universe
 
 
 def test_award_winner_removed_with_award(fx_session, fx_awards, fx_people):
