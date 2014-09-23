@@ -1,0 +1,112 @@
+{% extends "page.html" %}
+{% block tbody %}
+  <tr class="name">
+    <th scope="row">name</th>
+    <td>{{ work.name }}</td>
+  </tr>
+
+  {% if work.published_at %}
+    <tr class="published_at">
+      <th scope="row">published_at</th>
+      <td>{{ work.published_at }}</td>
+    </tr>
+  {% endif %}
+
+  {% if work.number_of_pages %}
+    <tr class="number_of_pages">
+      <th scope="row">number_of_pages</th>
+      <td>{{ work.number_of_pages }}</td>
+    </tr>
+  {% endif %}
+
+  {% if work.isbn %}
+    <tr class="isbn">
+      <th scope="row">isbn</th>
+      <td>{{ work.isbn }}</td>
+    </tr>
+  {% endif %}
+
+  {% if work.awards %}
+    <tr class="awards">
+      <th scope="row">awards</th>
+      <td>
+        <ul>
+          {% for val in work.awards %}
+            <li><a href="{{ url_for('.page', type_='award', title=val.name) }}">{{ val.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </td>
+    </tr>
+  {% endif %}
+
+  {% if work.genres %}
+    <tr class="genres">
+      <th scope="row">genres</th>
+      <td>
+        <ul>
+          {% for val in work.genres %}
+            <li><a href="{{ url_for('.page', type_='genre', title=val.name) }}">{{ val.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </td>
+    </tr>
+  {% endif %}
+
+  {% if grouped_credits %}
+    <tr class="credits">
+      <th role="row">credits</th>
+      <td>
+        <table>
+          <caption>Credits of {{ title }}</caption>
+          <thead>
+            <tr>
+              <th>Team</th>
+              <th>Name</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for team_id, credits in grouped_credits %}
+              {% for credit in credits %}
+                {% if team_id is none %}
+                  <tr>
+                    <td colspan="2" class="name">
+                      <a href="{{ url_for('.page', type_='person', title=credit.person.name) }}">
+                        {{- credit.person.name -}}
+                      </a>
+                    </td>
+                    <td class="role">
+                      <a href="{{ url_for('.page', type_='role', title=credit.role.value) }}">
+                        {{- credit.role.value -}}
+                      </a>
+                    </td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    {% if loop.first %}
+                      <td rowspan="{{ loop.length }}" class="team">
+                        <a href="{{ url_for('.page', type_='team', title=credit.team.name) }}">
+                          {{- credit.team.name -}}
+                        </a>
+                      </td>
+                    {% endif %}
+                    <td class="name">
+                      <a href="{{ url_for('.page', type_='person', title=credit.person.name) }}">
+                        {{- credit.person.name -}}
+                      </a>
+                    </td>
+                    <td class="role">
+                      <a href="{{ url_for('.page', type_='role', title=credit.role.value) }}">
+                        {{- credit.role.value -}}
+                      </a>
+                    </td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  {% endif %}
+{% endblock %}

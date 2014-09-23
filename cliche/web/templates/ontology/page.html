@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %} - contents of {{ title }}{% endblock %}
+{% block body %}
+  <h1><a href="{{ url_for('.list_') }}">Work</a> / {{ title }}</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Properties</th>
+        <th>Values</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% block tbody %}{% endblock %}
+    </tbody>
+  </table>
+{% endblock %}

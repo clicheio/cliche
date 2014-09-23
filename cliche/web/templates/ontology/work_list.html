@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %} - list of Work{% endblock %}
+{% block body %}
+  <table>
+    <caption>List of <a href="{{ url_for('.list_') }}">Work</a></caption>
+    <thead>
+      <tr>
+        <th>Title</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for title in work_list %}
+        <tr>
+          <td><a href="{{ url_for('.page', title=title) }}">{{ title }}</a></td>
+        </tr>
+      {% else %}
+        <tr>
+          <td>No contents here now.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
