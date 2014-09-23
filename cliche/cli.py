@@ -56,13 +56,12 @@ ALEMBIC_LOGGING = {
 
 
 def config(func):
-    """Provide supporting
-    :option:`--config` or :option:`-c` option and running
-    (:func:`initialize_app`) automatically.
+    """Provide :option:`--config` or :option:`-c` option and
+    run :func:`initialize_app()` automatically.
 
-    :param func: a command function that want to decorate.
+    :param func: a command function to decorate
     :type func: :class:`collections.abc.Callable`
-    :returns: Decorated ``func``
+    :returns: decorated ``func``
 
     """
     @functools.wraps(func)
@@ -78,9 +77,8 @@ def config(func):
 def initialize_app(config=None):
     """Initialize celery/flask app.
 
-    :param config: a config file path. accept .py, .yml file. default value is
-                  None and this function get values from environment
-                  variable.
+    :param config: a config file path. accept :file:`.py`, :file:`.yml` file.
+                   default value is :const:`None`
 
     """
     if config is None:
@@ -100,14 +98,14 @@ def initialize_app(config=None):
 
 @group()
 def cli():
-    """cliche for intergrated command for cliche.io service."""
+    """cliche for integrated command for cliche.io service."""
 
 
 @cli.command()
 @argument('revision', default='head')
 @config
 def upgrade(revision):
-    """Creates the database tables, or upgrade it to the latest revision."""
+    """Create the database tables, or upgrade it to the latest revision."""
 
     logging_config = dict(ALEMBIC_LOGGING)
     logging.config.dictConfig(logging_config)
@@ -142,7 +140,7 @@ def sync(service):  # FIXME available service listing
 @cli.command()
 @config
 def shell():
-    """Runs a Python shell inside Flask application context."""
+    """Run a Python shell inside Flask application context."""
     with flask_app.test_request_context():
         context = dict(app=_request_ctx_stack.top.app)
 
@@ -165,7 +163,7 @@ def shell():
 @config
 def runserver(host, port, threaded, processes,
               passthrough_errors, debug, reload):
-    """Runs the Flask development server i.e. app.run()"""
+    """Run the Flask development server i.e. app.run()"""
     flask_app.run(host=host,
                   port=port,
                   debug=debug,
