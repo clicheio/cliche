@@ -9,7 +9,8 @@ from yaml import dump
 
 from cliche.people import Person, Team
 from cliche.web.app import app
-from cliche.work import Award, Credit, Genre, Role, Work
+from cliche.work import Award, Credit, Franchise, Genre, Role, Work, World
+
 from .db import DEFAULT_DATABASE_URL, get_session
 
 
@@ -64,7 +65,7 @@ class FixtureModule(types.ModuleType):
 
 @fixture
 def fx_awards(fx_session):
-    # create awards: Seiun Awqrd, Hugo Awqrd and Nebula Award.
+    """create awards: Seiun Awqrd, Hugo Awqrd and Nebula Award"""
     f = FixtureModule('fx_awards')
     f.session = fx_session
     f.seiun_award = Award(name='Seiun Award')
@@ -79,8 +80,9 @@ def fx_awards(fx_session):
 
 @fixture
 def fx_people(fx_session, fx_awards):
-    # create people: four artisits and Peter Jackson who won
-    # Hugo and Nebula Award.
+    """create people: four artisits and Peter Jackson who won
+    Hugo and Nebula Award
+    """
     f = FixtureModule('fx_people')
     f += fx_awards
     f.clamp_member_1 = Person(name='Nanase Ohkawa',
@@ -106,7 +108,7 @@ def fx_people(fx_session, fx_awards):
 
 @fixture
 def fx_teams(fx_session, fx_people):
-    # create teams: CLAMP which consists of the four artists.
+    """create teams: CLAMP which consists of the four artists"""
     f = FixtureModule('fx_teams')
     f += fx_people
     f.clamp = Team(name='CLAMP')
@@ -121,7 +123,7 @@ def fx_teams(fx_session, fx_people):
 
 @fixture
 def fx_genres(fx_session):
-    # create genres: Comic, Romance
+    """create genres: Comic and Romance"""
     f = FixtureModule('fx_genres')
     f.session = fx_session
     f.comic = Genre(name='Comic')
@@ -133,15 +135,67 @@ def fx_genres(fx_session):
 
 
 @fixture
-def fx_works(fx_session, fx_teams, fx_awards, fx_genres):
-    # create works: Cardcaptor Sakura which
-    # made by CLAMP team and members of the team
-    # , won Seiun Award
-    # and belongs to comic and romance genres
+def fx_worlds(fx_session):
+    """create worlds: *Middle-earth* and *Marvel Cinematic Universe*."""
+    f = FixtureModule('fx_worlds')
+    f.session = fx_session
+    f.middle_earth = World(name='Middle-earth')
+    fx_session.add(f.middle_earth)
+    f.marvel_universe = World(name='Marvel Cinematic Universe')
+    fx_session.add(f.marvel_universe)
+    fx_session.flush()
+    return f
+
+
+@fixture
+def fx_franchises(fx_session, fx_worlds):
+    """create franchises: *The Lord of the Rings*
+    which belongs to *Middle-earth*, and four franchises
+    which belong to *Marvel Cinematic Universe*
+    """
+    f = FixtureModule('fx_franchises')
+    f.session = fx_session
+    f += fx_worlds
+    f.lord_of_rings = Franchise(name='The Lord of the Rings')
+    f.lord_of_rings.world = f.middle_earth
+    fx_session.add(f.lord_of_rings)
+    f.iron_man = Franchise(name='Iron Man')
+    f.iron_man.world = f.marvel_universe
+    fx_session.add(f.iron_man)
+    f.captain_america = Franchise(name='Captain America')
+    f.captain_america.world = f.marvel_universe
+    fx_session.add(f.captain_america)
+    f.hulk = Franchise(name='Hulk')
+    f.hulk.world = f.marvel_universe
+    fx_session.add(f.hulk)
+    f.thor = Franchise(name='Thor')
+    f.thor.world = f.marvel_universe
+    fx_session.add(f.thor)
+    fx_session.flush()
+    return f
+
+
+@fixture
+def fx_works(fx_session, fx_teams, fx_awards, fx_genres, fx_franchises):
+    """Create *Cardcaptor Sakura* (comic book),
+    which made by CLAMP members,
+    which won Seiun Award,
+    which belongs to comic and romance genres.
+
+    Create *The Lord of the Rings: The Fellowship of the Ring* (flim),
+    which directed by Peter Jackson,
+    which belongs to *The Lord of the Rings* franchise.
+
+    Create *The Avengers* (flim),
+    which belongs to *Iron Man*, *Captain America*, *Hulk*,
+    and *Thor* franchise.
+    """
     f = FixtureModule('fx_works')
     f += fx_teams
     f += fx_awards
     f += fx_genres
+    f += fx_franchises
+
     f.cardcaptor_sakura = Work(name='Cardcaptor Sakura, Volume 1',
                                published_at=datetime.date(1996, 11, 22),
                                number_of_pages=187,
@@ -178,6 +232,27 @@ def fx_works(fx_session, fx_teams, fx_awards, fx_genres):
         team_id=f.clamp.id
     )
     fx_session.add(f.skura_member_asso_4)
+
+    f.lord_of_rings_film = Work(
+        name='The Lord of the Rings: The Fellowship of the Ring',
+    )
+    fx_session.add(f.lord_of_rings_film)
+    fx_session.flush()
+    f.lor_film_asso_1 = Credit(
+        work_id=f.lord_of_rings_film.id,
+        person_id=f.peter_jackson.id,
+        role=Role.director
+    )
+    fx_session.add(f.lor_film_asso_1)
+    f.lord_of_rings_film.franchises.update({f.lord_of_rings})
+
+    f.avengers = Work(name='The Avengers')
+    fx_session.add(f.avengers)
+    fx_session.flush()
+    f.avengers.franchises.update({
+        f.iron_man, f.captain_america, f.hulk, f.thor
+    })
+
     fx_session.flush()
     return f
 
