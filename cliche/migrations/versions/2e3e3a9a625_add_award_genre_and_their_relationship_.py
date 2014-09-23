@@ -58,12 +58,11 @@ def upgrade():
                     sa.ForeignKeyConstraint(['work_id'], ['works.id'], ),
                     sa.PrimaryKeyConstraint('work_id', 'genre_id'))
     op.add_column('works', sa.Column('isbn', sa.String(), nullable=True))
-    op.add_column('works', sa.Column('name', sa.String(), nullable=False))
     op.add_column('works', sa.Column('number_of_pages', sa.Integer(),
                                      nullable=True))
     op.add_column('works', sa.Column('published_at', sa.Date(), nullable=True))
     op.drop_index('ix_works_title', table_name='works')
-    op.drop_column('works', 'title')
+    op.alter_column('works', 'title', new_column_name='name')
     op.drop_column('works', 'dop')
     op.create_index(op.f('ix_works_created_at'), 'works', ['created_at'],
                     unique=False)

@@ -14,7 +14,7 @@ from .people import Person
 from .sqltypes import EnumType
 
 __all__ = ('Award', 'AwardWinner', 'Credit', 'Genre',
-           'Work', 'WorkAward', 'WorkGenre')
+           'Role', 'Work', 'WorkAward', 'WorkGenre')
 
 
 class Role(enum.Enum):
@@ -23,6 +23,7 @@ class Role(enum.Enum):
     artist = 'artist'
     author = 'author'
     editor = 'editor'
+    unknown = 'unknown'
 
 
 class Award(Base):
@@ -111,7 +112,8 @@ class Credit(Base):
     person = relationship('Person')
 
     #: The person's role in making the work.
-    role = Column(EnumType(Role, name='credits_role'))
+    role = Column(EnumType(Role, name='credits_role'),
+                  primary_key=True, default=Role.unknown)
 
     #: (:class:`int`) :class:`Team.id` of :attr:`team`. (optional)
     team_id = Column(Integer, ForeignKey('teams.id'))
