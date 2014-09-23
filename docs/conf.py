@@ -54,7 +54,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Cliche'
-copyright = '2014, Hong Minhee'
+copyright = '2014, Cliche.io'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -207,7 +207,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   ('index', 'Cliche.tex', 'Cliche Documentation',
-   'Hong Minhee', 'manual'),
+   'Cliche.io', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -276,6 +276,7 @@ intersphinx_mapping = {
     'celery': ('http://docs.celeryproject.org/en/latest/', None),
     'werkzeug': ('http://werkzeug.pocoo.org/docs/', None),
     'flask': ('http://flask.pocoo.org/docs/', None),
+    'click': ('http://click.pocoo.org/3/', None),
 }
 
 extlinks = {

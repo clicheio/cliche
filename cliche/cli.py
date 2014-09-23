@@ -21,8 +21,7 @@ from .orm import downgrade_database, upgrade_database
 from .web.app import app as flask_app
 from .web.db import get_database_engine
 
-__all__ = ('get_database_engine', 'initialize_app', 'main')
-
+__all__ = ('initialize_app', 'config', 'main')
 
 ALEMBIC_LOGGING = {
     'version': 1,
@@ -57,6 +56,14 @@ ALEMBIC_LOGGING = {
 
 
 def config(func):
+    """Provide :option:`--config` or :option:`-c` option and
+    run :func:`initialize_app()` automatically.
+
+    :param func: a command function to decorate
+    :type func: :class:`collections.abc.Callable`
+    :returns: decorated ``func``
+
+    """
     @functools.wraps(func)
     def internal(*args, **kwargs):
         initialize_app(kwargs.pop('config'))
@@ -68,7 +75,12 @@ def config(func):
 
 
 def initialize_app(config=None):
-    """(:class:`flask.ext.script.Manager`) A Flask-Script manager object."""
+    """Initialize celery/flask app.
+
+    :param config: a config file path. accept :file:`.py`, :file:`.yml` file.
+                   default value is :const:`None`
+
+    """
     if config is None:
         try:
             config = os.environ['CLICHE_CONFIG']
@@ -82,19 +94,18 @@ def initialize_app(config=None):
     config = read_config(filename=pathlib.Path(config))
     flask_app.config.update(config)
     celery_app.conf.update(config)
-    return flask_app
 
 
 @group()
 def cli():
-    """cliche for intergrated command for cliche.io service."""
+    """cliche for integrated command for cliche.io service."""
 
 
 @cli.command()
 @argument('revision', default='head')
 @config
 def upgrade(revision):
-    """Creates the database tables, or upgrade it to the latest revision."""
+    """Create the database tables, or upgrade it to the latest revision."""
 
     logging_config = dict(ALEMBIC_LOGGING)
     logging.config.dictConfig(logging_config)
@@ -129,7 +140,7 @@ def sync(service):  # FIXME available service listing
 @cli.command()
 @config
 def shell():
-    """Runs a Python shell inside Flask application context."""
+    """Run a Python shell inside Flask application context."""
     with flask_app.test_request_context():
         context = dict(app=_request_ctx_stack.top.app)
 
@@ -152,7 +163,7 @@ def shell():
 @config
 def runserver(host, port, threaded, processes,
               passthrough_errors, debug, reload):
-    """Runs the Flask development server i.e. app.run()"""
+    """Run the Flask development server i.e. app.run()"""
     flask_app.run(host=host,
                   port=port,
                   debug=debug,

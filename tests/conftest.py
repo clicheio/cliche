@@ -1,7 +1,6 @@
 import datetime
 import os
 import pathlib
-import sqlite3
 import types
 
 from click.testing import CliRunner
@@ -181,26 +180,6 @@ def fx_works(fx_session, fx_teams, fx_awards, fx_genres):
     fx_session.add(f.skura_member_asso_4)
     fx_session.flush()
     return f
-
-
-@fixture
-def fx_sparql_dbpedia_table():
-    TABLE = {
-        'TABLENAME': 'allworks',
-        'PRIMARY': 'work',
-        'FOREIGN': 'author',
-        'LIMIT': 30,
-        'COUNT': 8
-    }
-    return TABLE
-
-
-@fixture
-def fx_sparql_dbpedia_cursor(fx_sparql_dbpedia_table):
-    db_file = '{}.tmp'.format(fx_sparql_dbpedia_table['TABLENAME'])
-    conn = sqlite3.connect(db_file)
-    c = conn.cursor()
-    return c
 
 
 @fixture
