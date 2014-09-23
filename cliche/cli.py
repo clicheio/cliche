@@ -21,8 +21,6 @@ from .orm import downgrade_database, upgrade_database
 from .web.app import app as flask_app
 from .web.db import get_database_engine
 
-from .services.tvtropes.crawler import crawl as crawl_tvtropes
-
 __all__ = ('initialize_app', 'config', 'main')
 
 ALEMBIC_LOGGING = {
