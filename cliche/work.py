@@ -22,6 +22,7 @@ class Role(enum.Enum):
 
     artist = 'artist'
     author = 'author'
+    director = 'director'
     editor = 'editor'
     unknown = 'unknown'
 
