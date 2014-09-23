@@ -13,8 +13,8 @@ from .orm import Base
 from .people import Person
 from .sqltypes import EnumType
 
-__all__ = ('Award', 'AwardWinner', 'Credit', 'Genre',
-           'Role', 'Work', 'WorkAward', 'WorkGenre')
+__all__ = ('Award', 'AwardWinner', 'Credit', 'Franchise', 'Genre', 'Role',
+           'Work', 'WorkAward', 'WorkFranchise', 'WorkGenre', 'World')
 
 
 class Role(enum.Enum):
@@ -131,6 +131,45 @@ class Credit(Base):
     __repr_columns__ = person_id, work_id, team_id
 
 
+class Franchise(Base):
+    """Multimedia franchise that is a franchise for which installments
+    exist in multiple forms of media, such as books, comic books, and films,
+    for example *The Lord of the Rings* and *Iron Man*.
+    """
+
+    #: (:class:`int`) The primary key integer.
+    id = Column(Integer, primary_key=True)
+
+    #: (:class:`str`) The name of the franchise.
+    name = Column(String, nullable=False, index=True)
+
+    #: (:class:`int`) :class:`World.id` of :attr:`world`.
+    world_id = Column(Integer, ForeignKey('worlds.id'))
+
+    #: (:class:`World`) The world which the franchise belongs to.
+    world = relationship('World')
+
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`WorkFranchise`\ s that the franchise has.
+    work_franchises = relationship('WorkFranchise',
+                                   cascade='delete, merge, save-update',
+                                   collection_class=set)
+
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`Work`\ s that belongs to the franchise.
+    works = relationship('Work',
+                         secondary='work_franchises',
+                         collection_class=set)
+
+    #: (:class:`datetime.datetime`) The date and time on which
+    #: the record was created.
+    created_at = Column(DateTime(timezone=True), nullable=False,
+                        default=now())
+
+    __tablename__ = 'franchises'
+    __repr_columns__ = id, name
+
+
 class Genre(Base):
     """Genre of the creative work"""
 
@@ -213,6 +252,18 @@ class Work(Base):
                            cascade='delete, merge, save-update',
                            collection_class=set)
 
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`WorkFranchise`\ s that the work has.
+    work_franchises = relationship('WorkFranchise',
+                                   cascade='delete, merge, save-update',
+                                   collection_class=set)
+
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`Franchise`\ s that the work belongs to.
+    franchises = relationship(Franchise,
+                              secondary='work_franchises',
+                              collection_class=set)
+
     #: (:class:`datetime.datetime`) The date and time on which
     #: the record was created.
     created_at = Column(DateTime(timezone=True),
@@ -248,6 +299,30 @@ class WorkAward(Base):
     __repr_columns__ = work_id, award_id
 
 
+class WorkFranchise(Base):
+    """Relationship between the work and the Franchise. """
+
+    #: (:class:`int`) :class:`Work.id` of :attr:`work`.
+    work_id = Column(Integer, ForeignKey(Work.id), primary_key=True)
+
+    #: (:class:`Work`) The work that belongs to the :attr:`franchise`.
+    work = relationship(Work)
+
+    #: (:class:`int`) :class:`Franchise.id` of :attr:`franchise`.
+    franchise_id = Column(Integer, ForeignKey(Franchise.id), primary_key=True)
+
+    #: (:class:`Franchise`) The franchise that the :attr:`work` belongs to.
+    franchise = relationship(Franchise)
+
+    #: (:class:`datetime.datetime`) The date and time on which
+    #: the record was created.
+    created_at = Column(DateTime(timezone=True), nullable=False,
+                        default=now())
+
+    __tablename__ = 'work_franchises'
+    __repr_columns__ = work_id, franchise_id
+
+
 class WorkGenre(Base):
     """Relationship between the work and the genre."""
 
@@ -270,3 +345,28 @@ class WorkGenre(Base):
 
     __tablename__ = 'work_genres'
     __repr_columns__ = work_id, genre_id
+
+
+class World(Base):
+    """Fictional universe that is a self-consistent fictional setting
+    with elements that differ from the real world,
+    for example *Middle-earth* and *Marvel Cinematic Universe*.
+    """
+
+    #: (:class:`int`) The primary key integer.
+    id = Column(Integer, primary_key=True)
+
+    #: (:class:`str`) The name of the world.
+    name = Column(String, nullable=False, index=True)
+
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`Franchise`\ s that belong the world.
+    franchises = relationship(Franchise, collection_class=set)
+
+    #: (:class:`datetime.datetime`) The date and time on which
+    #: the record was created.
+    created_at = Column(DateTime(timezone=True), nullable=False,
+                        default=now())
+
+    __tablename__ = 'worlds'
+    __repr_columns__ = id, name
