@@ -15,7 +15,6 @@ Loading DBpedia tables into a telational database
 References
 ----------
 """
-from celery import Task
 from sqlalchemy.exc import IntegrityError
 from SPARQLWrapper import JSON, SPARQLWrapper
 
@@ -34,7 +33,7 @@ def select_dbpedia(query):
     return[{k: v['value'] for k, v in tupl.items()} for tupl in tuples]
 
 
-def select_property(s, s_name='property', json=False):
+def select_property(s, s_name='property', return_json=False):
     prefix = {
         'owl:': 'http://www.w3.org/2002/07/owl#',
         'xsd:': 'http://www.w3.org/2001/XMLSchema#',
@@ -61,7 +60,7 @@ def select_property(s, s_name='property', json=False):
 
     properties = select_dbpedia(query)
 
-    if json:
+    if return_json:
         return properties
     else:
         for property_ in properties:
@@ -183,17 +182,6 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
         offset=PAGE_ITEM_COUNT * (page-1)
     )
     return select_dbpedia(query)
-
-
-class MyTask(Task):
-    abstract = True
-
-    def after_return(self, status, retval, task_id, args, kwargs, einfo):
-        print(args)
-        if retval == 100:
-            self.delay(args+1)
-        else:
-            print(retval)
 
 
 @app.task

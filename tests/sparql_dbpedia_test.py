@@ -11,7 +11,7 @@ def test_select_property(monkeypatch):
                 return {"results": {"bindings": fakeResult}}
 
     monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", FakeQuery)
-    res = dbpedia.select_property(s='dbpedia-owl:Person', json=True)
+    res = dbpedia.select_property(s='dbpedia-owl:Person', return_json=True)
     assert type(res[0]['property']) == str
 
 
