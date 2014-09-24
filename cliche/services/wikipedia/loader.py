@@ -1,7 +1,7 @@
 """:mod:`cliche.services.wikipedia.loader` --- Wikipedia_ loader
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Loading DBpedia tables into a telational database
+Loading DBpedia tables into a relational database
 
 .. seealso::
 
@@ -15,10 +15,11 @@ Loading DBpedia tables into a telational database
 References
 ----------
 """
+from celery.utils.log import get_task_logger
 from sqlalchemy.exc import IntegrityError
 from SPARQLWrapper import JSON, SPARQLWrapper
 
-from .WorkAuthor import WorkAuthor
+from .workauthor import WorkAuthor
 from ...celery import app, get_session
 
 

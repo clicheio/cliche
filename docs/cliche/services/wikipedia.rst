@@ -5,4 +5,4 @@
       :maxdepth: 2
 
       wikipedia/loader
-      wikipedia/WorkAuthor
+      wikipedia/workauthor

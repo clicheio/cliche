@@ -1,5 +1,5 @@
-""":mod:`cliche.services.wikipedia.WorkAuthor` --- Data entities for Wikipedia_
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+""":mod:`cliche.services.wikipedia.workauthor` --- Data entities for Wikipedia_
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _Wikipedia: http://wikipedia.org/
 
