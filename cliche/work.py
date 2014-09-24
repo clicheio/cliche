@@ -209,7 +209,7 @@ class Work(Base):
                         index=True)
 
     __tablename__ = 'works'
-    __repr_columns__ = id,
+    __repr_columns__ = [id]
 
 
 class WorkFranchise(Base):
