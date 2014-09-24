@@ -12,8 +12,8 @@ from sqlalchemy.types import Date, DateTime, Integer, String
 from .orm import Base
 from .sqltypes import EnumType
 
-__all__ = ('Credit', 'Franchise', 'Genre', 'Role', 'Work', 'WorkFranchise',
-           'WorkGenre', 'World')
+__all__ = ('Credit', 'Franchise', 'Genre', 'Role',
+           'Title', 'Work', 'WorkFranchise', 'WorkGenre', 'World')
 
 
 class Role(enum.Enum):
@@ -59,7 +59,7 @@ class Credit(Base):
                         default=now())
 
     __tablename__ = 'credits'
-    __repr_columns__ = person_id, work_id, team_id
+    __repr_columns__ = person_id, work_id, role, team_id
 
 
 class Franchise(Base):
@@ -133,16 +133,32 @@ class Genre(Base):
     __repr_columns__ = id, name
 
 
+class Title(Base):
+    """Title of the creative work."""
+
+    #: (:class:`int`) :class:`Work.id` of :attr:`work`.
+    work_id = Column(Integer, ForeignKey('works.id'), primary_key=True)
+
+    #: (:class:`Work`) The work that has :attr:`title`.
+    work = relationship('Work')
+
+    #: (:class:`str`) The title of the work.
+    title = Column(String, primary_key=True)
+
+    #: (:class:`int`) The number of references to the title.
+    reference_count = Column(Integer, default=0)
+
+    __tablename__ = 'titles'
+    __repr_columns__ = work_id, title
+
+
 class Work(Base):
-    """Creative work(s) that could be a single work such as a film, or
+    """Creative work(s) that could be a single work like a film, or
     a series of works such as a combic book series and a television series.
     """
 
     #: (:class:`int`) The primary key integer.
     id = Column(Integer, primary_key=True)
-
-    #: (:class:`str`) The name of the work.
-    name = Column(String, nullable=False, index=True)
 
     #: (:class:`datetime.date`) The publication date.
     published_at = Column(Date)
@@ -177,6 +193,14 @@ class Work(Base):
                               secondary='work_franchises',
                               collection_class=set)
 
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`Title`\ s that the work has.
+    titles = relationship(
+        Title,
+        cascade='delete, merge, save-update',
+        collection_class=set
+    )
+
     #: (:class:`datetime.datetime`) The date and time on which
     #: the record was created.
     created_at = Column(DateTime(timezone=True),
@@ -185,7 +209,7 @@ class Work(Base):
                         index=True)
 
     __tablename__ = 'works'
-    __repr_columns__ = id, name
+    __repr_columns__ = id,
 
 
 class WorkFranchise(Base):
