@@ -7,12 +7,12 @@ from click.testing import CliRunner
 from pytest import fixture, yield_fixture
 from yaml import dump
 
+from cliche.celery import app as celery_app
 from cliche.people import Person, Team
 from cliche.web.app import app
 from cliche.work import Credit, Franchise, Genre, Role, Work, World
 
 from .db import DEFAULT_DATABASE_URL, get_session
-from .celery import get_celery_always_eager_app
 
 
 def pytest_addoption(parser):
@@ -256,5 +256,6 @@ def fx_flask_client():
 
 
 @fixture
-def fx_celery_always_eager_app():
-    return get_celery_always_eager_app()
+def fx_celery_app():
+    celery_app.conf['CELERY_ALWAYS_EAGER'] = True
+    return celery_app
