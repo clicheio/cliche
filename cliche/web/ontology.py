@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
+""":mod:`cliche.web.ontology` --- Ontology web views
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Cliche provides ontology web pages to use our database.
+It widely uses Flask_ as its web framework.
+
+.. _Flask: http://flask.pocoo.org/
+
+"""
 from flask import Blueprint, abort, render_template
 import itertools
 from sqlalchemy.orm.exc import NoResultFound
