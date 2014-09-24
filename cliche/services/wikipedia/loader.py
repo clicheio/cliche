@@ -77,31 +77,35 @@ def select_by_relation(p, s_name='subject', o_name='object', page=1):
     Retrieves the list of s_name and o_name, the relation is
     a kind of ontology properties.
 
-    Args:
-        p: List of properties between s_name and o_name.
-        s_name: Name of subject. It doesn't affect to the results.
-        o_name: Name of object. It doesn't affect to the results.
+    :param list p: List of properties between s_name and o_name.
+    :param str s_name: Name of subject. It doesn't affect to the results.
+    :param str o_name: Name of object. It doesn't affect to the results.
+    :param page: The offset of query, each page will return 100 entities.
+    :type page: integer
+    :return: List of a dict mapping keys
+    :rtype: list of a dict mapping keys to the corresponding table row fetched.
 
-    Returns:
-        List of a dict mapping keys to the corresponding table row data
-        fetched. Each row is represented as a string.
-        For example:
+    For example:
 
-        >>> select_by_relation(s_name='work',
-            p=['dbpprop:author', 'dbpedia-owl:writer', 'dbpedia-owl:author'],
-            o_name='author', page=0)
+    .. code-block:: console
 
-            [{
-                  'work':'http://dbpedia.org/resource/The_Frozen_Child',
-                  'author': 'http://dbpedia.org/resource/József_Eötvös
-                  http://dbpedia.org/resource/Ede_Sas'
-               },{
-                  'work':'http://dbpedia.org/resource/Slaves_of_Sleep',
-                  'author': 'http://dbpedia.org/resource/L._Ron_Hubbard'
-            }]
+        select_by_relation(s_name='work',
+        p=['dbpprop:author', 'dbpedia-owl:writer', 'dbpedia-owl:author'],
+        o_name='author', page=0)
 
-        When the
-        row has more than two items, the items are combined by EOL.
+
+    .. code-block:: json
+
+        [{
+            'work':'http://dbpedia.org/resource/The_Frozen_Child',
+            'author': 'http://dbpedia.org/resource/József_Eötvös
+            http://dbpedia.org/resource/Ede_Sas'
+            },{
+            'work':'http://dbpedia.org/resource/Slaves_of_Sleep',
+            'author': 'http://dbpedia.org/resource/L._Ron_Hubbard'
+        }]
+
+    When the row has more than two items, the items are combined by EOL.
     """
     if not p:
         raise ValueError('at least one property required')
