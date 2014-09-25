@@ -94,8 +94,10 @@ class BaseAlembicCommand(distutils.core.Command):
 
     def run(self):
         try:
-            from cliche.cli import get_database_engine, initialize_app
+            from cliche.cli import initialize_app
             from cliche.orm import Base, get_alembic_config, import_all_modules
+            from cliche.web.app import app
+            from cliche.web.db import get_database_engine
             import_all_modules()
         except ImportError as e:
             raise ImportError('dependencies are not resolved yet; run '
@@ -107,7 +109,7 @@ class BaseAlembicCommand(distutils.core.Command):
                 if isinstance(cls, type):
                     print('- {0.__module__}.{0.__name__}'.format(cls),
                           file=sys.stderr)
-        app = initialize_app(self.config)
+        initialize_app(self.config)
         with app.app_context():
             engine = get_database_engine()
         config = get_alembic_config(engine)
