@@ -8,8 +8,9 @@ It widely uses Flask_ as its web framework.
 .. _Flask: http://flask.pocoo.org/
 
 """
-from flask import Blueprint, abort, render_template
 import itertools
+
+from flask import Blueprint, abort, render_template
 from sqlalchemy.orm.exc import NoResultFound
 
 from .db import session
