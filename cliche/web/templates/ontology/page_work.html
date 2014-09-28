@@ -2,7 +2,7 @@
 {% block tbody %}
   <tr class="name">
     <th scope="row">name</th>
-    <td>{{ work.name }}</td>
+    <td>{{ title }}</td>
   </tr>
 
   {% if work.published_at %}
@@ -32,7 +32,7 @@
       <td>
         <ul>
           {% for val in work.genres %}
-            <li><a href="{{ url_for('.page', type_='genre', title=val.name) }}">{{ val.name }}</a></li>
+            <li><a href="{{ url_for('.page', type_='genre', id=val.name) }}">{{ val.name }}</a></li>
           {% endfor %}
         </ul>
       </td>
@@ -58,12 +58,12 @@
                 {% if team_id is none %}
                   <tr>
                     <td colspan="2" class="name">
-                      <a href="{{ url_for('.page', type_='person', title=credit.person.name) }}">
+                      <a href="{{ url_for('.page', type_='person', id=credit.person.id) }}">
                         {{- credit.person.name -}}
                       </a>
                     </td>
                     <td class="role">
-                      <a href="{{ url_for('.page', type_='role', title=credit.role.value) }}">
+                      <a href="{{ url_for('.page', type_='role', id=credit.role.id) }}">
                         {{- credit.role.value -}}
                       </a>
                     </td>
@@ -72,18 +72,18 @@
                   <tr>
                     {% if loop.first %}
                       <td rowspan="{{ loop.length }}" class="team">
-                        <a href="{{ url_for('.page', type_='team', title=credit.team.name) }}">
+                        <a href="{{ url_for('.page', type_='team', id=credit.team.id) }}">
                           {{- credit.team.name -}}
                         </a>
                       </td>
                     {% endif %}
                     <td class="name">
-                      <a href="{{ url_for('.page', type_='person', title=credit.person.name) }}">
+                      <a href="{{ url_for('.page', type_='person', id=credit.person.id) }}">
                         {{- credit.person.name -}}
                       </a>
                     </td>
                     <td class="role">
-                      <a href="{{ url_for('.page', type_='role', title=credit.role.value) }}">
+                      <a href="{{ url_for('.page', type_='role', id=credit.role.value) }}">
                         {{- credit.role.value -}}
                       </a>
                     </td>

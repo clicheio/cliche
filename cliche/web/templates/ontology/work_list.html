@@ -9,9 +9,9 @@
       </tr>
     </thead>
     <tbody>
-      {% for title in work_list %}
+      {% for id, title in work_list %}
         <tr>
-          <td><a href="{{ url_for('.page', title=title) }}">{{ title }}</a></td>
+          <td><a href="{{ url_for('.page', id=id) }}">{{ title }}</a></td>
         </tr>
       {% else %}
         <tr>
