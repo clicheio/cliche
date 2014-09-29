@@ -156,7 +156,7 @@ def select_by_relation(p, s_name='subject', o_name='object', page=1):
             o_name=o_name,
             filt=filt,
             limit=PAGE_ITEM_COUNT,
-            offset=PAGE_ITEM_COUNT * (page-1)
+            offset=PAGE_ITEM_COUNT * page
         )
     return select_dbpedia(query)
 
@@ -236,9 +236,9 @@ def load_page(page, relation_num):
             pass
 
     logger = get_task_logger(__name__ + '.load_page')
-    current_retrieved = ((page - 1) * PAGE_ITEM_COUNT) + len(res)
+    current_retrieved = ( page * PAGE_ITEM_COUNT) + len(res)
     logger.warning('loaded %d/%d', current_retrieved, relation_num)
-    if (relation_num <= current_retrieved and res == PAGE_ITEM_COUNT):
+    if (relation_num <= current_retrieved and len(res) == PAGE_ITEM_COUNT):
         load_page.delay(page + 1, current_retrieved + PAGE_ITEM_COUNT)
 
     if app.conf['CELERY_ALWAYS_EAGER']:
@@ -254,5 +254,5 @@ def load():
             'dbpedia-owl:author'
         ]
     )
-    for x in range(1, relation_num//PAGE_ITEM_COUNT):
+    for x in range(0, relation_num//PAGE_ITEM_COUNT + 1):
         load_page.delay(x, relation_num)
