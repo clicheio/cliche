@@ -48,11 +48,11 @@ def select_property(s, s_name='property', return_json=False):
 
     .. code-block:: json
 
-        [{
-            'property' : 'rdf:type'
-            },{
-            'property' : 'owl:sameAs'
-        }]
+       [{
+           'property' : 'rdf:type'
+           },{
+           'property' : 'owl:sameAs'
+       }]
     """
     prefix = {
         'owl:': 'http://www.w3.org/2002/07/owl#',
