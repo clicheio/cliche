@@ -65,62 +65,11 @@ class FixtureModule(types.ModuleType):
 
 
 @fixture
-<<<<<<< HEAD
 def fx_people(fx_session):
-    """create people: four artisits and Peter Jackson"""
-||||||| merged common ancestors
-def fx_awards(fx_session):
-    """create awards: Seiun Awqrd, Hugo Awqrd and Nebula Award"""
-    f = FixtureModule('fx_awards')
-    f.session = fx_session
-    f.seiun_award = Award(name='Seiun Award')
-    fx_session.add(f.seiun_award)
-    f.hugo_award = Award(name='Hugo Award')
-    fx_session.add(f.hugo_award)
-    f.nebula_award = Award(name='Nebula Award')
-    fx_session.add(f.nebula_award)
-    fx_session.flush()
-    return f
-
-
-@fixture
-def fx_people(fx_session, fx_awards):
-    """create people: four artisits and Peter Jackson who won
-    Hugo and Nebula Award
-    """
-=======
-def fx_awards(fx_session):
-    """create awards: Seiun Awqrd, Hugo Awqrd and Nebula Award"""
-    f = FixtureModule('fx_awards')
-    f.session = fx_session
-
-    # create awards
-    f.seiun_award = Award(name='Seiun Award')
-    fx_session.add(f.seiun_award)
-    f.hugo_award = Award(name='Hugo Award')
-    fx_session.add(f.hugo_award)
-    f.nebula_award = Award(name='Nebula Award')
-    fx_session.add(f.nebula_award)
-
-    fx_session.flush()
-    return f
-
-
-@fixture
-def fx_people(fx_session, fx_awards):
-    """create people: four artists and Peter Jackson who won
-    Hugo and Nebula Award
-    """
->>>>>>> Test on Title, and stylistic change
+    """create people: four artists and Peter Jackson"""
     f = FixtureModule('fx_people')
-<<<<<<< HEAD
-||||||| merged common ancestors
-    f += fx_awards
-=======
-    f += fx_awards
 
     # create four artists of 'CLAMP' team
->>>>>>> Test on Title, and stylistic change
     f.clamp_member_1 = Person(name='Nanase Ohkawa',
                               dob=datetime.date(1967, 5, 2))
     fx_session.add(f.clamp_member_1)
@@ -254,20 +203,8 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     f += fx_genres
     f += fx_franchises
 
-<<<<<<< HEAD
-    f.cardcaptor_sakura = Work(name='Cardcaptor Sakura',
-                               published_at=datetime.date(1996, 11, 22))
-||||||| merged common ancestors
-    f.cardcaptor_sakura = Work(name='Cardcaptor Sakura, Volume 1',
-                               published_at=datetime.date(1996, 11, 22),
-                               number_of_pages=187,
-                               isbn='4063197433')
-    f.cardcaptor_sakura.awards.update({f.seiun_award})
-=======
     # create 'Cardcaptor Sakura'
     f.cardcaptor_sakura = Work(published_at=datetime.date(1996, 11, 22))
-    f.cardcaptor_sakura.awards.update({f.seiun_award})
->>>>>>> Test on Title, and stylistic change
     f.cardcaptor_sakura.genres.update({f.comic, f.romance})
     fx_session.add(f.cardcaptor_sakura)
 
