@@ -26,19 +26,6 @@
     </tr>
   {% endif %}
 
-  {% if work.awards %}
-    <tr class="awards">
-      <th scope="row">awards</th>
-      <td>
-        <ul>
-          {% for val in work.awards %}
-            <li><a href="{{ url_for('.page', type_='award', title=val.name) }}">{{ val.name }}</a></li>
-          {% endfor %}
-        </ul>
-      </td>
-    </tr>
-  {% endif %}
-
   {% if work.genres %}
     <tr class="genres">
       <th scope="row">genres</th>

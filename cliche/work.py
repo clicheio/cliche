@@ -10,11 +10,10 @@ from sqlalchemy.sql.functions import now
 from sqlalchemy.types import Date, DateTime, Integer, String
 
 from .orm import Base
-from .people import Person
 from .sqltypes import EnumType
 
-__all__ = ('Award', 'AwardWinner', 'Credit', 'Franchise', 'Genre', 'Role',
-           'Work', 'WorkAward', 'WorkFranchise', 'WorkGenre', 'World')
+__all__ = ('Credit', 'Franchise', 'Genre', 'Role', 'Work', 'WorkFranchise',
+           'WorkGenre', 'World')
 
 
 class Role(enum.Enum):
@@ -25,74 +24,6 @@ class Role(enum.Enum):
     director = 'director'
     editor = 'editor'
     unknown = 'unknown'
-
-
-class Award(Base):
-    """Award won by the person or for the creative work."""
-
-    #: (:class:`int`) The primary key integer.
-    id = Column(Integer, primary_key=True)
-
-    #: (:class:`str`) The name of the award.
-    name = Column(String, nullable=False, index=True)
-
-    #: (:class:`collections.abc.MutableSet`) The set of
-    #: :class:`AwardWinner`\ s that the award has.
-    award_winners = relationship('AwardWinner',
-                                 cascade='delete, merge, save-update',
-                                 collection_class=set)
-
-    #: (:class:`collections.abc.MutableSet`) The set of
-    #: :class:`cliche.people.Person`\ s that won the award.
-    persons = relationship(Person,
-                           secondary='award_winners',
-                           collection_class=set)
-
-    #: (:class:`collections.abc.MutableSet`) The set of
-    #: :class:`WorkAward`\ s that the award has.
-    work_awards = relationship('WorkAward',
-                               cascade='delete, merge, save-update',
-                               collection_class=set)
-
-    #: (:class:`collections.abc.MutableSet`) The set of
-    #: :class:`Work`\ s that won the award.
-    works = relationship('Work',
-                         secondary='work_awards',
-                         collection_class=set)
-
-    #: (:class:`datetime.datetime`) The date and time on which
-    #: the record was created.
-    created_at = Column(DateTime(timezone=True),
-                        nullable=False,
-                        default=now(),
-                        index=True)
-
-    __tablename__ = 'awards'
-    __repr_columns__ = id, name
-
-
-class AwardWinner(Base):
-    """Relationship between the person and the award."""
-
-    #: (:class:`int`) :class:`cliche.people.Person.id` of :attr:`person`.
-    person_id = Column(Integer, ForeignKey(Person.id), primary_key=True)
-
-    #: (:class:`cliche.people.Person`) The person that won the :attr:`award`.
-    person = relationship(Person)
-
-    #: (:class:`int`) :class:`Award.id` of :attr:`award`.
-    award_id = Column(Integer, ForeignKey(Award.id), primary_key=True)
-
-    #: (:class:`Award`) The award that the :attr:`person` won.
-    award = relationship(Award)
-
-    #: (:class:`datetime.datetime`) The date and time on which
-    #: the record was created.
-    created_at = Column(DateTime(timezone=True), nullable=False,
-                        default=now())
-
-    __tablename__ = 'award_winners'
-    __repr_columns__ = person_id, award_id
 
 
 class Credit(Base):
@@ -223,18 +154,6 @@ class Work(Base):
     isbn = Column(String)
 
     #: (:class:`collections.abc.MutableSet`) The set of
-    #: :class:`WorkAward`\ s that the work has.
-    work_awards = relationship('WorkAward',
-                               cascade='delete, merge, save-update',
-                               collection_class=set)
-
-    #: (:class:`collections.abc.MutableSet`) The set of
-    #: :class:`Award`\ s that the work won.
-    awards = relationship(Award,
-                          secondary='work_awards',
-                          collection_class=set)
-
-    #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkGenre`\ s that the work has.
     work_genres = relationship('WorkGenre',
                                cascade='delete, merge, save-update',
@@ -273,30 +192,6 @@ class Work(Base):
 
     __tablename__ = 'works'
     __repr_columns__ = id, name
-
-
-class WorkAward(Base):
-    """Relationship between the work and the award."""
-
-    #: (:class:`int`) :class:`Work.id` of :attr:`work`.
-    work_id = Column(Integer, ForeignKey(Work.id), primary_key=True)
-
-    #: (:class:`Work`) The work that won the :attr:`award`.
-    work = relationship(Work)
-
-    #: (:class:`int`) :class:`Award.id` of :attr:`award`.
-    award_id = Column(Integer, ForeignKey(Award.id), primary_key=True)
-
-    #: (:class:`Award`) The award that the :attr:`work` won.
-    award = relationship(Award)
-
-    #: (:class:`datetime.datetime`) The date and time on which
-    #: the record was created.
-    created_at = Column(DateTime(timezone=True), nullable=False,
-                        default=now())
-
-    __tablename__ = 'work_awards'
-    __repr_columns__ = work_id, award_id
 
 
 class WorkFranchise(Base):

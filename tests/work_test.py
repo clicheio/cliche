@@ -1,12 +1,4 @@
-from cliche.work import AwardWinner, Credit, Role
-
-
-def test_work_wins_awards(fx_works, fx_awards):
-    assert fx_works.cardcaptor_sakura.awards == {fx_awards.seiun_award}
-
-
-def test_award_was_given_to_works(fx_works, fx_awards):
-    assert fx_awards.seiun_award.works == {fx_works.cardcaptor_sakura}
+from cliche.work import Credit, Role
 
 
 def test_genres_of_work(fx_works, fx_genres):
@@ -17,17 +9,6 @@ def test_genres_of_work(fx_works, fx_genres):
 
 def test_what_belong_to_genre(fx_works, fx_genres):
     assert fx_genres.romance.works == {fx_works.cardcaptor_sakura}
-
-
-def test_person_has_awards(fx_people, fx_awards):
-    assert fx_people.peter_jackson.awards == {
-        fx_awards.hugo_award,
-        fx_awards.nebula_award
-    }
-
-
-def test_winners_of_award(fx_people, fx_awards):
-    assert fx_awards.hugo_award.persons == {fx_people.peter_jackson}
 
 
 def test_person_made_works(fx_people, fx_works):
@@ -80,44 +61,6 @@ def test_work_belongs_to_franchise(fx_works, fx_franchises):
 def test_franchise_belongs_to_world(fx_franchises, fx_worlds):
     assert fx_franchises.lord_of_rings.world == fx_worlds.middle_earth
     assert fx_franchises.iron_man.world == fx_worlds.marvel_universe
-
-
-def test_award_winner_removed_with_award(fx_session, fx_awards, fx_people):
-    hugo_award_id = fx_awards.hugo_award.id
-
-    # before delete the award.
-    num_award_winners = fx_session.query(AwardWinner).\
-        filter_by(award_id=hugo_award_id).\
-        count()
-    assert num_award_winners == 1
-
-    fx_session.delete(fx_awards.hugo_award)
-    fx_session.flush()
-
-    # after delete the award.
-    num_award_winners = fx_session.query(AwardWinner).\
-        filter_by(award_id=hugo_award_id).\
-        count()
-    assert num_award_winners == 0
-
-
-def test_award_winner_removed_with_person(fx_session, fx_awards, fx_people):
-    peter_jackson_id = fx_people.peter_jackson.id
-
-    # before delete the person.
-    num_award_winners = fx_session.query(AwardWinner).\
-        filter_by(person_id=peter_jackson_id).\
-        count()
-    assert num_award_winners == 2
-
-    fx_session.delete(fx_people.peter_jackson)
-    fx_session.flush()
-
-    # after delete the person.
-    num_award_winners = fx_session.query(AwardWinner).\
-        filter_by(person_id=peter_jackson_id).\
-        count()
-    assert num_award_winners == 0
 
 
 def test_credit_removed_with_work(fx_session, fx_works, fx_people):

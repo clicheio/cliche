@@ -3,7 +3,7 @@ import datetime
 from lxml.html import document_fromstring
 
 from cliche.people import Person, Team
-from cliche.work import Award, Credit, Genre, Role, Work
+from cliche.work import Credit, Genre, Role, Work
 
 
 def assert_contain_text(text, expr, data):
@@ -75,21 +75,6 @@ def test_work_page(fx_session, fx_flask_client):
 
     rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
     assert_contain_text('1931520720', 'tr.isbn>td', rv.data)
-
-    work.awards.add(Award(name='Nebula Award'))
-    with fx_session.begin():
-        fx_session.add(work)
-
-    rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
-    assert_contain_text('Nebula Award', 'tr.awards>td', rv.data)
-
-    work.awards.add(Award(name='Sturgeon Award'))
-    with fx_session.begin():
-        fx_session.add(work)
-
-    rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
-    assert_contain_text('Nebula Award', 'tr.awards>td', rv.data)
-    assert_contain_text('Sturgeon Award', 'tr.awards>td', rv.data)
 
     work.genres.add(Genre(name='Short Stories'))
     with fx_session.begin():
