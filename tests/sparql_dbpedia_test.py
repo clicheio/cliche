@@ -18,7 +18,9 @@ def test_select_property(monkeypatch):
 def test_count_by_relation(monkeypatch):
     class FakeQuery(object):
         def convert(self):
-            return {"results": {"bindings": [{"callret-0": {"value": "251083"}}]}}
+            return {"results":
+                    {"bindings": [{"callret-0": {"value": "251083"}}]}
+                    }
 
     monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", FakeQuery)
     res = dbpedia.count_by_relation(
