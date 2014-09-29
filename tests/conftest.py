@@ -9,7 +9,7 @@ from yaml import dump
 
 from cliche.people import Person, Team
 from cliche.web.app import app
-from cliche.work import Award, Credit, Franchise, Genre, Role, Work, World
+from cliche.work import Credit, Franchise, Genre, Role, Work, World
 
 from .db import DEFAULT_DATABASE_URL, get_session
 
@@ -64,27 +64,9 @@ class FixtureModule(types.ModuleType):
 
 
 @fixture
-def fx_awards(fx_session):
-    """create awards: Seiun Awqrd, Hugo Awqrd and Nebula Award"""
-    f = FixtureModule('fx_awards')
-    f.session = fx_session
-    f.seiun_award = Award(name='Seiun Award')
-    fx_session.add(f.seiun_award)
-    f.hugo_award = Award(name='Hugo Award')
-    fx_session.add(f.hugo_award)
-    f.nebula_award = Award(name='Nebula Award')
-    fx_session.add(f.nebula_award)
-    fx_session.flush()
-    return f
-
-
-@fixture
-def fx_people(fx_session, fx_awards):
-    """create people: four artisits and Peter Jackson who won
-    Hugo and Nebula Award
-    """
+def fx_people(fx_session):
+    """create people: four artisits and Peter Jackson"""
     f = FixtureModule('fx_people')
-    f += fx_awards
     f.clamp_member_1 = Person(name='Nanase Ohkawa',
                               dob=datetime.date(1967, 5, 2))
     fx_session.add(f.clamp_member_1)
@@ -99,8 +81,6 @@ def fx_people(fx_session, fx_awards):
     fx_session.add(f.clamp_member_4)
     f.peter_jackson = Person(name='Peter Jackson',
                              dob=datetime.date(1961, 10, 31))
-    f.peter_jackson.awards.update({fx_awards.hugo_award,
-                                   fx_awards.nebula_award})
     fx_session.add(f.peter_jackson)
     fx_session.flush()
     return f
@@ -176,10 +156,9 @@ def fx_franchises(fx_session, fx_worlds):
 
 
 @fixture
-def fx_works(fx_session, fx_teams, fx_awards, fx_genres, fx_franchises):
+def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     """Create *Cardcaptor Sakura* (comic book),
     which made by CLAMP members,
-    which won Seiun Award,
     which belongs to comic and romance genres.
 
     Create *The Lord of the Rings: The Fellowship of the Ring* (flim),
@@ -192,15 +171,11 @@ def fx_works(fx_session, fx_teams, fx_awards, fx_genres, fx_franchises):
     """
     f = FixtureModule('fx_works')
     f += fx_teams
-    f += fx_awards
     f += fx_genres
     f += fx_franchises
 
-    f.cardcaptor_sakura = Work(name='Cardcaptor Sakura, Volume 1',
-                               published_at=datetime.date(1996, 11, 22),
-                               number_of_pages=187,
-                               isbn='4063197433')
-    f.cardcaptor_sakura.awards.update({f.seiun_award})
+    f.cardcaptor_sakura = Work(name='Cardcaptor Sakura',
+                               published_at=datetime.date(1996, 11, 22))
     f.cardcaptor_sakura.genres.update({f.comic, f.romance})
     fx_session.add(f.cardcaptor_sakura)
     fx_session.flush()

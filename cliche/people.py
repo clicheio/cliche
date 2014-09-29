@@ -46,18 +46,6 @@ class Person(Base):
                          collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
-    #: :class:`cliche.work.AwardWinner`\ s that the person has.
-    award_winners = relationship('AwardWinner',
-                                 cascade='delete, merge, save-update',
-                                 collection_class=set)
-
-    #: (:class:`collections.abc.MutableSet`) The set of
-    #: :class:`cliche.work.Award`\ s that the person won.
-    awards = relationship('Award',
-                          secondary='award_winners',
-                          collection_class=set)
-
-    #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`cliche.work.Credit`\ s that the person has.
     credits = relationship('Credit',
                            cascade='delete, merge, save-update',
