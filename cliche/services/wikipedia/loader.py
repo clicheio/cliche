@@ -15,7 +15,6 @@ Loading DBpedia tables into a relational database
 References
 ----------
 """
-from celery.utils.log import get_task_logger
 from sqlalchemy.exc import IntegrityError
 from SPARQLWrapper import JSON, SPARQLWrapper
 
@@ -129,8 +128,8 @@ def select_by_relation(p, s_name='subject', o_name='object', page=1):
     a kind of ontology properties.
 
     :param list p: List of properties between s_name and o_name.
-    :param str s_name: Name of subject. It doesn't affect to the results.
-    :param str o_name: Name of object. It doesn't affect to the results.
+    :param str s_name: Name of subject. It doesn't affect the results.
+    :param str o_name: Name of object. It doesn't affect the results.
     :param page: The offset of query, each page will return 100 entities.
     :type page: integer
     :return: list of a dict mapping keys to the matching table row fetched.
@@ -191,7 +190,7 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
     """List of **s** which as property as **entities**
 
     :param str s: Ontology name of subject.
-    :param str s_name: Name of subject. It doesn't affect to the results.
+    :param str s_name: Name of subject. It doesn't affect the results.
     :param list entities: List of property ontologies.
     :param page: The offset of query, each page will return 100 entities.
     :type page: integer
@@ -291,10 +290,8 @@ def load_page(page, relation_num):
         except IntegrityError:
             pass
 
-    logger = get_task_logger(__name__ + '.load_page')
     result_len = len(res)
     current_retrieved = (page * PAGE_ITEM_COUNT) + result_len
-    logger.warning('loaded %d/%d', current_retrieved, relation_num)
     if (relation_num <= current_retrieved and result_len == PAGE_ITEM_COUNT):
         load_page.delay(page + 1, current_retrieved + PAGE_ITEM_COUNT)
 
