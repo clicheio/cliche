@@ -35,6 +35,28 @@ def select_dbpedia(query):
 
 
 def select_property(s, s_name='property', return_json=False):
+    """Get properties of a ontology.
+
+    :param str s: Ontology name of subject.
+    :return: list of objects which contain properties.
+    :rtype: :class:`list`
+
+
+    For example:
+
+    .. code-block:: console
+
+        select_property(s='dbpedia-owl:Writer', json=True)
+
+
+    .. code-block:: json
+
+        [{
+            'property' : 'rdf:type'
+            },{
+            'property' : 'owl:sameAs'
+        }]
+    """
     prefix = {
         'owl:': 'http://www.w3.org/2002/07/owl#',
         'xsd:': 'http://www.w3.org/2001/XMLSchema#',
@@ -72,7 +94,11 @@ def select_property(s, s_name='property', return_json=False):
 
 
 def count_by_relation(p):
-    """Get count of all works"""
+    """Get count of all works
+
+    :param list p: List of properties
+    :rtype: int
+    """
 
     if not p:
         raise ValueError('at least one property required')
@@ -162,7 +188,37 @@ def select_by_relation(p, s_name='subject', o_name='object', page=1):
 
 
 def select_by_class(s, s_name='subject', entities=None, page=1):
-    """List of Artist and ComicsCreator"""
+    """List of **s** which as property as **entities**
+
+    :param str s: Ontology name of subject.
+    :param str s_name: Name of subject. It doesn't affect to the results.
+    :param list entities: List of property ontologies.
+    :param page: The offset of query, each page will return 100 entities.
+    :type page: integer
+    :return: list of a dict mapping keys which have 'entities' as property.
+    :rtype: :class:`list`
+
+    For example:
+
+    .. code-block:: console
+
+        select_by_class (s_name='author',
+        s=['dbpedia-owl:Artist', 'dbpedia-owl:ComicsCreator'],
+        entities=['dbpedia-owl:birthDate', 'dbpprop:shortDescription'])
+
+
+    .. code-block:: json
+
+        [{
+
+            'author': 'http://dbpedia.org/page/J._K._Rowling',
+            'name': 'J. K. Rowling',
+            'dob' : '1965-07-31',
+            'shortDescription' : 'English writer. Author of the Harry ...'
+            },{
+            'author': ...
+        }]
+    """
     if not s:
         raise ValueError('at least one class required')
     if entities is None:
