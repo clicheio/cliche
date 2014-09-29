@@ -147,12 +147,6 @@ class Work(Base):
     #: (:class:`datetime.date`) The publication date.
     published_at = Column(Date)
 
-    #: (:class:`int`) The number of pages in the book.
-    number_of_pages = Column(Integer)
-
-    #: (:class:`str`) The ISBN of the book.
-    isbn = Column(String)
-
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkGenre`\ s that the work has.
     work_genres = relationship('WorkGenre',

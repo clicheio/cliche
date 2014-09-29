@@ -62,20 +62,6 @@ def test_work_page(fx_session, fx_flask_client):
     rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
     assert_contain_text('2010-10-26', 'tr.published_at>td', rv.data)
 
-    work.number_of_pages = 281
-    with fx_session.begin():
-        fx_session.add(work)
-
-    rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
-    assert_contain_text('281', 'tr.number_of_pages>td', rv.data)
-
-    work.isbn = '1931520720'
-    with fx_session.begin():
-        fx_session.add(work)
-
-    rv = fx_flask_client.get('/work/Story%20of%20Your%20Life/')
-    assert_contain_text('1931520720', 'tr.isbn>td', rv.data)
-
     work.genres.add(Genre(name='Short Stories'))
     with fx_session.begin():
         fx_session.add(work)

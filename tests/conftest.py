@@ -174,10 +174,8 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     f += fx_genres
     f += fx_franchises
 
-    f.cardcaptor_sakura = Work(name='Cardcaptor Sakura, Volume 1',
-                               published_at=datetime.date(1996, 11, 22),
-                               number_of_pages=187,
-                               isbn='4063197433')
+    f.cardcaptor_sakura = Work(name='Cardcaptor Sakura',
+                               published_at=datetime.date(1996, 11, 22))
     f.cardcaptor_sakura.genres.update({f.comic, f.romance})
     fx_session.add(f.cardcaptor_sakura)
     fx_session.flush()
