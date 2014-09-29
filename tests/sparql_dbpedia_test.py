@@ -15,6 +15,22 @@ def test_select_property(monkeypatch):
     assert type(res[0]['property']) == str
 
 
+def test_count_by_relation(monkeypatch):
+    class FakeQuery(object):
+        def convert(self):
+            return {"results": {"bindings": [{'callret-0': '251083'}]}}
+
+    monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", FakeQuery)
+    res = dbpedia.count_by_realation(
+        p=[
+            'dbpprop:author',
+            'dbpedia-owl:writer',
+            'dbpedia-owl:author'
+        ]
+    )
+    assert res > 250000
+
+
 def test_select_by_relation(monkeypatch):
     class FakeQuery(object):
         offset = 0

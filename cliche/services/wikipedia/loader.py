@@ -71,6 +71,31 @@ def select_property(s, s_name='property', return_json=False):
         return tuples
 
 
+def count_by_relation(p):
+    """Get count of all works"""
+
+    if not p:
+        raise ValueError('at least one property required')
+
+    filt = '?p = {}'.format(p[0])
+    for x in p[1:]:
+        filt += '\n            || ?p = {}'.format(x)
+
+    query = '''PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
+    PREFIX dbpprop: <http://dbpedia.org/property/>
+    SELECT DISTINCT
+        count(?work)
+    WHERE {{
+        ?work ?p ?author
+    FILTER(
+        (  {filt}  )
+        && STRSTARTS(STR(?work), "http://dbpedia.org/"))
+    }}
+    '''.format(filt=filt)
+
+    return int(select_dbpedia(query)[0]['callret-0'])
+
+
 def select_by_relation(p, s_name='subject', o_name='object', page=1):
     """Find author of somethings
 
@@ -186,7 +211,7 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
 
 
 @app.task
-def load_page(page):
+def load_page(page, relation_num):
     session = get_session()
     res = select_by_relation(
         p=[
@@ -210,12 +235,24 @@ def load_page(page):
         except IntegrityError:
             pass
 
+    logger = get_task_logger(__name__ + '.load_page')
+    current_retrieved = ((page - 1) * PAGE_ITEM_COUNT) + len(res)
+    logger.warning('loaded %d/%d', current_retrieved, relation_num)
+    if (relation_num <= current_retrieved and res == PAGE_ITEM_COUNT):
+        load_page.delay(page + 1, current_retrieved + PAGE_ITEM_COUNT)
+
     if app.conf['CELERY_ALWAYS_EAGER']:
         return
-
-    load_page.delay(page+1)
 
 
 @app.task
 def load():
-    load_page.delay(1)
+    relation_num = count_by_relation(
+        p=[
+            'dbpprop:author',
+            'dbpedia-owl:writer',
+            'dbpedia-owl:author'
+        ]
+    )
+    for x in range(1, relation_num//PAGE_ITEM_COUNT):
+        load_page.delay(x, relation_num)
