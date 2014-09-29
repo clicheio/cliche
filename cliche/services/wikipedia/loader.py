@@ -41,9 +41,7 @@ def select_property(s, s_name='property', return_json=False):
     :rtype: :class:`list`
 
 
-    For example:
-
-    .. code-block:: console
+    For example::
 
         select_property(s='dbpedia-owl:Writer', json=True)
 
@@ -96,7 +94,7 @@ def count_by_relation(p):
     """Get count of all works
 
     :param list p: List of properties
-    :rtype: int
+    :rtype: :class:`int`
     """
 
     if not p:
@@ -122,7 +120,7 @@ def count_by_relation(p):
 
 
 def select_by_relation(p, s_name='subject', o_name='object', page=1):
-    """Find author of somethings
+    """Find author of something
 
     Retrieves the list of s_name and o_name, the relation is
     a kind of ontology properties.
@@ -131,13 +129,11 @@ def select_by_relation(p, s_name='subject', o_name='object', page=1):
     :param str s_name: Name of subject. It doesn't affect the results.
     :param str o_name: Name of object. It doesn't affect the results.
     :param page: The offset of query, each page will return 100 entities.
-    :type page: integer
+    :type page: :class:`int`
     :return: list of a dict mapping keys to the matching table row fetched.
     :rtype: :class:`list`
 
-    For example:
-
-    .. code-block:: console
+    For example::
 
         select_by_relation(s_name='work',
         p=['dbpprop:author', 'dbpedia-owl:writer', 'dbpedia-owl:author'],
@@ -146,14 +142,14 @@ def select_by_relation(p, s_name='subject', o_name='object', page=1):
 
     .. code-block:: json
 
-        [{
-            'work':'http://dbpedia.org/resource/The_Frozen_Child',
-            'author': 'http://dbpedia.org/resource/József_Eötvös
-            http://dbpedia.org/resource/Ede_Sas'
-            },{
-            'work':'http://dbpedia.org/resource/Slaves_of_Sleep',
-            'author': 'http://dbpedia.org/resource/L._Ron_Hubbard'
-        }]
+       [{
+           'work':'http://dbpedia.org/resource/The_Frozen_Child',
+           'author': 'http://dbpedia.org/resource/József_Eötvös
+           http://dbpedia.org/resource/Ede_Sas'
+           },{
+           'work':'http://dbpedia.org/resource/Slaves_of_Sleep',
+           'author': 'http://dbpedia.org/resource/L._Ron_Hubbard'
+       }]
 
     When the row has more than two items, the items are combined by EOL.
     """
@@ -193,13 +189,11 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
     :param str s_name: Name of subject. It doesn't affect the results.
     :param list entities: List of property ontologies.
     :param page: The offset of query, each page will return 100 entities.
-    :type page: integer
+    :type page: :class:`int`
     :return: list of a dict mapping keys which have 'entities' as property.
     :rtype: :class:`list`
 
-    For example:
-
-    .. code-block:: console
+    For example::
 
         select_by_class (s_name='author',
         s=['dbpedia-owl:Artist', 'dbpedia-owl:ComicsCreator'],
@@ -208,15 +202,14 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
 
     .. code-block:: json
 
-        [{
-
-            'author': 'http://dbpedia.org/page/J._K._Rowling',
-            'name': 'J. K. Rowling',
-            'dob' : '1965-07-31',
-            'shortDescription' : 'English writer. Author of the Harry ...'
-            },{
-            'author': ...
-        }]
+       [{
+           'author': 'http://dbpedia.org/page/J._K._Rowling',
+           'name': 'J. K. Rowling',
+           'dob' : '1965-07-31',
+           'shortDescription' : 'English writer. Author of the Harry ...'
+           },{
+           'author': ...
+       }]
     """
     if not s:
         raise ValueError('at least one class required')
@@ -260,7 +253,7 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
     OFFSET {offset}'''.format(
         s_name=s_name,
         limit=PAGE_ITEM_COUNT,
-        offset=PAGE_ITEM_COUNT * (page-1)
+        offset=PAGE_ITEM_COUNT * (page - 1)
     )
     return select_dbpedia(query)
 
@@ -308,5 +301,5 @@ def load():
             'dbpedia-owl:author'
         ]
     )
-    for x in range(0, relation_num//PAGE_ITEM_COUNT + 1):
+    for x in range(0, relation_num // PAGE_ITEM_COUNT + 1):
         load_page.delay(x, relation_num)
