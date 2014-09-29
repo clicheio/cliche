@@ -9,10 +9,10 @@ from sqlalchemy import Column, String
 from ...orm import Base
 
 
-__all__ = 'WorkAuthor'
+__all__ = 'workauthor'
 
 
-class WorkAuthor(Base):
+class workauthor(Base):
     """Representation of a work."""
 
     work = Column(String, primary_key=True)

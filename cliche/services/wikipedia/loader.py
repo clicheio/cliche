@@ -19,7 +19,7 @@ from celery.utils.log import get_task_logger
 from sqlalchemy.exc import IntegrityError
 from SPARQLWrapper import JSON, SPARQLWrapper
 
-from .workauthor import WorkAuthor
+from .workauthor import workauthor
 from ...celery import app, get_session
 
 
@@ -107,7 +107,7 @@ def select_by_relation(p, s_name='subject', o_name='object', page=1):
     :param str o_name: Name of object. It doesn't affect to the results.
     :param page: The offset of query, each page will return 100 entities.
     :type page: integer
-    :return: list of a dict mapping keys to the corresponding table row fetched.
+    :return: list of a dict mapping keys to the matching table row fetched.
     :rtype: :class:`list`
 
     For example:
@@ -227,7 +227,7 @@ def load_page(page, relation_num):
     for item in res:
         try:
             with session.begin():
-                new_entity = WorkAuthor(
+                new_entity = workauthor(
                     work=item['work'],
                     author=item['author'],
                 )
