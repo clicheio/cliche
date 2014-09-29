@@ -35,7 +35,7 @@ class Credit(Base):
     work_id = Column(Integer, ForeignKey('works.id'), primary_key=True)
 
     #: (:class:`Work`) The work which the :attr:`person` made.
-    work = relationship('Work')
+    work = relationship(lambda: Work)
 
     #: (:class:`int`) :class:`cliche.people.Person.id` of :attr:`person`.
     person_id = Column(Integer, ForeignKey('people.id'), primary_key=True)
@@ -88,7 +88,7 @@ class Franchise(Base):
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`Work`\ s that belongs to the franchise.
-    works = relationship('Work',
+    works = relationship(lambda: Work,
                          secondary='work_franchises',
                          collection_class=set)
 
@@ -118,7 +118,7 @@ class Genre(Base):
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`Work`\ s that fall into the genre.
-    works = relationship('Work',
+    works = relationship(lambda: Work,
                          secondary='work_genres',
                          collection_class=set)
 

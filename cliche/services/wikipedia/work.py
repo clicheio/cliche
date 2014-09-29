@@ -1,4 +1,4 @@
-""":mod:`cliche.services.wikipedia.workauthor` --- Data entities for Wikipedia_
+""":mod:`cliche.services.wikipedia.work` --- Data entities for Wikipedia_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _Wikipedia: http://wikipedia.org/
@@ -9,10 +9,10 @@ from sqlalchemy import Column, String
 from ...orm import Base
 
 
-__all__ = 'workauthor'
+__all__ = 'Work',
 
 
-class workauthor(Base):
+class Work(Base):
     """Representation of a work."""
 
     work = Column(String, primary_key=True)

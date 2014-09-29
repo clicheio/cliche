@@ -1,6 +1,6 @@
 import json
 from cliche.services.wikipedia import loader as dbpedia
-from cliche.services.wikipedia.workauthor import workauthor
+from cliche.services.wikipedia.work import Work
 
 
 def test_loader(monkeypatch, fx_session, fx_celery_app):
@@ -32,5 +32,5 @@ def test_loader(monkeypatch, fx_session, fx_celery_app):
 
     monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", FakeQuery)
     dbpedia.load_page(1, relation_num)
-    num = fx_session.query(workauthor).count()
+    num = fx_session.query(Work).count()
     assert num == 100

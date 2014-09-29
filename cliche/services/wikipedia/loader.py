@@ -18,7 +18,7 @@ References
 from sqlalchemy.exc import IntegrityError
 from SPARQLWrapper import JSON, SPARQLWrapper
 
-from .workauthor import workauthor
+from .work import Work
 from ...celery import app, get_session
 
 
@@ -275,7 +275,7 @@ def load_page(page, relation_num):
     for item in res:
         try:
             with session.begin():
-                new_entity = workauthor(
+                new_entity = Work(
                     work=item['work'],
                     author=item['author'],
                 )
