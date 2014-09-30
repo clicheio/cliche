@@ -15,8 +15,8 @@ Loading DBpedia tables into a relational database
 References
 ----------
 """
-from sqlalchemy.exc import IntegrityError
 from SPARQLWrapper import JSON, SPARQLWrapper
+from sqlalchemy.exc import IntegrityError
 
 from .work import Work
 from ...celery import app, get_session

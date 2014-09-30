@@ -1,4 +1,5 @@
 import json
+
 from cliche.services.wikipedia import loader as dbpedia
 from cliche.services.wikipedia.work import Work
 
