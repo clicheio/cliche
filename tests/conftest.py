@@ -7,6 +7,7 @@ from click.testing import CliRunner
 from pytest import fixture, yield_fixture
 from yaml import dump
 
+from cliche.celery import app as celery_app
 from cliche.people import Person, Team
 from cliche.web.app import app
 from cliche.work import Credit, Franchise, Genre, Role, Work, World
@@ -252,3 +253,9 @@ def fx_cfg_yml_file(fx_tmpdir):
 def fx_flask_client():
     app.config['TESTING'] = True
     return app.test_client()
+
+
+@fixture
+def fx_celery_app():
+    celery_app.conf['CELERY_ALWAYS_EAGER'] = True
+    return celery_app
