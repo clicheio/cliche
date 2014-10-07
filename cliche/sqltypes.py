@@ -4,15 +4,17 @@
 """
 import enum
 
-from sqlalchemy.types import Enum, SchemaType, TypeDecorator
+from babel import Locale
+from sqlalchemy.types import Enum, SchemaType, String, TypeDecorator
 
-__all__ = 'EnumType',
+__all__ = 'EnumType', 'LocaleType'
 
 
 class EnumType(TypeDecorator, SchemaType):
-    """Enum type to be used as :class:`enum.Enum` in Python standard library.
-    It inherits :class:`sqlalchemy.types.SchemaType` since it requires
-    schema-level DDL. PostgreSQL ENUM type must be explicitly created/dropped.
+    """Custom enum type to be used as :class:`enum.Enum`in Python standard
+    library. It inherits :class:`sqlalchemy.types.SchemaType` since it
+    requires schema-level DDL. PostgreSQL ENUM type defined in an Alembic
+    script must be explicitly created/dropped.
     """
 
     impl = Enum
@@ -35,3 +37,17 @@ class EnumType(TypeDecorator, SchemaType):
     @property
     def python_type(self):
         return self._enum_class
+
+
+class LocaleType(TypeDecorator):
+    """Custom locale type to be used as :class:`babel.Locale`."""
+
+    impl = String
+
+    def process_bind_param(self, value, dialect):
+        if not isinstance(value, Locale):
+            raise TypeError('expected babel.Locale instance')
+        return '{}_{}'.format(value.language, value.territory)
+
+    def process_result_value(self, value, dialect):
+        return Locale.parse(value)

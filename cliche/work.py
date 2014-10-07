@@ -140,7 +140,7 @@ class Title(Base):
     work_id = Column(Integer, ForeignKey('works.id'), primary_key=True)
 
     #: (:class:`Work`) The work that has :attr:`title`.
-    work = relationship('Work')
+    work = relationship(lambda: Work)
 
     #: (:class:`str`) The title of the work.
     title = Column(String, primary_key=True)

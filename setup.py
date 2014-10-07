@@ -48,6 +48,8 @@ install_requires = {
     'SPARQLWrapper >= 1.6.2',
     # CLI
     'click >= 3.3',
+    # Locale
+    'Babel >= 1.3',
 }
 
 if sys.version_info < (3, 4, 0):
