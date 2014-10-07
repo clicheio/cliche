@@ -1,6 +1,6 @@
 import json
 
-from cliche.services.wikipedia import loader as dbpedia
+from cliche.services.wikipedia import crawler as dbpedia
 
 
 def test_select_property(monkeypatch):
