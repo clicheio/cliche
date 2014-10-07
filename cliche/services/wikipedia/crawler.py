@@ -1,7 +1,7 @@
-""":mod:`cliche.services.wikipedia.loader` --- Wikipedia_ loader
+""":mod:`cliche.services.wikipedia.crawler` --- Wikipedia_ crawler
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Loading DBpedia tables into a relational database
+Crawling DBpedia tables into a relational database
 
 .. seealso::
 
@@ -259,7 +259,7 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
 
 
 @app.task
-def load_page(page, relation_num):
+def crawl_page(page, relation_num):
     session = get_session()
     res = select_by_relation(
         p=[
@@ -286,14 +286,14 @@ def load_page(page, relation_num):
     result_len = len(res)
     current_retrieved = (page * PAGE_ITEM_COUNT) + result_len
     if (relation_num <= current_retrieved and result_len == PAGE_ITEM_COUNT):
-        load_page.delay(page + 1, current_retrieved + PAGE_ITEM_COUNT)
+        crawl_page.delay(page + 1, current_retrieved + PAGE_ITEM_COUNT)
 
     if app.conf['CELERY_ALWAYS_EAGER']:
         return
 
 
 @app.task
-def load():
+def crawl():
     relation_num = count_by_relation(
         p=[
             'dbpprop:author',
@@ -302,4 +302,4 @@ def load():
         ]
     )
     for x in range(0, relation_num // PAGE_ITEM_COUNT + 1):
-        load_page.delay(x, relation_num)
+        crawl_page.delay(x, relation_num)

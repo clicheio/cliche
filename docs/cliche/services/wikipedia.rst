@@ -4,5 +4,5 @@
    .. toctree::
       :maxdepth: 2
 
-      wikipedia/loader
+      wikipedia/crawler
       wikipedia/work

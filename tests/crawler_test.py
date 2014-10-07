@@ -1,10 +1,10 @@
 import json
 
-from cliche.services.wikipedia import loader as dbpedia
+from cliche.services.wikipedia import crawler as dbpedia
 from cliche.services.wikipedia.work import Work
 
 
-def test_loader(monkeypatch, fx_session, fx_celery_app):
+def test_crawler(monkeypatch, fx_session, fx_celery_app):
     class FakeQuery(object):
         def convert(self):
             return {"results":
@@ -32,6 +32,6 @@ def test_loader(monkeypatch, fx_session, fx_celery_app):
                 return {"results": {"bindings": fakeResult}}
 
     monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", FakeQuery)
-    dbpedia.load_page(1, relation_num)
+    dbpedia.crawl_page(1, relation_num)
     num = fx_session.query(Work).count()
     assert num == 100
