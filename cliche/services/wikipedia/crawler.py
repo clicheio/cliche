@@ -120,7 +120,7 @@ def count_by_relation(p):
     return int(select_dbpedia(query)[0]['callret-0'])
 
 
-def select_by_relation(p, s_name='subject', o_name='object', page=1):
+def select_by_relation(p, revision, s_name='subject', o_name='object', page=1):
     """Find author of something
 
     Retrieves the list of s_name and o_name, the relation is
@@ -172,7 +172,7 @@ def select_by_relation(p, s_name='subject', o_name='object', page=1):
             (  {filt}  )
             && STRSTARTS(STR(?{s_name}), "http://dbpedia.org/")) .
             ?{s_name} dbpedia-owl:wikiPageRevisionID ?revision .
-            FILTER( ?revision > {max_revision} )
+            FILTER( ?revision > {revision} )
         }}
         GROUP BY ?{s_name}
         LIMIT {limit}
@@ -182,7 +182,7 @@ def select_by_relation(p, s_name='subject', o_name='object', page=1):
             filt=filt,
             limit=PAGE_ITEM_COUNT,
             offset=PAGE_ITEM_COUNT * page,
-            max_revision=get_session().query(func.max(Work.revision)).scalar(),
+            revision=revision,
         )
 
     query_out = select_dbpedia(query)
@@ -268,7 +268,7 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
 
 
 @app.task
-def crawl_page(page, relation_num):
+def crawl_page(page, relation_num, revision):
     session = get_session()
     res = select_by_relation(
         p=[
@@ -276,6 +276,7 @@ def crawl_page(page, relation_num):
             'dbpedia-owl:writer',
             'dbpedia-owl:author'
         ],
+        revision=revision,
         s_name='work',
         o_name='author',
         page=page
@@ -296,7 +297,7 @@ def crawl_page(page, relation_num):
     result_len = len(res)
     current_retrieved = (page * PAGE_ITEM_COUNT) + result_len
     if (relation_num <= current_retrieved and result_len == PAGE_ITEM_COUNT):
-        crawl_page.delay(page + 1, current_retrieved + PAGE_ITEM_COUNT)
+        crawl_page.delay(page + 1, current_retrieved + PAGE_ITEM_COUNT, revision)
 
     if app.conf['CELERY_ALWAYS_EAGER']:
         return
@@ -304,6 +305,9 @@ def crawl_page(page, relation_num):
 
 @app.task
 def crawl():
+    revision = get_session().query(func.max(Work.revision)).scalar()
+    if not revision:
+        revision = 0
     relation_num = count_by_relation(
         p=[
             'dbpprop:author',
@@ -312,4 +316,4 @@ def crawl():
         ]
     )
     for x in range(0, relation_num // PAGE_ITEM_COUNT + 1):
-        crawl_page.delay(x, relation_num)
+        crawl_page.delay(x, relation_num, revision)

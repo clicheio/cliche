@@ -9,9 +9,13 @@ from cliche.services.wikipedia.work import Work
 def test_crawler(monkeypatch, fx_session, fx_celery_app):
     class FakeQuery(object):
         def convert(self):
-            return {"results":
-                    {"bindings": [{"callret-0": {"value": "250280"}}]}
-                    }
+            return {
+                "results": {
+                    "bindings": [
+                        {"callret-0": {"value": "250280"}}
+                    ]
+                }
+            }
 
     monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", FakeQuery)
 
@@ -34,7 +38,7 @@ def test_crawler(monkeypatch, fx_session, fx_celery_app):
                 return {"results": {"bindings": fakeResult}}
 
     monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", FakeQuery)
-    dbpedia.crawl_page(1, relation_num)
+    dbpedia.crawl_page(1, relation_num, 0)
     num = fx_session.query(Work).count()
     assert fx_session.query(func.max(Work.revision)).scalar() > 0
     assert num == 100
