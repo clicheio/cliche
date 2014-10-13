@@ -4,7 +4,7 @@
 .. _Wikipedia: http://wikipedia.org/
 
 """
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, Integer
 
 from ...orm import Base
 
@@ -16,7 +16,8 @@ class Work(Base):
     """Representation of a work."""
 
     work = Column(String, primary_key=True)
+    revision = Column(Integer)
     author = Column(String)
 
     __tablename__ = 'wikipedia_works'
-    __repr_columns__ = work, author
+    __repr_columns__ = work, revision, author

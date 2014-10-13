@@ -17,6 +17,7 @@ References
 """
 from SPARQLWrapper import JSON, SPARQLWrapper
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.sql.expression import func
 
 from .work import Work
 from ...celery import app, get_session
@@ -163,12 +164,15 @@ def select_by_relation(p, s_name='subject', o_name='object', page=1):
         PREFIX dbpprop: <http://dbpedia.org/property/>
         SELECT DISTINCT
             ?{s_name}
+            (group_concat( STR(?revision); SEPARATOR="$") as ?revision)
             (group_concat( STR(?{o_name}) ; SEPARATOR="\\n") as ?{o_name})
         WHERE {{
-            ?{s_name} ?p ?{o_name}
+            ?{s_name} ?p ?{o_name} .
         FILTER(
             (  {filt}  )
-            && STRSTARTS(STR(?{s_name}), "http://dbpedia.org/"))
+            && STRSTARTS(STR(?{s_name}), "http://dbpedia.org/")) .
+            ?{s_name} dbpedia-owl:wikiPageRevisionID ?revision .
+            FILTER( ?revision > {max_revision} )
         }}
         GROUP BY ?{s_name}
         LIMIT {limit}
@@ -177,9 +181,14 @@ def select_by_relation(p, s_name='subject', o_name='object', page=1):
             o_name=o_name,
             filt=filt,
             limit=PAGE_ITEM_COUNT,
-            offset=PAGE_ITEM_COUNT * page
+            offset=PAGE_ITEM_COUNT * page,
+            max_revision=get_session().query(func.max(Work.revision)).scalar(),
         )
-    return select_dbpedia(query)
+
+    query_out = select_dbpedia(query)
+    for x in query_out:
+        x['revision'] = int(x['revision'].split('$')[0])
+    return query_out
 
 
 def select_by_class(s, s_name='subject', entities=None, page=1):
@@ -278,6 +287,7 @@ def crawl_page(page, relation_num):
                 new_entity = Work(
                     work=item['work'],
                     author=item['author'],
+                    revision=item['revision']
                 )
                 session.add(new_entity)
         except IntegrityError:

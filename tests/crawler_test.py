@@ -1,5 +1,7 @@
 import json
 
+from sqlalchemy.sql.expression import func
+
 from cliche.services.wikipedia import crawler as dbpedia
 from cliche.services.wikipedia.work import Work
 
@@ -34,4 +36,5 @@ def test_crawler(monkeypatch, fx_session, fx_celery_app):
     monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", FakeQuery)
     dbpedia.crawl_page(1, relation_num)
     num = fx_session.query(Work).count()
+    assert fx_session.query(func.max(Work.revision)).scalar() > 0
     assert num == 100
