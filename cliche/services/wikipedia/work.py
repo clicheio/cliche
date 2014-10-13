@@ -4,7 +4,7 @@
 .. _Wikipedia: http://wikipedia.org/
 
 """
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, Integer, String
 
 from ...orm import Base
 
