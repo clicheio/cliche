@@ -297,7 +297,8 @@ def crawl_page(page, relation_num, revision):
     result_len = len(res)
     current_retrieved = (page * PAGE_ITEM_COUNT) + result_len
     if (relation_num <= current_retrieved and result_len == PAGE_ITEM_COUNT):
-        crawl_page.delay(page + 1, current_retrieved + PAGE_ITEM_COUNT, revision)
+        crawl_page.delay(page + 1,
+                         current_retrieved + PAGE_ITEM_COUNT, revision)
 
     if app.conf['CELERY_ALWAYS_EAGER']:
         return
