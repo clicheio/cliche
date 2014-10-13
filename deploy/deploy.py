@@ -47,7 +47,7 @@ def main():
             revision = head_file.readline().strip()
     with (workdir / 'deploy' / 'revision.txt').open('w') as revision_file:
         revision_file.write(revision + '\n')
-    subprocess.call(
+    subprocess.check_call(
         [
             'python',
             'setup.py',
@@ -71,28 +71,29 @@ def main():
 
     for crawler in args.crawler or []:
         print('Promoting crawler at ' + crawler[0])
-        execute_remote_script(crawler[0], revision, 'promote.sh')
+        execute_remote_script(crawler[0], revision, 'promote.py')
 
     for web_worker in args.web_worker or []:
         print('Promoting web worker at ' + web_worker[0])
-        execute_remote_script(web_worker[0], revision, 'promote.sh')
+        execute_remote_script(web_worker[0], revision, 'promote.py')
 
 
 def upload(address, revision, workdir):
-    subprocess.call(
+    subprocess.check_call(
         [
             'ssh',
             address,
             'mkdir',
+            '-p',
             str(tmp / revision)
         ]
     )
-    subprocess.call(
+    subprocess.check_call(
         [
             'scp',
             str(workdir / 'deploy' / 'prepare.sh'),
             str(workdir / 'deploy' / 'upgrade.sh'),
-            str(workdir / 'deploy' / 'promote.sh'),
+            str(workdir / 'deploy' / 'promote.py'),
             str(workdir / 'deploy' / 'apt-requirements.txt'),
             str(workdir / 'deploy' / 'revision.txt'),
             str(workdir / 'deploy' / 'cliche.io'),
@@ -100,7 +101,7 @@ def upload(address, revision, workdir):
             address + ':' + str(tmp / revision)
         ]
     )
-    subprocess.call(
+    subprocess.check_call(
         [
             'ssh',
             address,
@@ -108,13 +109,13 @@ def upload(address, revision, workdir):
             '+x',
             str(tmp / revision / 'prepare.sh'),
             str(tmp / revision / 'upgrade.sh'),
-            str(tmp / revision / 'promote.sh')
+            str(tmp / revision / 'promote.py')
         ]
     )
 
 
 def execute_remote_script(address, revision, script_name):
-    subprocess.call(
+    subprocess.check_call(
         [
             'ssh',
             address,
