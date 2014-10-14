@@ -33,8 +33,6 @@ def main():
              """
     )
     args = parser.parse_args()
-    from pprint import pprint as pp
-    pp(args)
     workdir = pathlib.Path(__file__).resolve().parent.parent
     os.chdir(str(workdir))
     try:
