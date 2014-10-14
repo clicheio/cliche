@@ -4,5 +4,6 @@ build-essential
 libpq-dev
 libxml2-dev
 libxslt1-dev
+python-virtualenv
 sysv-rc-conf
 nginx
