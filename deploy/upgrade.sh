@@ -9,6 +9,12 @@ upgrade() {
 	mkdir -p $HOME/venv_$(cat $(dirname $0)/revision.txt)/etc
 	cp $(dirname $0)/prod.cfg.yml $HOME/venv_$(cat $(dirname $0)/revision.txt)/etc
 	cp $(dirname $0)/revision.txt $HOME/venv_$(cat $(dirname $0)/revision.txt)/etc
+	cp $(dirname $0)/cliche.io $HOME/venv_$(cat $(dirname $0)/revision.txt)/etc
+
+	sudo cp $HOME/venv_$(cat $(dirname $0)/revision.txt)/etc/cliche.io /etc/nginx/sites-available/cliche.io
+	if [ -h /etc/nginx/sites-enabled/cliche.io  ]; then
+		sudo ln -s /etc/nginx/sites-available/cliche.io /etc/nginx/sites-enabled/cliche.io
+	fi
 }
 
 not_compatible_with_os() {

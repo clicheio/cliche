@@ -10,10 +10,6 @@ prepare() {
 	packages="$(cat $(dirname $0)/apt-requirements.txt)"
 	echo $packages
 	sudo apt-get install -y $packages
-	sudo cp $(dirname $0)/cliche.io /etc/nginx/sites-available/cliche.io
-	if [ ! -h /etc/nginx/sites-enabled/cliche.io  ]; then
-		sudo ln -s /etc/nginx/sites-available/cliche.io /etc/nginx/sites-enabled/cliche.io
-	fi
 	sudo sysv-rc-conf nginx on
 	sudo sysv-rc-conf --list nginx
 	sudo service nginx start
