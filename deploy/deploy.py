@@ -20,6 +20,10 @@ def main():
                         help='Build number which will be deployed.')
     parser.add_argument('-c', '--config-template', nargs=1, required=True,
                         help='Template of config file to be deployed.')
+    parser.add_argument('-d', '--db-host', nargs=1, required=True,
+                        help='Database host address to use.')
+    parser.add_argument('-r', '--redis-host', nargs=1, required=True,
+                        help='Redis cache host address to use.')
     parser.add_argument(
         '--crawler', action='append', nargs=1,
         help="""
@@ -52,6 +56,12 @@ def main():
 
     with config_file.open('r') as config_data:
         config = yaml.load(config_data)
+
+    config['database_url'] = 'postgres://{}/cliche' \
+                             .format(args.db_host[0])
+
+    config['broker_url'] = 'redis://{}/1' \
+                           .format(args.redis_host[0])
 
     os.chdir(str(workdir))
 
