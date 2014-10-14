@@ -42,7 +42,8 @@ def main():
     gitdir = workdir / '.git'
     with (gitdir / 'HEAD').open('r') as head:
         with (gitdir / head.readline().split()[1]).open('r') as head_file:
-            revision = head_file.readline().strip()
+            revision = (args.build_number[0] + '_' +
+                        head_file.readline().strip())
     with (workdir / 'deploy' / 'revision.txt').open('w') as revision_file:
         revision_file.write(revision + '\n')
     subprocess.check_call(
@@ -51,7 +52,7 @@ def main():
             'setup.py',
             'egg_info',
             '-b',
-            '_{}_{}'.format(args.build_number[0], revision),
+            '_{}'.format(revision),
             'bdist_wheel'
         ]
     )
