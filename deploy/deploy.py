@@ -1,9 +1,14 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 import argparse
+import errno
 import os
 import pathlib
+import shlex
 import shutil
 import subprocess
+import sys
+
+import yaml
 
 
 tmp = pathlib.Path('/tmp')
@@ -13,38 +18,58 @@ def main():
     parser = argparse.ArgumentParser(description='Deploy cliche.io.')
     parser.add_argument('-b', '--build-number', nargs=1, required=True,
                         help='Build number which will be deployed.')
+    parser.add_argument('-c', '--config-template', nargs=1, required=True,
+                        help='Template of config file to be deployed.')
     parser.add_argument(
-        '-c', '--crawler', action='append', nargs=1,
+        '--crawler', action='append', nargs=1,
         help="""
              Server to be deployed as crawler.
              It should be declared with every other server.
-             For example: -c user@server1
+             For example: --crawler user@server1
              -c user@server2...
              """
     )
     parser.add_argument(
-        '-w', '--web-worker', action='append', nargs=1,
+        '--web-worker', action='append', nargs=1,
         help="""
              Server to be deployed as web worker.
              It should be declared with every other server.
-             For example: -w user@server1
+             For example: --web-worker user@server1
              -w user@server2...
              """
     )
     args = parser.parse_args()
+
     workdir = pathlib.Path(__file__).resolve().parent.parent
+
+    try:
+        config_file = pathlib.Path(args.config_template[0]).resolve()
+        if not config_file.is_file():
+            raise FileNotFoundError
+    except FileNotFoundError:
+        print('Config file given does not exist.')
+        sys.exit(errno.EPERM)
+
+    with config_file.open('r') as config_data:
+        config = yaml.load(config_data)
+
     os.chdir(str(workdir))
+
     try:
         shutil.rmtree(str(workdir / 'dist'))
     except FileNotFoundError:
         pass
+
     gitdir = workdir / '.git'
+
     with (gitdir / 'HEAD').open('r') as head:
         with (gitdir / head.readline().split()[1]).open('r') as head_file:
             revision = (args.build_number[0] + '_' +
                         head_file.readline().strip())
+
     with (workdir / 'deploy' / 'revision.txt').open('w') as revision_file:
         revision_file.write(revision + '\n')
+
     subprocess.check_call(
         [
             'python',
@@ -58,13 +83,13 @@ def main():
 
     for crawler in args.crawler or []:
         print('Uploading crawler to ' + crawler[0])
-        upload(crawler[0], revision, workdir)
+        upload(crawler[0], revision, config, workdir)
         execute_remote_script(crawler[0], revision, 'prepare.sh')
         execute_remote_script(crawler[0], revision, 'upgrade.sh')
 
     for web_worker in args.web_worker or []:
         print('Uploading web worker to ' + web_worker[0])
-        upload(web_worker[0], revision, workdir)
+        upload(web_worker[0], revision, config, workdir)
         execute_remote_script(web_worker[0], revision, 'prepare.sh')
         execute_remote_script(web_worker[0], revision, 'upgrade.sh')
 
@@ -77,7 +102,7 @@ def main():
         execute_remote_script(web_worker[0], revision, 'promote.py')
 
 
-def upload(address, revision, workdir):
+def upload(address, revision, config, workdir):
     subprocess.check_call(
         [
             'ssh',
@@ -98,6 +123,16 @@ def upload(address, revision, workdir):
             str(workdir / 'deploy' / 'cliche.io'),
             str(list((workdir / 'dist').glob('*.whl'))[0]),
             address + ':' + str(tmp / revision)
+        ]
+    )
+    subprocess.check_call(
+        [
+            'ssh',
+            address,
+            'echo',
+            shlex.quote(yaml.dump(config)),
+            '>>',
+            str(tmp / revision / 'prod.cfg.yml'),
         ]
     )
     subprocess.check_call(

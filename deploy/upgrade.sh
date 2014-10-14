@@ -6,6 +6,9 @@ upgrade() {
 	# pyvenv-3.4 $HOME/venv_$(cat $(dirname $0)/revision.txt)
 	virtualenv -p `which python3.4` $HOME/venv_$(cat $(dirname $0)/revision.txt)
 	$HOME/venv_$(cat $(dirname $0)/revision.txt)/bin/pip install /tmp/$(cat $(dirname $0)/revision.txt)/Cliche-*.whl
+	mkdir -p $HOME/venv_$(cat $(dirname $0)/revision.txt)/etc
+	cp $(dirname $0)/prod.cfg.yml $HOME/venv_$(cat $(dirname $0)/revision.txt)/etc
+	cp $(dirname $0)/revision.txt $HOME/venv_$(cat $(dirname $0)/revision.txt)/etc
 }
 
 not_compatible_with_os() {
