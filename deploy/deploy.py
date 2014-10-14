@@ -64,6 +64,7 @@ def main():
 
     for web_worker in args.web_worker or []:
         print('Uploading web worker to ' + web_worker[0])
+        upload(web_worker[0], revision, workdir)
         execute_remote_script(web_worker[0], revision, 'prepare.sh')
         execute_remote_script(web_worker[0], revision, 'upgrade.sh')
 
