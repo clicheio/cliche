@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 import argparse
-import glob
 import os
 import pathlib
 import shutil
@@ -96,7 +95,7 @@ def upload(address, revision, workdir):
             str(workdir / 'deploy' / 'apt-requirements.txt'),
             str(workdir / 'deploy' / 'revision.txt'),
             str(workdir / 'deploy' / 'cliche.io'),
-            glob.glob(str(workdir / 'dist' / '*.whl'))[0],
+            str((workdir / 'dist').glob('*.whl')[0]),
             address + ':' + str(tmp / revision)
         ]
     )
