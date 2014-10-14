@@ -96,7 +96,7 @@ def upload(address, revision, workdir):
             str(workdir / 'deploy' / 'apt-requirements.txt'),
             str(workdir / 'deploy' / 'revision.txt'),
             str(workdir / 'deploy' / 'cliche.io'),
-            str((workdir / 'dist').glob('*.whl')[0]),
+            str(list((workdir / 'dist').glob('*.whl'))[0]),
             address + ':' + str(tmp / revision)
         ]
     )
