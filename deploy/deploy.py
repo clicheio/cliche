@@ -42,6 +42,14 @@ def main():
              -w user@server2...
              """
     )
+    parser.add_argument(
+        '--beat', nargs=1,
+        help="""
+             Server to be deployed as beat server.
+             It should be declared only once.
+             For example: --beat user@server1
+             """
+    )
     args = parser.parse_args()
 
     workdir = pathlib.Path(__file__).resolve().parent.parent
@@ -103,6 +111,12 @@ def main():
         execute_remote_script(web_worker[0], revision, 'prepare.sh')
         execute_remote_script(web_worker[0], revision, 'upgrade.sh')
 
+    if args.beat[0] is not None:
+        print('Uploading beat to ' + args.beat[0])
+        upload(args.beat[0], revision, config, workdir)
+        execute_remote_script(args.beat[0], revision, 'prepare.sh')
+        execute_remote_script(args.beat[0], revision, 'upgrade.sh')
+
     for crawler in args.crawler or []:
         print('Promoting crawler at ' + crawler[0])
         execute_remote_script(crawler[0], revision, 'promote.py')
@@ -110,6 +124,10 @@ def main():
     for web_worker in args.web_worker or []:
         print('Promoting web worker at ' + web_worker[0])
         execute_remote_script(web_worker[0], revision, 'promote.py')
+
+    if args.beat[0] is not None:
+        print('Promoting beat at ' + args.beat[0])
+        execute_remote_script(args.beat[0], revision, 'promote.py')
 
 
 def upload(address, revision, config, workdir):
