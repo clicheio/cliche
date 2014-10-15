@@ -63,21 +63,6 @@ def test_franchise_belongs_to_world(fx_franchises, fx_worlds):
     assert fx_franchises.iron_man.world == fx_worlds.marvel_universe
 
 
-def test_work_has_title(fx_works):
-    assert len(fx_works.cardcaptor_sakura.titles) == 1
-    for title in fx_works.cardcaptor_sakura.titles:
-        assert title.work_id == fx_works.cardcaptor_sakura.id
-        assert title.title == 'Cardcaptor Sakura'
-        assert title.reference_count == 0
-
-    assert len(fx_works.lord_of_rings_film.titles) == 1
-    for title in fx_works.lord_of_rings_film.titles:
-        assert title.work_id == fx_works.lord_of_rings_film.id
-        assert title.title == \
-            'The Lord of the Rings: The Fellowship of the Ring'
-        assert title.reference_count == 0
-
-
 def test_credit_removed_with_work(fx_session, fx_works, fx_people):
     cardcaptor_id = fx_works.cardcaptor_sakura.id
 

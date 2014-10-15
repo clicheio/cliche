@@ -2,8 +2,10 @@ import datetime
 
 from lxml.html import document_fromstring
 
+from cliche.name import Name
 from cliche.people import Person, Team
-from cliche.work import Credit, Genre, Role, Title, Work
+from cliche.sqltypes import HashableLocale as Locale
+from cliche.work import Credit, Genre, Role, Work
 
 
 def assert_contain_text(text, expr, data):
@@ -31,7 +33,11 @@ def test_work_list(fx_session, fx_flask_client):
 
     # case 2: add document
     work = Work()
-    work.titles.update({Title(title='Story of Your Life')})
+    work.names.update({
+        Name(nameable=work,
+             name='Story of Your Life',
+             locale=Locale.parse('en_US'))
+    })
 
     with fx_session.begin():
         fx_session.add(work)
@@ -47,7 +53,11 @@ def test_work_page(fx_session, fx_flask_client):
 
     # case 2: add document
     work = Work()
-    work.titles.update({Title(title='Story of Your Life')})
+    work.names.update({
+        Name(nameable=work,
+             name='Story of Your Life',
+             locale=Locale.parse('en_US'))
+    })
     with fx_session.begin():
         fx_session.add(work)
 
@@ -78,7 +88,12 @@ def test_work_page(fx_session, fx_flask_client):
     assert_contain_text('Short Stories', 'tr.genres>td', rv.data)
     assert_contain_text('SF', 'tr.genres>td', rv.data)
 
-    author = Person(name='Ted Chiang')
+    author = Person()
+    author.names.update({
+        Name(nameable=author,
+             name='Ted Chiang',
+             locale=Locale.parse('en_US'))
+    })
     credit = Credit(person=author, work=work, role=Role.author)
 
     with fx_session.begin():
@@ -100,19 +115,34 @@ def test_work_page(fx_session, fx_flask_client):
 def test_complex_credits(fx_session, fx_flask_client):
     """Data: http://www.animenewsnetwork.com/encyclopedia/anime.php?id=12376"""
     work = Work()
-    work.titles.update({Title(title='Fate/Zero')})
-    author_credit = Credit(person=Person(name='Akihiko Uda'), work=work,
+    work.names.update({
+        Name(nameable=work,
+             name='Fate/Zero',
+             locale=Locale.parse('en_US'))
+    })
+
+    def make_with_name(cls, name):
+        ins = cls()
+        ins.names.update({
+            Name(nameable=ins,
+                 name=name,
+                 locale=Locale.parse('en_US'))
+        })
+        return ins
+
+    author_credit = Credit(person=make_with_name(Person, 'Akihiko Uda'),
+                           work=work,
                            role=Role.author)
-    ufotable = Team(name='ufotable')
-    easter = Team(name='Studio Easter')
+    ufotable = make_with_name(Team, 'ufotable')
+    easter = make_with_name(Team, 'Studio Easter')
     artist_credits = [
-        Credit(person=Person(name="Aki In'yama"), work=work,
+        Credit(person=make_with_name(Person, "Aki In'yama"), work=work,
                role=Role.artist, team=ufotable),
-        Credit(person=Person(name='Erika Okazaki'), work=work,
+        Credit(person=make_with_name(Person, 'Erika Okazaki'), work=work,
                role=Role.artist, team=easter),
-        Credit(person=Person(name='Eun Kyung Seo'), work=work,
+        Credit(person=make_with_name(Person, 'Eun Kyung Seo'), work=work,
                role=Role.artist, team=easter),
-        Credit(person=Person(name='Jeong Ji Kim'), work=work,
+        Credit(person=make_with_name(Person, 'Jeong Ji Kim'), work=work,
                role=Role.artist, team=ufotable)
     ]
 

@@ -12,20 +12,6 @@
     </tr>
   {% endif %}
 
-  {% if work.number_of_pages %}
-    <tr class="number_of_pages">
-      <th scope="row">number_of_pages</th>
-      <td>{{ work.number_of_pages }}</td>
-    </tr>
-  {% endif %}
-
-  {% if work.isbn %}
-    <tr class="isbn">
-      <th scope="row">isbn</th>
-      <td>{{ work.isbn }}</td>
-    </tr>
-  {% endif %}
-
   {% if work.genres %}
     <tr class="genres">
       <th scope="row">genres</th>
@@ -59,7 +45,7 @@
                   <tr>
                     <td colspan="2" class="name">
                       <a href="{{ url_for('.page', type_='person', id=credit.person.id) }}">
-                        {{- credit.person.name -}}
+                        {{- credit.person.canonical_name(locale).name -}}
                       </a>
                     </td>
                     <td class="role">
@@ -73,13 +59,13 @@
                     {% if loop.first %}
                       <td rowspan="{{ loop.length }}" class="team">
                         <a href="{{ url_for('.page', type_='team', id=credit.team.id) }}">
-                          {{- credit.team.name -}}
+                          {{- credit.team.canonical_name(locale).name -}}
                         </a>
                       </td>
                     {% endif %}
                     <td class="name">
                       <a href="{{ url_for('.page', type_='person', id=credit.person.id) }}">
-                        {{- credit.person.name -}}
+                        {{- credit.person.canonical_name(locale).name -}}
                       </a>
                     </td>
                     <td class="role">

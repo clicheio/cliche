@@ -5,9 +5,10 @@
 import enum
 
 from babel import Locale
+from sqlalchemy.sql.expression import func
 from sqlalchemy.types import Enum, SchemaType, String, TypeDecorator
 
-__all__ = 'EnumType', 'LocaleType'
+__all__ = 'EnumType', 'HashableLocale', 'LocaleType'
 
 
 class EnumType(TypeDecorator, SchemaType):
@@ -39,15 +40,35 @@ class EnumType(TypeDecorator, SchemaType):
         return self._enum_class
 
 
+class HashableLocale(Locale):
+    """Hashable Locale"""
+
+    def __hash__(self):
+        return hash('{}_{}'.format(self.language, self.territory))
+
+
 class LocaleType(TypeDecorator):
     """Custom locale type to be used as :class:`babel.Locale`."""
 
     impl = String
 
-    def process_bind_param(self, value, dialect):
-        if not isinstance(value, Locale):
-            raise TypeError('expected babel.Locale instance')
-        return '{}_{}'.format(value.language, value.territory)
+    def bind_processor(self, dialect):
+        def process_bind_param(value):
+            if not issubclass(value.__class__, Locale):
+                raise TypeError('expected babel.Locale instance')
+            return '{}_{}'.format(value.language, value.territory)
+        return process_bind_param
 
-    def process_result_value(self, value, dialect):
-        return Locale.parse(value)
+    def result_processor(self, dialect, coltype):
+        def process_result_value(value):
+            return HashableLocale.parse(value)
+        return process_result_value
+
+    class comparator_factory(TypeDecorator.Comparator):
+        @property
+        def language(self):
+            return func.substr(self.expr, 1, 2)
+
+        @property
+        def territory(self):
+            return func.substr(self.expr, 4, 2)
