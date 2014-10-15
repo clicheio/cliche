@@ -1,0 +1,6 @@
+[submodule "cliche/web/static/bootstrap-sass"]
+	path = cliche/web/static/bootstrap-sass
+	url = git@github.com:twbs/bootstrap-sass.git
+[submodule "bootstrap-sass"]
+	path = cliche/web/static/bootstrap-sass
+	url = git@github.com:twbs/bootstrap-sass.git
