@@ -1,0 +1,30 @@
+@import "../bootstrap-sass/assets/stylesheets/bootstrap";
+
+@mixin make-middle($width) {
+  @include make-sm-column($width);
+  @include make-sm-column-push(($grid-columns - $width) / 2);
+  @include make-md-column($width);
+  @include make-md-column-push(($grid-columns - $width) / 2);
+  @include make-lg-column($width);
+  @include make-lg-column-push(($grid-columns - $width) / 2);
+}
+
+main {
+  @include make-row();
+
+  h1 {
+    @include make-middle(10);
+  }
+}
+
+table.list, table.page {
+  @include make-middle(10);
+}
+
+table.list, table.page, table.page table {
+  @include make-middle(10);
+
+  @extend .table;
+  @extend .table-bordered;
+
+}
