@@ -173,8 +173,10 @@ def upload(address, revision, config, workdir):
     )
     subprocess.check_call(
         [
-            'cp',
-            str(workdir / 'deploy' / 'cliche.io'),
+            'cp'
+        ] +
+        [str(path) for path in ((workdir / 'deploy' / 'etc').glob('*'))] +
+        [
             str(workdir / 'deploy' / 'tmp' / 'etc')
         ]
     )
