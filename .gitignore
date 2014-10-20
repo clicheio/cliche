@@ -30,5 +30,6 @@ cliche/web/static/css/*
 # ruby sass command cache file
 .sass-cache
 
-# ignore temporary deployment revision text file
-deploy/revision.txt
+# ignore temporary deployment file
+deploy/tmp
+cliche-deploy-*.tar.gz
