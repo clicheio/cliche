@@ -126,19 +126,19 @@ def main():
         print('Uploading crawler to ' + crawler[0])
         upload(crawler[0], revision, config, workdir)
         execute_remote_script(crawler[0], revision, 'prepare.sh')
-        execute_remote_script(crawler[0], revision, 'upgrade.sh')
+        execute_remote_script(crawler[0], revision, 'upgrade.py')
 
     for web_worker in args.web_worker or []:
         print('Uploading web worker to ' + web_worker[0])
         upload(web_worker[0], revision, config, workdir)
         execute_remote_script(web_worker[0], revision, 'prepare.sh')
-        execute_remote_script(web_worker[0], revision, 'upgrade.sh')
+        execute_remote_script(web_worker[0], revision, 'upgrade.py')
 
     if args.beat is not None and args.beat[0] is not None:
         print('Uploading beat to ' + args.beat[0])
         upload(args.beat[0], revision, config, workdir)
         execute_remote_script(args.beat[0], revision, 'prepare.sh')
-        execute_remote_script(args.beat[0], revision, 'upgrade.sh')
+        execute_remote_script(args.beat[0], revision, 'upgrade.py')
 
     for crawler in args.crawler or []:
         print('Promoting crawler at ' + crawler[0])
@@ -164,7 +164,7 @@ def upload(address, revision, config, workdir):
         [
             'cp',
             str(workdir / 'deploy' / 'prepare.sh'),
-            str(workdir / 'deploy' / 'upgrade.sh'),
+            str(workdir / 'deploy' / 'upgrade.py'),
             str(workdir / 'deploy' / 'promote.py'),
             str(workdir / 'deploy' / 'apt-requirements.txt'),
             str(list((workdir / 'dist').glob('*.whl'))[0]),
@@ -227,7 +227,7 @@ def upload(address, revision, config, workdir):
             'chmod',
             '+x',
             str(tmp / revision / 'prepare.sh'),
-            str(tmp / revision / 'upgrade.sh'),
+            str(tmp / revision / 'upgrade.py'),
             str(tmp / revision / 'promote.py')
         ]
     )
