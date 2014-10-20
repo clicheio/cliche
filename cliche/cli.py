@@ -120,8 +120,10 @@ def upgrade(revision):
                     downgrade_database(engine, revision)
                 except CommandError as e:
                     echo(e, file=sys.stderr)
+                    raise SystemExit(1)
             else:
                 echo(e, file=sys.stderr)
+                raise SystemExit(1)
 
 
 @cli.command()
