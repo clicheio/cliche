@@ -73,6 +73,14 @@ def main():
 
     os.chdir(str(workdir))
 
+    subprocess.check_call(
+        [
+            'python',
+            'setup.py',
+            'clean',
+        ]
+    )
+
     try:
         shutil.rmtree(str(workdir / 'dist'))
     except FileNotFoundError:
