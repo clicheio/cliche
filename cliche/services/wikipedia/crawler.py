@@ -17,6 +17,7 @@ References
 """
 from SPARQLWrapper import JSON, SPARQLWrapper
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.sql.expression import func
 
 from .work import Work
 from ...celery import app, get_session
@@ -119,7 +120,7 @@ def count_by_relation(p):
     return int(select_dbpedia(query)[0]['callret-0'])
 
 
-def select_by_relation(p, s_name='subject', o_name='object', page=1):
+def select_by_relation(p, revision, s_name='subject', o_name='object', page=1):
     """Find author of something
 
     Retrieves the list of s_name and o_name, the relation is
@@ -163,12 +164,15 @@ def select_by_relation(p, s_name='subject', o_name='object', page=1):
         PREFIX dbpprop: <http://dbpedia.org/property/>
         SELECT DISTINCT
             ?{s_name}
+            (group_concat( STR(?revision); SEPARATOR="$") as ?revision)
             (group_concat( STR(?{o_name}) ; SEPARATOR="\\n") as ?{o_name})
         WHERE {{
-            ?{s_name} ?p ?{o_name}
+            ?{s_name} ?p ?{o_name} .
         FILTER(
             (  {filt}  )
-            && STRSTARTS(STR(?{s_name}), "http://dbpedia.org/"))
+            && STRSTARTS(STR(?{s_name}), "http://dbpedia.org/")) .
+            ?{s_name} dbpedia-owl:wikiPageRevisionID ?revision .
+            FILTER( ?revision > {revision} )
         }}
         GROUP BY ?{s_name}
         LIMIT {limit}
@@ -177,9 +181,14 @@ def select_by_relation(p, s_name='subject', o_name='object', page=1):
             o_name=o_name,
             filt=filt,
             limit=PAGE_ITEM_COUNT,
-            offset=PAGE_ITEM_COUNT * page
+            offset=PAGE_ITEM_COUNT * page,
+            revision=revision,
         )
-    return select_dbpedia(query)
+
+    query_out = select_dbpedia(query)
+    for x in query_out:
+        x['revision'] = int(x['revision'].split('$')[0])
+    return query_out
 
 
 def select_by_class(s, s_name='subject', entities=None, page=1):
@@ -259,7 +268,7 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
 
 
 @app.task
-def crawl_page(page, relation_num):
+def crawl_page(page, relation_num, revision):
     session = get_session()
     res = select_by_relation(
         p=[
@@ -267,6 +276,7 @@ def crawl_page(page, relation_num):
             'dbpedia-owl:writer',
             'dbpedia-owl:author'
         ],
+        revision=revision,
         s_name='work',
         o_name='author',
         page=page
@@ -278,6 +288,7 @@ def crawl_page(page, relation_num):
                 new_entity = Work(
                     work=item['work'],
                     author=item['author'],
+                    revision=item['revision']
                 )
                 session.add(new_entity)
         except IntegrityError:
@@ -286,7 +297,8 @@ def crawl_page(page, relation_num):
     result_len = len(res)
     current_retrieved = (page * PAGE_ITEM_COUNT) + result_len
     if (relation_num <= current_retrieved and result_len == PAGE_ITEM_COUNT):
-        crawl_page.delay(page + 1, current_retrieved + PAGE_ITEM_COUNT)
+        crawl_page.delay(page + 1,
+                         current_retrieved + PAGE_ITEM_COUNT, revision)
 
     if app.conf['CELERY_ALWAYS_EAGER']:
         return
@@ -294,6 +306,9 @@ def crawl_page(page, relation_num):
 
 @app.task
 def crawl():
+    revision = get_session().query(func.max(Work.revision)).scalar()
+    if not revision:
+        revision = 0
     relation_num = count_by_relation(
         p=[
             'dbpprop:author',
@@ -302,4 +317,4 @@ def crawl():
         ]
     )
     for x in range(0, relation_num // PAGE_ITEM_COUNT + 1):
-        crawl_page.delay(x, relation_num)
+        crawl_page.delay(x, relation_num, revision)

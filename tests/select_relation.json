@@ -4,6 +4,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/All_Creatures_Great_and_Small_(TV_series)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "606779217"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/James_Herriot"
@@ -13,6 +17,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Love_Is_a_Racket"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "580501134$580501134"
         },
         "author": {
             "type": "literal",
@@ -24,6 +32,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/For_the_Union_Dead"
         },
+        "revision": {
+            "type": "literal",
+            "value": "597938582$597938582"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Robert_Lowell\nhttp://dbpedia.org/resource/Robert_Lowell"
@@ -33,6 +45,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Bruno_Maddox"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "602354166"
         },
         "author": {
             "type": "literal",
@@ -44,6 +60,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/How_to_Survive_a_Robot_Uprising"
         },
+        "revision": {
+            "type": "literal",
+            "value": "606030940$606030940"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Daniel_H._Wilson\nhttp://dbpedia.org/resource/Daniel_H._Wilson"
@@ -53,6 +73,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Dark_of_the_Moon:_Poems_of_Fantasy_and_the_Macabre"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "604050980$604050980"
         },
         "author": {
             "type": "literal",
@@ -64,6 +88,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Iraq_Study_Group_Report"
         },
+        "revision": {
+            "type": "literal",
+            "value": "579021853$579021853$579021853$579021853$579021853$579021853$579021853$579021853$579021853$579021853$579021853$579021853$579021853$579021853$579021853$579021853$579021853$579021853$579021853$579021853"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Edwin_Meese\nhttp://dbpedia.org/resource/Sandra_Day_O'Connor\nhttp://dbpedia.org/resource/William_Perry\nhttp://dbpedia.org/resource/Lawrence_Eagleburger\nhttp://dbpedia.org/resource/Chuck_Robb\nhttp://dbpedia.org/resource/Alan_K._Simpson\nhttp://dbpedia.org/resource/Vernon_Jordan\nhttp://dbpedia.org/resource/Leon_Panetta\nCo-chair James Baker\nCo-chair Lee H. Hamilton\nhttp://dbpedia.org/resource/Edwin_Meese\nhttp://dbpedia.org/resource/Sandra_Day_O'Connor\nhttp://dbpedia.org/resource/William_Perry\nhttp://dbpedia.org/resource/Lawrence_Eagleburger\nhttp://dbpedia.org/resource/James_Baker\nhttp://dbpedia.org/resource/Chuck_Robb\nhttp://dbpedia.org/resource/Lee_H._Hamilton\nhttp://dbpedia.org/resource/Alan_K._Simpson\nhttp://dbpedia.org/resource/Vernon_Jordan\nhttp://dbpedia.org/resource/Leon_Panetta"
@@ -73,6 +101,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/India:_Kingdom_of_the_Tiger"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "593119708"
         },
         "author": {
             "type": "literal",
@@ -84,6 +116,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Touch_My_Body"
         },
+        "revision": {
+            "type": "literal",
+            "value": "606376439$606376439$606376439$606376439"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Crystal_Nicole\nhttp://dbpedia.org/resource/Mariah_Carey\nhttp://dbpedia.org/resource/The-Dream\nhttp://dbpedia.org/resource/Tricky_Stewart"
@@ -93,6 +129,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Fruit_Fly_(film)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "603968324"
         },
         "author": {
             "type": "literal",
@@ -104,6 +144,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Revelations_(Audioslave_song)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "589058343"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Chris_Cornell"
@@ -112,17 +156,11 @@
     {
         "work": {
             "type": "uri",
-            "value": "http://dbpedia.org/resource/Wagon_Wheel_(song)__Wagon_Wheel__1"
-        },
-        "author": {
-            "type": "literal",
-            "value": "http://dbpedia.org/resource/Bob_Dylan\nhttp://dbpedia.org/resource/Old_Crow_Medicine_Show"
-        }
-    },
-    {
-        "work": {
-            "type": "uri",
             "value": "http://dbpedia.org/resource/Day_of_the_Idiots"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "549835947"
         },
         "author": {
             "type": "literal",
@@ -134,6 +172,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Amanush"
         },
+        "revision": {
+            "type": "literal",
+            "value": "605933649"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Shaktipada_Rajguru"
@@ -142,17 +184,11 @@
     {
         "work": {
             "type": "uri",
-            "value": "http://dbpedia.org/resource/Cold_Blade"
-        },
-        "author": {
-            "type": "literal",
-            "value": "http://dbpedia.org/resource/Chor_Yuen"
-        }
-    },
-    {
-        "work": {
-            "type": "uri",
             "value": "http://dbpedia.org/resource/Tough_Guys_Don't_Dance_(film)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "593268867$593268867"
         },
         "author": {
             "type": "literal",
@@ -162,7 +198,25 @@
     {
         "work": {
             "type": "uri",
+            "value": "http://dbpedia.org/resource/Cold_Blade"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "586981775"
+        },
+        "author": {
+            "type": "literal",
+            "value": "http://dbpedia.org/resource/Chor_Yuen"
+        }
+    },
+    {
+        "work": {
+            "type": "uri",
             "value": "http://dbpedia.org/resource/Sledgehammer_(song)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "606667136"
         },
         "author": {
             "type": "literal",
@@ -174,6 +228,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Le_Gentleman_d'Epsom"
         },
+        "revision": {
+            "type": "literal",
+            "value": "575362070$575362070$575362070"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Gilles_Grangier\nhttp://dbpedia.org/resource/Michel_Audiard\nhttp://dbpedia.org/resource/Albert_Simonin"
@@ -183,6 +241,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Tremor_of_Intent:_An_Eschatological_Spy_Novel"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "604063994$604063994"
         },
         "author": {
             "type": "literal",
@@ -194,6 +256,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Pan_(2015_film)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "606574344"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Jason_Fuchs"
@@ -203,6 +269,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Camera_Obscura_(film)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "584390279"
         },
         "author": {
             "type": "literal",
@@ -214,6 +284,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Canterbury_Tales_(musical)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "600328999$600328999"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Nevill_Coghill\nhttp://dbpedia.org/resource/Martin_Starkie"
@@ -223,6 +297,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Duvar"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "542913653"
         },
         "author": {
             "type": "literal",
@@ -234,6 +312,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Neikea"
         },
+        "revision": {
+            "type": "literal",
+            "value": "586579606"
+        },
         "author": {
             "type": "literal",
             "value": "Hesiod, translated by Hugh G. Evelyn-White"
@@ -243,6 +325,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/First_Contact_(novelette)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "586852649$586852649"
         },
         "author": {
             "type": "literal",
@@ -254,6 +340,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Wives_Under_Suspicion"
         },
+        "revision": {
+            "type": "literal",
+            "value": "598230988$598230988$598230988"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Tom_Barry_(screenwriter)\nhttp://dbpedia.org/resource/Ladislas_Fodor\nhttp://dbpedia.org/resource/Myles_Connolly"
@@ -263,6 +353,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Gun_n'_Rose"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "600076992"
         },
         "author": {
             "type": "literal",
@@ -274,6 +368,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Mazes_and_Monsters_(novel)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "592459509$592459509"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Rona_Jaffe\nhttp://dbpedia.org/resource/Rona_Jaffe"
@@ -283,6 +381,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Honkey_Tonk_Horror"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "555247774"
         },
         "author": {
             "type": "literal",
@@ -294,6 +396,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Too_Much_(Little)_Love"
         },
+        "revision": {
+            "type": "literal",
+            "value": "547587269$547587269"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Jacques_Doillon\nhttp://dbpedia.org/resource/Brune_Compagnon"
@@ -303,6 +409,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Modern_Primitives_(book)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "594503702$594503702$594503702$594503702"
         },
         "author": {
             "type": "literal",
@@ -314,6 +424,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Anything_Goes!_(Maki_Ohguro_song)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "601808432$601808432$601808432"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/K%C5%8Dtar%C5%8D_Nakagawa\nhttp://dbpedia.org/resource/Shoko_Fujibayashi\nhttp://dbpedia.org/resource/Everset"
@@ -323,6 +437,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Sleeping_Beauty_(1942_film)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "606760921$606760921$606760921$606760921"
         },
         "author": {
             "type": "literal",
@@ -334,6 +452,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/High_Fidelity_(novel)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "603078726$603078726"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Nick_Hornby\nhttp://dbpedia.org/resource/Nick_Hornby"
@@ -343,6 +465,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Living_Out_Loud"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "601583808"
         },
         "author": {
             "type": "literal",
@@ -354,6 +480,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Expiration_Date_(novel)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "578927860$578927860"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Tim_Powers\nhttp://dbpedia.org/resource/Tim_Powers"
@@ -363,6 +493,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/All_is_at_Stake"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "589769945"
         },
         "author": {
             "type": "literal",
@@ -374,6 +508,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/The_Concert_Singer"
         },
+        "revision": {
+            "type": "literal",
+            "value": "593920460"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Thomas_Eakins"
@@ -383,6 +521,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/The_Far_Side_Gallery_3"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "594110953$594110953"
         },
         "author": {
             "type": "literal",
@@ -394,6 +536,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/American_Pie_(song)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "604089161"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Don_McLean"
@@ -403,6 +549,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Superstar_(Ice_Prince_song)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "601124594"
         },
         "author": {
             "type": "literal",
@@ -414,6 +564,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Happy_Mania"
         },
+        "revision": {
+            "type": "literal",
+            "value": "590426617$590426617"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Moyoko_Anno\nhttp://dbpedia.org/resource/Moyoko_Anno"
@@ -423,6 +577,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Born_of_the_Sea"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "492147133$492147133"
         },
         "author": {
             "type": "literal",
@@ -434,6 +592,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Dreaming_(OMD_song)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "587428241"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Orchestral_Manoeuvres_in_the_Dark"
@@ -443,6 +605,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Private_Duty_Nurses"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "537553644"
         },
         "author": {
             "type": "literal",
@@ -454,6 +620,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Incomplete_Nature"
         },
+        "revision": {
+            "type": "literal",
+            "value": "606260033$606260033"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Terrence_Deacon\nhttp://dbpedia.org/resource/Terrence_Deacon"
@@ -463,6 +633,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Nothin'_on_You"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "606745165$606745165"
         },
         "author": {
             "type": "literal",
@@ -474,6 +648,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Gundaraj"
         },
+        "revision": {
+            "type": "literal",
+            "value": "599906980"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Anees_Bazmee"
@@ -483,6 +661,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Manhattanites"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "557748707"
         },
         "author": {
             "type": "literal",
@@ -494,6 +676,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Beauty,_Disrupted"
         },
+        "revision": {
+            "type": "literal",
+            "value": "605556874$605556874$605556874$605556874"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Carr%C3%A9_Otis\nhttp://dbpedia.org/resource/Hugo_Schwyzer\nhttp://dbpedia.org/resource/Carr%C3%A9_Otis\nhttp://dbpedia.org/resource/Hugo_Schwyzer"
@@ -503,6 +689,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Usagi_Yojimbo"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "601550607"
         },
         "author": {
             "type": "literal",
@@ -514,6 +704,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Schoolin'"
         },
+        "revision": {
+            "type": "literal",
+            "value": "564821198"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Everything_Everything"
@@ -523,6 +717,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Black_XXX-Mas"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "593902540"
         },
         "author": {
             "type": "literal",
@@ -534,6 +732,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Hatara_Kizzu_Maihamu_Gumi"
         },
+        "revision": {
+            "type": "literal",
+            "value": "592207691"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Takashi_Yamada"
@@ -543,6 +745,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Dream_On_(Naoya_Urata_song)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "602153291"
         },
         "author": {
             "type": "literal",
@@ -554,6 +760,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/The_Water_Margin_(1973_TV_series)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "591935741"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Shi_Nai'an"
@@ -563,6 +773,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/D._W._Washburn"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "589390900"
         },
         "author": {
             "type": "literal",
@@ -574,6 +788,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Nicholas_of_Basel"
         },
+        "revision": {
+            "type": "literal",
+            "value": "594596363"
+        },
         "author": {
             "type": "literal",
             "value": "Alexander James Grieve"
@@ -583,6 +801,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/I_Belong_to_You_(Nikki_Sudden_song)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "547144189"
         },
         "author": {
             "type": "literal",
@@ -594,6 +816,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Come_On_Come_On_(Smash_Mouth_song)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "589062112"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Greg_Camp"
@@ -603,6 +829,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/I_Love_You_(Otis_Leavill_song)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "591604730$591604730$591604730"
         },
         "author": {
             "type": "literal",
@@ -614,6 +844,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Show_Boat_(novel)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "599564350$599564350"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Edna_Ferber\nhttp://dbpedia.org/resource/Edna_Ferber"
@@ -623,6 +857,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/The_Madonna_of_the_Cherubim"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "587324952"
         },
         "author": {
             "type": "literal",
@@ -634,6 +872,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Gapyear.com"
         },
+        "revision": {
+            "type": "literal",
+            "value": "573404107"
+        },
         "author": {
             "type": "literal",
             "value": "Tom Griffiths and Peter Pedrick"
@@ -643,6 +885,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Slightly_Scarlet_(1930_film)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "602880583$602880583$602880583"
         },
         "author": {
             "type": "literal",
@@ -654,6 +900,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Computer:_A_History_of_the_Information_Machine"
         },
+        "revision": {
+            "type": "literal",
+            "value": "595858859$595858859$595858859"
+        },
         "author": {
             "type": "literal",
             "value": "Martin Campbell-Kelly and William Aspray\nhttp://dbpedia.org/resource/Martin_Campbell-Kelly\nhttp://dbpedia.org/resource/William_Aspray"
@@ -663,6 +913,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/The_Nightly_News"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "532090855"
         },
         "author": {
             "type": "literal",
@@ -674,6 +928,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/The_New_Country"
         },
+        "revision": {
+            "type": "literal",
+            "value": "604297522$604297522"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Lukas_Moodysson\nhttp://dbpedia.org/resource/Peter_Birro"
@@ -682,17 +940,11 @@
     {
         "work": {
             "type": "uri",
-            "value": "http://dbpedia.org/resource/Ronin_Warriors__manga__1"
-        },
-        "author": {
-            "type": "literal",
-            "value": "http://dbpedia.org/resource/Hajime_Yatate"
-        }
-    },
-    {
-        "work": {
-            "type": "uri",
             "value": "http://dbpedia.org/resource/Little_Butterfly"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "584604291$584604291"
         },
         "author": {
             "type": "literal",
@@ -704,6 +956,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Girls_in_Distress"
         },
+        "revision": {
+            "type": "literal",
+            "value": "545723418$545723418$545723418"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Christa_Winsloe\nhttp://dbpedia.org/resource/Peter_Quinn_(writer)\nhttp://dbpedia.org/resource/Albrecht_Joseph"
@@ -712,17 +968,11 @@
     {
         "work": {
             "type": "uri",
-            "value": "http://dbpedia.org/resource/Honey_Love_(The_Drifters_song)"
-        },
-        "author": {
-            "type": "literal",
-            "value": "http://dbpedia.org/resource/Clyde_McPhatter\nhttp://dbpedia.org/resource/Jerry_Wexler"
-        }
-    },
-    {
-        "work": {
-            "type": "uri",
             "value": "http://dbpedia.org/resource/Into_White"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "606489794"
         },
         "author": {
             "type": "literal",
@@ -732,17 +982,11 @@
     {
         "work": {
             "type": "uri",
-            "value": "http://dbpedia.org/resource/Captain_Nagarjun"
-        },
-        "author": {
-            "type": "literal",
-            "value": "http://dbpedia.org/resource/Aatreya"
-        }
-    },
-    {
-        "work": {
-            "type": "uri",
             "value": "http://dbpedia.org/resource/El_crimen_de_la_calle_Bordadores"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "566433886"
         },
         "author": {
             "type": "literal",
@@ -752,7 +996,39 @@
     {
         "work": {
             "type": "uri",
+            "value": "http://dbpedia.org/resource/Captain_Nagarjun"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "546697952"
+        },
+        "author": {
+            "type": "literal",
+            "value": "http://dbpedia.org/resource/Aatreya"
+        }
+    },
+    {
+        "work": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Honey_Love_(The_Drifters_song)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "589124048$589124048"
+        },
+        "author": {
+            "type": "literal",
+            "value": "http://dbpedia.org/resource/Clyde_McPhatter\nhttp://dbpedia.org/resource/Jerry_Wexler"
+        }
+    },
+    {
+        "work": {
+            "type": "uri",
             "value": "http://dbpedia.org/resource/The_Sinister_Man"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "593150572"
         },
         "author": {
             "type": "literal",
@@ -764,6 +1040,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Naveed_(song)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "583713980"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Raine_Maida"
@@ -774,6 +1054,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Gypsy_(musical)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "606004387"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Arthur_Laurents"
@@ -782,17 +1066,11 @@
     {
         "work": {
             "type": "uri",
-            "value": "http://dbpedia.org/resource/Bobbie_Ann_Mason_(song)"
-        },
-        "author": {
-            "type": "literal",
-            "value": "http://dbpedia.org/resource/Mark_D._Sanders"
-        }
-    },
-    {
-        "work": {
-            "type": "uri",
             "value": "http://dbpedia.org/resource/Air_Apparent"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "578546897$578546897"
         },
         "author": {
             "type": "literal",
@@ -802,7 +1080,25 @@
     {
         "work": {
             "type": "uri",
+            "value": "http://dbpedia.org/resource/Bobbie_Ann_Mason_(song)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "576834035"
+        },
+        "author": {
+            "type": "literal",
+            "value": "http://dbpedia.org/resource/Mark_D._Sanders"
+        }
+    },
+    {
+        "work": {
+            "type": "uri",
             "value": "http://dbpedia.org/resource/Last_Dayz"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "540778209"
         },
         "author": {
             "type": "literal",
@@ -814,6 +1110,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Weeds_(Millennium)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "601026592"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Frank_Spotnitz"
@@ -823,6 +1123,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Adam's_Wall"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "569053862$569053862"
         },
         "author": {
             "type": "literal",
@@ -834,6 +1138,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Al_otro_lado"
         },
+        "revision": {
+            "type": "literal",
+            "value": "600037644"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Gustavo_Loza"
@@ -843,6 +1151,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Whatever_Happened_to_Corey_Haim%3F"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "572683287"
         },
         "author": {
             "type": "literal",
@@ -854,6 +1166,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Chameleon_Jail"
         },
+        "revision": {
+            "type": "literal",
+            "value": "580096375"
+        },
         "author": {
             "type": "literal",
             "value": "Kazuhiko Watanabe"
@@ -862,17 +1178,11 @@
     {
         "work": {
             "type": "uri",
-            "value": "http://dbpedia.org/resource/Way_Back_Home_(1931_film)"
-        },
-        "author": {
-            "type": "literal",
-            "value": "http://dbpedia.org/resource/Jane_Murfin"
-        }
-    },
-    {
-        "work": {
-            "type": "uri",
             "value": "http://dbpedia.org/resource/Burned_(The_Twilight_Zone)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "571058666$571058666"
         },
         "author": {
             "type": "literal",
@@ -882,7 +1192,25 @@
     {
         "work": {
             "type": "uri",
+            "value": "http://dbpedia.org/resource/Way_Back_Home_(1931_film)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "544788887"
+        },
+        "author": {
+            "type": "literal",
+            "value": "http://dbpedia.org/resource/Jane_Murfin"
+        }
+    },
+    {
+        "work": {
+            "type": "uri",
             "value": "http://dbpedia.org/resource/Virgin_Witch"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "574511065"
         },
         "author": {
             "type": "literal",
@@ -894,6 +1222,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/How_I_Became_a_Hindu"
         },
+        "revision": {
+            "type": "literal",
+            "value": "603512053$603512053"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Sita_Ram_Goel\nhttp://dbpedia.org/resource/Sita_Ram_Goel"
@@ -903,6 +1235,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Me_and_My_Town"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "545470164"
         },
         "author": {
             "type": "literal",
@@ -914,6 +1250,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Kizuna_(Aya_Ueto_song)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "547232348"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/T2ya"
@@ -923,6 +1263,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/The_Freshman_(Buffy_the_Vampire_Slayer)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "588573209"
         },
         "author": {
             "type": "literal",
@@ -934,6 +1278,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Murder_on_the_Midnight_Plane"
         },
+        "revision": {
+            "type": "literal",
+            "value": "593601628$593601628"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Gaby_Waters\nhttp://dbpedia.org/resource/Gaby_Waters"
@@ -942,7 +1290,25 @@
     {
         "work": {
             "type": "uri",
+            "value": "http://dbpedia.org/resource/History_of_the_DC_Universe"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "585860452"
+        },
+        "author": {
+            "type": "literal",
+            "value": "http://dbpedia.org/resource/Marv_Wolfman"
+        }
+    },
+    {
+        "work": {
+            "type": "uri",
             "value": "http://dbpedia.org/resource/Space_Mix_'98"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "542643656"
         },
         "author": {
             "type": "literal",
@@ -954,6 +1320,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Guys_Like_Me"
         },
+        "revision": {
+            "type": "literal",
+            "value": "596463609$596463609"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Eric_Church\nhttp://dbpedia.org/resource/Deric_Ruttan"
@@ -962,17 +1332,11 @@
     {
         "work": {
             "type": "uri",
-            "value": "http://dbpedia.org/resource/History_of_the_DC_Universe"
-        },
-        "author": {
-            "type": "literal",
-            "value": "http://dbpedia.org/resource/Marv_Wolfman"
-        }
-    },
-    {
-        "work": {
-            "type": "uri",
             "value": "http://dbpedia.org/resource/Heroes_II:_The_Return"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "581494516"
         },
         "author": {
             "type": "literal",
@@ -984,6 +1348,10 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Bang_Bang_(Kardinal_Offishall_song)"
         },
+        "revision": {
+            "type": "literal",
+            "value": "536234591"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Kardinal_Offishall"
@@ -993,6 +1361,10 @@
         "work": {
             "type": "uri",
             "value": "http://dbpedia.org/resource/Ups_and_Downs_(1937_film)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "601719956"
         },
         "author": {
             "type": "literal",
@@ -1004,9 +1376,27 @@
             "type": "uri",
             "value": "http://dbpedia.org/resource/Scarlet_Feather"
         },
+        "revision": {
+            "type": "literal",
+            "value": "544898209$544898209"
+        },
         "author": {
             "type": "literal",
             "value": "http://dbpedia.org/resource/Maeve_Binchy\nhttp://dbpedia.org/resource/Maeve_Binchy"
+        }
+    },
+    {
+        "work": {
+            "type": "uri",
+            "value": "http://dbpedia.org/resource/Annunciation_(church_of_San_Salvador)"
+        },
+        "revision": {
+            "type": "literal",
+            "value": "603153910"
+        },
+        "author": {
+            "type": "literal",
+            "value": "http://dbpedia.org/resource/Titian"
         }
     }
 ]

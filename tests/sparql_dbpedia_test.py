@@ -56,6 +56,7 @@ def test_select_by_relation(monkeypatch):
             'dbpedia-owl:writer',
             'dbpedia-owl:author'
         ],
+        revision=0,
         s_name='work',
         o_name='author',
         page=1
