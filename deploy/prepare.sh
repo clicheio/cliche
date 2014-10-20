@@ -10,6 +10,8 @@ prepare() {
 	packages="$(cat $(dirname $0)/apt-requirements.txt)"
 	echo $packages
 	sudo apt-get install -y $packages
+
+	# Web
 	sudo sysv-rc-conf nginx on
 	sudo sysv-rc-conf --list nginx
 	sudo service nginx start
@@ -29,10 +31,18 @@ prepare() {
 
 	revision="$(cat $(dirname $0)/etc/revision.txt)"
 
-	sudo -ucliche rm -f /home/cliche/bin/celery /home/cliche/etc/prod.cfg.yml
+	sudo -ucliche rm -f /home/cliche/bin/celery
 	sudo -ucliche ln -s /home/cliche/venv_$revision/bin/celery /home/cliche/bin/celery
-	sudo -ucliche ln -s /home/cliche/venv_$revision/etc/prod.cfg.yml /home/cliche/etc/prod.cfg.yml
 
+	sudo -ucliche rm -f /home/cliche/etc/prod.cfg.yml /home/cliche/etc/cliche-celery-beat.conf
+	sudo -ucliche ln -s /home/cliche/venv_$revision/etc/prod.cfg.yml /home/cliche/etc/prod.cfg.yml
+	sudo -ucliche ln -s /home/cliche/venv_$revision/etc/cliche-celery-beat.conf /home/cliche/etc/cliche-celery-beat.conf
+
+	# Celery beat
+	sudo rm -f /etc/init/cliche-celery-beat.conf
+	sudo ln -s /home/cliche/etc/cliche-celery-beat.conf /etc/init/cliche-celery-beat.conf
+
+	# Web
 	sudo rm -f /etc/nginx/sites-available/cliche.io /etc/nginx/sites-enabled/cliche.io
 	sudo ln -s /home/cliche/venv_$revision/etc/cliche.io /etc/nginx/sites-available/cliche.io
 	sudo ln -s /home/cliche/venv_$revision/etc/cliche.io /etc/nginx/sites-enabled/cliche.io
