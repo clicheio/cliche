@@ -14,27 +14,28 @@ prepare() {
 	sudo sysv-rc-conf --list nginx
 	sudo service nginx start
 
-	if [[ ! `id -u cliche >/dev/null 2>cliche` ]]; then
+	if [[ `id -u cliche >/dev/null 2>cliche` ]]; then
 		sudo useradd -m -G users cliche
 	fi
 
-	sudo -ucliche mkdir $HOME/etc
-	sudo -ucliche mkdir $HOME/bin
+	sudo -ucliche mkdir -p /home/cliche/etc
+	sudo -ucliche mkdir -p /home/cliche/bin
 
-	sudo -ucliche virtualenv -p `which python3.4` $HOME/venv_$(cat $(dirname $0)/revision.txt)
-	sudo -ucliche $HOME/venv_$(cat $(dirname $0)/revision.txt)/bin/pip install /tmp/$(cat $(dirname $0)/revision.txt)/Cliche-*.whl
-	sudo -ucliche mkdir -p $HOME/venv_$(cat $(dirname $0)/revision.txt)/etc
-	sudo -ucliche cp $(dirname $0)/prod.cfg.yml $HOME/venv_$(cat $(dirname $0)/revision.txt)/etc
-	sudo -ucliche cp $(dirname $0)/revision.txt $HOME/venv_$(cat $(dirname $0)/revision.txt)/etc
-	sudo -ucliche cp $(dirname $0)/cliche.io $HOME/venv_$(cat $(dirname $0)/revision.txt)/etc
+	sudo mv /tmp/cliche-deploy-$(cat $(dirname $0)/revision.txt).tar.gz /home/cliche
+	sudo -ucliche virtualenv -p `which python3.4` /home/cliche/venv_$(cat $(dirname $0)/revision.txt)
+	sudo -ucliche /home/cliche/venv_$(cat $(dirname $0)/revision.txt)/bin/pip install /tmp/$(cat $(dirname $0)/revision.txt)/Cliche-*.whl
+	sudo -ucliche mkdir -p /home/cliche/venv_$(cat $(dirname $0)/revision.txt)/etc
+	sudo -ucliche cp $(dirname $0)/prod.cfg.yml /home/cliche/venv_$(cat $(dirname $0)/revision.txt)/etc
+	sudo -ucliche cp $(dirname $0)/revision.txt /home/cliche/venv_$(cat $(dirname $0)/revision.txt)/etc
+	sudo -ucliche cp $(dirname $0)/cliche.io /home/cliche/venv_$(cat $(dirname $0)/revision.txt)/etc
 
-	sudo -ucliche rm -f $HOME/bin/celery $HOME/etc/prod.cfg.py
-	sudo -ucliche ln -s $HOME/venv_$(cat $(dirname $0)/revision.txt)/bin/celery $HOME/bin/celery
-	sudo -ucliche ln -s $HOME/venv_$(cat $(dirname $0)/revision.txt)/bin/prod.cfg.py $HOME/etc/prod.cfg.py
+	sudo -ucliche rm -f /home/cliche/bin/celery /home/cliche/etc/prod.cfg.py
+	sudo -ucliche ln -s /home/cliche/venv_$(cat $(dirname $0)/revision.txt)/bin/celery /home/cliche/bin/celery
+	sudo -ucliche ln -s /home/cliche/venv_$(cat $(dirname $0)/revision.txt)/bin/prod.cfg.py /home/cliche/etc/prod.cfg.py
 
 	sudo rm -f /etc/nginx/sites-available/cliche.io /etc/nginx/sites-enabled/cliche.io
-	sudo ln -s $HOME/venv_$(cat $(dirname $0)/revision.txt)/etc/cliche.io /etc/nginx/sites-available/cliche.io
-	sudo ln -s $HOME/venv_$(cat $(dirname $0)/revision.txt)/etc/cliche.io /etc/nginx/sites-enabled/cliche.io
+	sudo ln -s /home/cliche/venv_$(cat $(dirname $0)/revision.txt)/etc/cliche.io /etc/nginx/sites-available/cliche.io
+	sudo ln -s /home/cliche/venv_$(cat $(dirname $0)/revision.txt)/etc/cliche.io /etc/nginx/sites-enabled/cliche.io
 }
 
 not_compatible_with_os() {

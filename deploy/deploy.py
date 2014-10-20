@@ -3,7 +3,6 @@ import argparse
 import errno
 import os
 import pathlib
-import shlex
 import shutil
 import subprocess
 import sys
@@ -85,6 +84,18 @@ def main():
         shutil.rmtree(str(workdir / 'dist'))
     except FileNotFoundError:
         pass
+    try:
+        shutil.rmtree(str(workdir / 'deploy' / 'tmp'))
+    except FileNotFoundError:
+        pass
+
+    subprocess.check_call(
+        [
+            'mkdir',
+            '-p',
+            str(workdir / 'deploy' / 'tmp')
+        ]
+    )
 
     gitdir = workdir / '.git'
 
@@ -93,7 +104,10 @@ def main():
             revision = (args.build_number[0] + '_' +
                         head_file.readline().strip())
 
-    with (workdir / 'deploy' / 'revision.txt').open('w') as revision_file:
+    with (workdir /
+          'deploy' /
+          'tmp' /
+          'revision.txt').open('w') as revision_file:
         revision_file.write(revision + '\n')
 
     subprocess.check_call(
@@ -119,7 +133,7 @@ def main():
         execute_remote_script(web_worker[0], revision, 'prepare.sh')
         execute_remote_script(web_worker[0], revision, 'upgrade.sh')
 
-    if args.beat[0] is not None:
+    if args.beat is not None and args.beat[0] is not None:
         print('Uploading beat to ' + args.beat[0])
         upload(args.beat[0], revision, config, workdir)
         execute_remote_script(args.beat[0], revision, 'prepare.sh')
@@ -133,12 +147,48 @@ def main():
         print('Promoting web worker at ' + web_worker[0])
         execute_remote_script(web_worker[0], revision, 'promote.py')
 
-    if args.beat[0] is not None:
+    if args.beat is not None and args.beat[0] is not None:
         print('Promoting beat at ' + args.beat[0])
         execute_remote_script(args.beat[0], revision, 'promote.py')
 
 
 def upload(address, revision, config, workdir):
+    with (workdir /
+          'deploy' /
+          'tmp' /
+          'prod.cfg.yml').open('w') as f:
+        print(yaml.dump(config), file=f)
+    subprocess.check_call(
+        [
+            'cp',
+            str(workdir / 'deploy' / 'prepare.sh'),
+            str(workdir / 'deploy' / 'upgrade.sh'),
+            str(workdir / 'deploy' / 'promote.py'),
+            str(workdir / 'deploy' / 'apt-requirements.txt'),
+            str(workdir / 'deploy' / 'cliche.io'),
+            str(list((workdir / 'dist').glob('*.whl'))[0]),
+            str(workdir / 'deploy' / 'tmp')
+        ]
+    )
+    subprocess.check_call(
+        [
+            'tar',
+            'cvfz',
+            str(workdir /
+                'deploy' /
+                'cliche-deploy-{}.tar.gz'.format(revision))
+        ] + [path.name for path in ((workdir / 'deploy' / 'tmp').glob('*'))],
+        cwd=str(workdir / 'deploy' / 'tmp')
+    )
+    subprocess.check_call(
+        [
+            'scp',
+            str(workdir /
+                'deploy' /
+                'cliche-deploy-{}.tar.gz'.format(revision)),
+            address + ':' + str(tmp)
+        ]
+    )
     subprocess.check_call(
         [
             'ssh',
@@ -150,25 +200,13 @@ def upload(address, revision, config, workdir):
     )
     subprocess.check_call(
         [
-            'scp',
-            str(workdir / 'deploy' / 'prepare.sh'),
-            str(workdir / 'deploy' / 'upgrade.sh'),
-            str(workdir / 'deploy' / 'promote.py'),
-            str(workdir / 'deploy' / 'apt-requirements.txt'),
-            str(workdir / 'deploy' / 'revision.txt'),
-            str(workdir / 'deploy' / 'cliche.io'),
-            str(list((workdir / 'dist').glob('*.whl'))[0]),
-            address + ':' + str(tmp / revision)
-        ]
-    )
-    subprocess.check_call(
-        [
             'ssh',
             address,
-            'echo',
-            shlex.quote(yaml.dump(config)),
-            '>>',
-            str(tmp / revision / 'prod.cfg.yml'),
+            'tar',
+            'Cxvf',
+            str(tmp / revision),
+            str(tmp /
+                'cliche-deploy-{}.tar.gz'.format(revision))
         ]
     )
     subprocess.check_call(

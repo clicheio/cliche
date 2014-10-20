@@ -4,6 +4,7 @@ set -e
 
 upgrade() {
 	# pyvenv-3.4 $HOME/venv_$(cat $(dirname $0)/revision.txt)
+	echo 'This is a stub.'
 }
 
 not_compatible_with_os() {
