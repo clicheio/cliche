@@ -31,7 +31,7 @@ prepare() {
 
 	sudo -ucliche rm -f /home/cliche/bin/celery /home/cliche/etc/prod.cfg.py
 	sudo -ucliche ln -s /home/cliche/venv_$(cat $(dirname $0)/revision.txt)/bin/celery /home/cliche/bin/celery
-	sudo -ucliche ln -s /home/cliche/venv_$(cat $(dirname $0)/revision.txt)/bin/prod.cfg.py /home/cliche/etc/prod.cfg.py
+	sudo -ucliche ln -s /home/cliche/venv_$(cat $(dirname $0)/revision.txt)/etc/prod.cfg.py /home/cliche/etc/prod.cfg.py
 
 	sudo rm -f /etc/nginx/sites-available/cliche.io /etc/nginx/sites-enabled/cliche.io
 	sudo ln -s /home/cliche/venv_$(cat $(dirname $0)/revision.txt)/etc/cliche.io /etc/nginx/sites-available/cliche.io
