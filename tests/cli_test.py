@@ -40,7 +40,7 @@ def test_upgrade_downgrade_fail(fx_cli_runner, fx_cfg_yml_file):
     """downgrade work incorrectly"""
     result = fx_cli_runner.invoke(upgrade,
                                   ['-c', str(fx_cfg_yml_file), 'zzzzzzzzzzz'])
-    assert result.exit_code == 0
+    assert result.exit_code == 1
     assert "No such revision 'zzzzzzzzzzz'" in result.output
 
 
