@@ -93,7 +93,7 @@ def main():
         [
             'mkdir',
             '-p',
-            str(workdir / 'deploy' / 'tmp')
+            str(workdir / 'deploy' / 'tmp' / 'etc')
         ]
     )
 
@@ -107,6 +107,7 @@ def main():
     with (workdir /
           'deploy' /
           'tmp' /
+          'etc' /
           'revision.txt').open('w') as revision_file:
         revision_file.write(revision + '\n')
 
@@ -156,6 +157,7 @@ def upload(address, revision, config, workdir):
     with (workdir /
           'deploy' /
           'tmp' /
+          'etc' /
           'prod.cfg.yml').open('w') as f:
         print(yaml.dump(config), file=f)
     subprocess.check_call(
@@ -165,9 +167,15 @@ def upload(address, revision, config, workdir):
             str(workdir / 'deploy' / 'upgrade.sh'),
             str(workdir / 'deploy' / 'promote.py'),
             str(workdir / 'deploy' / 'apt-requirements.txt'),
-            str(workdir / 'deploy' / 'cliche.io'),
             str(list((workdir / 'dist').glob('*.whl'))[0]),
             str(workdir / 'deploy' / 'tmp')
+        ]
+    )
+    subprocess.check_call(
+        [
+            'cp',
+            str(workdir / 'deploy' / 'cliche.io'),
+            str(workdir / 'deploy' / 'tmp' / 'etc')
         ]
     )
     subprocess.check_call(
@@ -177,7 +185,8 @@ def upload(address, revision, config, workdir):
             str(workdir /
                 'deploy' /
                 'cliche-deploy-{}.tar.gz'.format(revision))
-        ] + [path.name for path in ((workdir / 'deploy' / 'tmp').glob('*'))],
+        ] + [str(path.relative_to(workdir / 'deploy' / 'tmp'))
+             for path in ((workdir / 'deploy' / 'tmp').glob('*'))],
         cwd=str(workdir / 'deploy' / 'tmp')
     )
     subprocess.check_call(
