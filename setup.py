@@ -147,7 +147,19 @@ class history(BaseAlembicCommand):
 
     def alembic_process(self, config):
         from alembic.command import history
-        history(config)
+        from alembic.environment import EnvironmentContext
+        from alembic.script import ScriptDirectory
+
+        from cliche.web.app import app
+        from cliche.web.db import get_database_engine
+
+        with app.app_context():
+            engine = get_database_engine()
+        script = ScriptDirectory.from_config(config)
+        with EnvironmentContext(config, script, as_sql=False,
+                                destination_rev=None, tag=None) as context:
+            context.configure(engine.contextual_connect(), engine.url)
+            history(config)
 
 
 class pytest(test):
