@@ -17,11 +17,6 @@ prepare() {
 	echo $packages
 	sudo apt-get install -y $packages
 
-	# Web
-	sudo sysv-rc-conf nginx on
-	sudo sysv-rc-conf --list nginx
-	sudo service nginx start
-
 	if [[ `id -u cliche >/dev/null 2>cliche` ]]; then
 		sudo useradd -m -G users cliche
 	fi
@@ -35,24 +30,25 @@ prepare() {
 	sudo -ucliche mkdir -p /home/cliche/venv_$revision/etc
 	sudo -ucliche cp $deploy_root/etc/* /home/cliche/venv_$revision/etc
 
+	# celery
 	sudo -ucliche rm -f /home/cliche/bin/celery
-	sudo -ucliche ln -s /home/cliche/venv_$revision/bin/celery /home/cliche/bin/celery
+	sudo -ucliche ln -fs /home/cliche/venv_$revision/bin/celery /home/cliche/bin/celery
 
 	sudo -ucliche rm -f /home/cliche/etc/prod.cfg.yml /home/cliche/etc/cliche-celery-beat.conf /home/cliche/etc/cliche.io
-	sudo -ucliche ln -s /home/cliche/venv_$revision/etc/prod.cfg.yml /home/cliche/etc/prod.cfg.yml
-	sudo -ucliche ln -s /home/cliche/venv_$revision/etc/cliche-celery-beat.conf /home/cliche/etc/cliche-celery-beat.conf
-	sudo -ucliche ln -s /home/cliche/venv_$revision/etc/cliche.io /home/cliche/etc/cliche.io
+	sudo -ucliche ln -fs /home/cliche/venv_$revision/etc/prod.cfg.yml /home/cliche/etc/prod.cfg.yml
+	sudo -ucliche ln -fs /home/cliche/venv_$revision/etc/cliche-celery-beat.conf /home/cliche/etc/cliche-celery-beat.conf
+	sudo -ucliche ln -fs /home/cliche/venv_$revision/etc/cliche.io /home/cliche/etc/cliche.io
 
 	# Celery beat
 	sudo rm -f /etc/init/cliche-celery-beat.conf
-	sudo ln -s /home/cliche/etc/cliche-celery-beat.conf /etc/init/cliche-celery-beat.conf
+	sudo ln -fs /home/cliche/etc/cliche-celery-beat.conf /etc/init/cliche-celery-beat.conf
 
 	# Web
 	sudo rm -f /etc/nginx/sites-available/cliche.io
-	sudo ln -s /home/cliche/etc/cliche.io /etc/nginx/sites-available/cliche.io
+	sudo ln -fs /home/cliche/etc/cliche.io /etc/nginx/sites-available/cliche.io
 
 	sudo rm -f /etc/nginx/sites-enabled/cliche.io
-	sudo ln -s /etc/nginx/sites-available/cliche.io /etc/nginx/sites-enabled/cliche.io
+	sudo ln -fs /etc/nginx/sites-available/cliche.io /etc/nginx/sites-enabled/cliche.io
 }
 
 not_compatible_with_os() {
