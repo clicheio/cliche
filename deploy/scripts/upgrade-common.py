@@ -59,6 +59,16 @@ def main():
         [
             'sudo',
             '-ucliche',
+            str(venv_dir / 'bin' / 'pip').format(revision),
+            'install',
+            'redis',
+        ]
+    )
+
+    subprocess.check_call(
+        [
+            'sudo',
+            '-ucliche',
             'mkdir',
             '-p',
             str(venv_dir / 'etc'),
