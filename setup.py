@@ -205,6 +205,13 @@ setup(
     url='http://cliche.io/',
     license='AGPLv3 or later',
     packages=find_packages(exclude=['tests']),
+    package_data={
+        'cliche': [
+            'migrations/env.py',
+            'migrations/script.py.mako',
+            'migrations/versions/*.py'
+        ]
+    },
     zip_safe=False,
     entry_points='''
         [console_scripts]
