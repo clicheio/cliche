@@ -127,7 +127,6 @@ def main():
         print('Uploading beat to ' + args.beat[0])
         upload(args.beat[0], revision, config, workdir)
         execute_remote_script(args.beat[0], revision, 'prepare-common.sh')
-        execute_remote_script(args.beat[0], revision, 'prepare-beat.sh')
         execute_remote_script(args.beat[0], revision, 'upgrade-common.py')
 
     for crawler in args.crawler or []:
