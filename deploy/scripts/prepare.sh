@@ -1,5 +1,8 @@
 #!/bin/bash
 # Script to prepare target for deployment
+# Common installation that must be run only once
+# when deploying for the first time should be
+# placed on this script.
 set -e
 
 prepare() {
