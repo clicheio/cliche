@@ -97,7 +97,8 @@ def main():
         [
             'mkdir',
             '-p',
-            str(workdir / 'deploy' / 'tmp' / 'etc')
+            str(workdir / 'deploy' / 'tmp' / 'etc'),
+            str(workdir / 'deploy' / 'tmp' / 'scripts'),
         ]
     )
 
@@ -122,39 +123,39 @@ def main():
             'egg_info',
             '-b',
             '_{}'.format(revision),
-            'bdist_wheel'
+            'bdist_wheel',
         ]
     )
 
     if args.beat is not None and args.beat[0] is not None:
         print('Uploading beat to ' + args.beat[0])
         upload(args.beat[0], revision, config, workdir)
-        execute_remote_script(args.beat[0], revision, 'prepare.sh')
-        execute_remote_script(args.beat[0], revision, 'upgrade.py')
+        execute_remote_script(args.beat[0], revision, 'prepare-common.sh')
+        execute_remote_script(args.beat[0], revision, 'upgrade-common.py')
 
     for crawler in args.crawler or []:
         print('Uploading crawler to ' + crawler[0])
         upload(crawler[0], revision, config, workdir)
-        execute_remote_script(crawler[0], revision, 'prepare.sh')
-        execute_remote_script(crawler[0], revision, 'upgrade.py')
+        execute_remote_script(crawler[0], revision, 'prepare-common.sh')
+        execute_remote_script(crawler[0], revision, 'upgrade-common.py')
 
     for web_worker in args.web_worker or []:
         print('Uploading web worker to ' + web_worker[0])
         upload(web_worker[0], revision, config, workdir)
-        execute_remote_script(web_worker[0], revision, 'prepare.sh')
-        execute_remote_script(web_worker[0], revision, 'upgrade.py')
+        execute_remote_script(web_worker[0], revision, 'prepare-common.sh')
+        execute_remote_script(web_worker[0], revision, 'upgrade-common.py')
 
     if args.beat is not None and args.beat[0] is not None:
         print('Promoting beat at ' + args.beat[0])
-        execute_remote_script(args.beat[0], revision, 'promote.py')
+        execute_remote_script(args.beat[0], revision, 'promote-common.py')
 
     for crawler in args.crawler or []:
         print('Promoting crawler at ' + crawler[0])
-        execute_remote_script(crawler[0], revision, 'promote.py')
+        execute_remote_script(crawler[0], revision, 'promote-common.py')
 
     for web_worker in args.web_worker or []:
         print('Promoting web worker at ' + web_worker[0])
-        execute_remote_script(web_worker[0], revision, 'promote.py')
+        execute_remote_script(web_worker[0], revision, 'promote-common.py')
 
 
 def upload(address, revision, config, workdir):
@@ -168,25 +169,25 @@ def upload(address, revision, config, workdir):
         [
             'cp',
             str(list((workdir / 'dist').glob('*.whl'))[0]),
-            str(workdir / 'deploy' / 'tmp')
+            str(workdir / 'deploy' / 'tmp'),
         ]
     )
     subprocess.check_call(
         [
-            'cp'
+            'cp',
         ] +
         [str(path) for path in ((workdir / 'deploy' / 'scripts').glob('*'))] +
         [
-            str(workdir / 'deploy' / 'tmp' / 'scripts')
+            str(workdir / 'deploy' / 'tmp' / 'scripts'),
         ]
     )
     subprocess.check_call(
         [
-            'cp'
+            'cp',
         ] +
         [str(path) for path in ((workdir / 'deploy' / 'etc').glob('*'))] +
         [
-            str(workdir / 'deploy' / 'tmp' / 'etc')
+            str(workdir / 'deploy' / 'tmp' / 'etc'),
         ]
     )
     subprocess.check_call(
@@ -206,7 +207,7 @@ def upload(address, revision, config, workdir):
             str(workdir /
                 'deploy' /
                 'cliche-deploy-{}.tar.gz'.format(revision)),
-            address + ':' + str(tmp)
+            address + ':' + str(tmp),
         ]
     )
     subprocess.check_call(
@@ -215,7 +216,7 @@ def upload(address, revision, config, workdir):
             address,
             'mkdir',
             '-p',
-            str(tmp / revision)
+            str(tmp / revision),
         ]
     )
     subprocess.check_call(
@@ -226,7 +227,7 @@ def upload(address, revision, config, workdir):
             'Cxvf',
             str(tmp / revision),
             str(tmp /
-                'cliche-deploy-{}.tar.gz'.format(revision))
+                'cliche-deploy-{}.tar.gz'.format(revision)),
         ]
     )
     subprocess.check_call(
@@ -235,10 +236,11 @@ def upload(address, revision, config, workdir):
             address,
             'chmod',
             '+x',
-            str(tmp / revision / 'scripts' / 'prepare.sh'),
-            str(tmp / revision / 'scripts' / 'upgrade.py'),
-            str(tmp / revision / 'scripts' / 'promote.py')
-        ]
+        ] +
+        [str(path.relative_to(tmp / revision / 'scripts'))
+         for path in ((tmp / revision / 'scripts').glob('*.sh'))] +
+        [str(path.relative_to(tmp / revision / 'scripts'))
+         for path in ((tmp / revision / 'scripts').glob('*.py'))]
     )
 
 
