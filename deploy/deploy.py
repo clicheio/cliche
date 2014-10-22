@@ -7,7 +7,7 @@ import shutil
 import subprocess
 import sys
 
-import yaml
+from yaml import load, dump
 
 
 tmp = pathlib.Path('/tmp')
@@ -62,7 +62,7 @@ def main():
         sys.exit(errno.EPERM)
 
     with config_file.open('r') as config_data:
-        config = yaml.load(config_data)
+        config = load(config_data)
 
     config['database_url'] = 'postgres://{}/cliche' \
                              .format(args.db_host[0].rpartition('@')[2])
@@ -164,7 +164,7 @@ def upload(address, revision, config, workdir):
           'tmp' /
           'etc' /
           'prod.cfg.yml').open('w') as f:
-        print(yaml.dump(config), file=f)
+        print(dump(config), file=f)
     subprocess.check_call(
         [
             'cp',
