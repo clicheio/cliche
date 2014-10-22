@@ -8,7 +8,9 @@ from pytest import fixture, yield_fixture
 from yaml import dump
 
 from cliche.celery import app as celery_app
+from cliche.name import Name
 from cliche.people import Person, Team
+from cliche.sqltypes import HashableLocale as Locale
 from cliche.web.app import app
 from cliche.work import Credit, Franchise, Genre, Role, Work, World
 
@@ -66,23 +68,48 @@ class FixtureModule(types.ModuleType):
 
 @fixture
 def fx_people(fx_session):
-    """create people: four artisits and Peter Jackson"""
+    """create people: four artists and Peter Jackson"""
     f = FixtureModule('fx_people')
-    f.clamp_member_1 = Person(name='Nanase Ohkawa',
-                              dob=datetime.date(1967, 5, 2))
+
+    # create four artists of 'CLAMP' team
+    f.clamp_member_1 = Person(dob=datetime.date(1967, 5, 2))
+    f.clamp_member_1.names.update({
+        Name(nameable=f.clamp_member_1,
+             name='Nanase Ohkawa',
+             locale=Locale.parse('en_US'))
+    })
     fx_session.add(f.clamp_member_1)
-    f.clamp_member_2 = Person(name='Mokona',
-                              dob=datetime.date(1968, 6, 16))
+    f.clamp_member_2 = Person(dob=datetime.date(1968, 6, 16))
+    f.clamp_member_2.names.update({
+        Name(nameable=f.clamp_member_2,
+             name='Mokona',
+             locale=Locale.parse('en_US'))
+    })
     fx_session.add(f.clamp_member_2)
-    f.clamp_member_3 = Person(name='Tsubaki Nekoi',
-                              dob=datetime.date(1969, 1, 21))
+    f.clamp_member_3 = Person(dob=datetime.date(1969, 1, 21))
+    f.clamp_member_3.names.update({
+        Name(nameable=f.clamp_member_3,
+             name='Tsubaki Nekoi',
+             locale=Locale.parse('en_US'))
+    })
     fx_session.add(f.clamp_member_3)
-    f.clamp_member_4 = Person(name='Satsuki Igarashi',
-                              dob=datetime.date(1969, 2, 8))
+    f.clamp_member_4 = Person(dob=datetime.date(1969, 2, 8))
+    f.clamp_member_4.names.update({
+        Name(nameable=f.clamp_member_4,
+             name='Satsuki Igarashi',
+             locale=Locale.parse('en_US'))
+    })
     fx_session.add(f.clamp_member_4)
-    f.peter_jackson = Person(name='Peter Jackson',
-                             dob=datetime.date(1961, 10, 31))
+
+    # create 'Peter Jackson'
+    f.peter_jackson = Person(dob=datetime.date(1961, 10, 31))
+    f.peter_jackson.names.update({
+        Name(nameable=f.peter_jackson,
+             name='Peter Jackson',
+             locale=Locale.parse('en_US'))
+    })
     fx_session.add(f.peter_jackson)
+
     fx_session.flush()
     return f
 
@@ -92,12 +119,20 @@ def fx_teams(fx_session, fx_people):
     """create teams: CLAMP which consists of the four artists"""
     f = FixtureModule('fx_teams')
     f += fx_people
-    f.clamp = Team(name='CLAMP')
-    f.clamp.members.update({fx_people.clamp_member_1,
-                            fx_people.clamp_member_2,
-                            fx_people.clamp_member_3,
-                            fx_people.clamp_member_4})
+
+    # create 'CLAMP' team
+    f.clamp = Team()
+    f.clamp.names.update({
+        Name(nameable=f.clamp,
+             name='CLAMP',
+             locale=Locale.parse('en_US'))
+    })
+    f.clamp.members.update({f.clamp_member_1,
+                            f.clamp_member_2,
+                            f.clamp_member_3,
+                            f.clamp_member_4})
     fx_session.add(f.clamp)
+
     fx_session.flush()
     return f
 
@@ -107,8 +142,12 @@ def fx_genres(fx_session):
     """create genres: Comic and Romance"""
     f = FixtureModule('fx_genres')
     f.session = fx_session
+
+    # create 'Comic' genre
     f.comic = Genre(name='Comic')
     fx_session.add(f.comic)
+
+    # create 'Romance' genre
     f.romance = Genre(name='Romance')
     fx_session.add(f.romance)
     fx_session.flush()
@@ -120,10 +159,25 @@ def fx_worlds(fx_session):
     """create worlds: *Middle-earth* and *Marvel Cinematic Universe*."""
     f = FixtureModule('fx_worlds')
     f.session = fx_session
-    f.middle_earth = World(name='Middle-earth')
+
+    # create fictional universe, 'Middle-earth'
+    f.middle_earth = World()
+    f.middle_earth.names.update({
+        Name(nameable=f.middle_earth,
+             name='Middle-earth',
+             locale=Locale.parse('en_US'))
+    })
     fx_session.add(f.middle_earth)
-    f.marvel_universe = World(name='Marvel Cinematic Universe')
+
+    # create 'Marvel Cinematic Universe'
+    f.marvel_universe = World()
+    f.marvel_universe.names.update({
+        Name(nameable=f.marvel_universe,
+             name='Marvel Cinematic Universe',
+             locale=Locale.parse('en_US'))
+    })
     fx_session.add(f.marvel_universe)
+
     fx_session.flush()
     return f
 
@@ -137,21 +191,57 @@ def fx_franchises(fx_session, fx_worlds):
     f = FixtureModule('fx_franchises')
     f.session = fx_session
     f += fx_worlds
-    f.lord_of_rings = Franchise(name='The Lord of the Rings')
+
+    # create 'The Lord of the Rings'
+    f.lord_of_rings = Franchise()
+    f.lord_of_rings.names.update({
+        Name(nameable=f.lord_of_rings,
+             name='The Lord of the Rings',
+             locale=Locale.parse('en_US'))
+    })
     f.lord_of_rings.world = f.middle_earth
     fx_session.add(f.lord_of_rings)
-    f.iron_man = Franchise(name='Iron Man')
+
+    # create 'Iron Man'
+    f.iron_man = Franchise()
+    f.iron_man.names.update({
+        Name(nameable=f.iron_man,
+             name='Iron Man',
+             locale=Locale.parse('en_US'))
+    })
     f.iron_man.world = f.marvel_universe
     fx_session.add(f.iron_man)
-    f.captain_america = Franchise(name='Captain America')
+
+    # create 'Captain America'
+    f.captain_america = Franchise()
+    f.captain_america.names.update({
+        Name(nameable=f.captain_america,
+             name='Captain America',
+             locale=Locale.parse('en_US'))
+    })
     f.captain_america.world = f.marvel_universe
     fx_session.add(f.captain_america)
-    f.hulk = Franchise(name='Hulk')
+
+    # create 'Hulk'
+    f.hulk = Franchise()
+    f.hulk.names.update({
+        Name(nameable=f.hulk,
+             name='Hulk',
+             locale=Locale.parse('en_US'))
+    })
     f.hulk.world = f.marvel_universe
     fx_session.add(f.hulk)
-    f.thor = Franchise(name='Thor')
+
+    # create 'Thor'
+    f.thor = Franchise()
+    f.thor.names.update({
+        Name(nameable=f.thor,
+             name='Thor',
+             locale=Locale.parse('en_US'))
+    })
     f.thor.world = f.marvel_universe
     fx_session.add(f.thor)
+
     fx_session.flush()
     return f
 
@@ -175,59 +265,67 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     f += fx_genres
     f += fx_franchises
 
-    f.cardcaptor_sakura = Work(name='Cardcaptor Sakura',
-                               published_at=datetime.date(1996, 11, 22))
+    # create 'Cardcaptor Sakura'
+    f.cardcaptor_sakura = Work(published_at=datetime.date(1996, 11, 22))
     f.cardcaptor_sakura.genres.update({f.comic, f.romance})
+    f.cardcaptor_sakura.names.update({
+        Name(nameable=f.cardcaptor_sakura,
+             name='Cardcaptor Sakura',
+             locale=Locale.parse('en_US'))
+    })
     fx_session.add(f.cardcaptor_sakura)
-    fx_session.flush()
-    f.skura_member_asso_1 = Credit(
-        work_id=f.cardcaptor_sakura.id,
-        person_id=f.clamp_member_1.id,
-        role=Role.artist,
-        team_id=f.clamp.id
-    )
+
+    f.skura_member_asso_1 = Credit(work=f.cardcaptor_sakura,
+                                   person=f.clamp_member_1,
+                                   team=f.clamp,
+                                   role=Role.artist)
     fx_session.add(f.skura_member_asso_1)
-    f.skura_member_asso_2 = Credit(
-        work_id=f.cardcaptor_sakura.id,
-        person_id=f.clamp_member_2.id,
-        role=Role.artist,
-        team_id=f.clamp.id
-    )
+
+    f.skura_member_asso_2 = Credit(work=f.cardcaptor_sakura,
+                                   person=f.clamp_member_2,
+                                   team=f.clamp,
+                                   role=Role.artist)
     fx_session.add(f.skura_member_asso_2)
-    f.skura_member_asso_3 = Credit(
-        work_id=f.cardcaptor_sakura.id,
-        person_id=f.clamp_member_3.id,
-        role=Role.artist,
-        team_id=f.clamp.id
-    )
+
+    f.skura_member_asso_3 = Credit(work=f.cardcaptor_sakura,
+                                   person=f.clamp_member_3,
+                                   team=f.clamp,
+                                   role=Role.artist)
     fx_session.add(f.skura_member_asso_3)
-    f.skura_member_asso_4 = Credit(
-        work_id=f.cardcaptor_sakura.id,
-        person_id=f.clamp_member_4.id,
-        role=Role.artist,
-        team_id=f.clamp.id
-    )
+
+    f.skura_member_asso_4 = Credit(work=f.cardcaptor_sakura,
+                                   person=f.clamp_member_4,
+                                   team=f.clamp,
+                                   role=Role.artist)
     fx_session.add(f.skura_member_asso_4)
 
-    f.lord_of_rings_film = Work(
-        name='The Lord of the Rings: The Fellowship of the Ring',
-    )
-    fx_session.add(f.lord_of_rings_film)
-    fx_session.flush()
+    # create 'The Lord of the Rings: The Fellowship of the Ring'
+    f.lord_of_rings_film = Work()
+    f.lord_of_rings_film.names.update({
+        Name(nameable=f.lord_of_rings_film,
+             name='The Lord of the Rings: The Fellowship of the Ring',
+             locale=Locale.parse('en_US'))
+    })
     f.lor_film_asso_1 = Credit(
-        work_id=f.lord_of_rings_film.id,
-        person_id=f.peter_jackson.id,
+        work=f.lord_of_rings_film,
+        person=f.peter_jackson,
         role=Role.director
     )
     fx_session.add(f.lor_film_asso_1)
     f.lord_of_rings_film.franchises.update({f.lord_of_rings})
+    fx_session.add(f.lord_of_rings_film)
 
-    f.avengers = Work(name='The Avengers')
-    fx_session.add(f.avengers)
-    fx_session.flush()
+    # create 'The Avengers'
+    f.avengers = Work()
+    f.avengers.names.update({
+        Name(nameable=f.avengers,
+             name='The Avengers',
+             locale=Locale.parse('en_US'))
+    })
     f.avengers.franchises.update({
         f.iron_man, f.captain_america, f.hulk, f.thor
     })
+    fx_session.add(f.avengers)
 
     fx_session.flush()
     return f

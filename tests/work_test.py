@@ -1,4 +1,4 @@
-from cliche.work import Credit, Role
+from cliche.work import Credit, Franchise, Role, Work, World
 
 
 def test_genres_of_work(fx_works, fx_genres):
@@ -99,3 +99,23 @@ def test_credit_removed_with_person(fx_session, fx_works, fx_people):
         filter_by(person_id=member_1_id).\
         count()
     assert num_credits == 0
+
+
+def test_discriminator():
+    def assert_discriminator(cls):
+        try:
+            cls(type='changing_manually')
+            assert False
+        except AttributeError:
+            pass
+
+        ins = cls()
+        try:
+            ins.type = 'changing_manually'
+            assert False
+        except AttributeError:
+            pass
+
+    assert_discriminator(Franchise)
+    assert_discriminator(Work)
+    assert_discriminator(World)

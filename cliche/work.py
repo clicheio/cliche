@@ -10,7 +10,8 @@ from sqlalchemy.sql.functions import now
 from sqlalchemy.types import Date, DateTime, Integer, String
 
 from .orm import Base
-from .sqltypes import EnumType
+from .sqltypes import EnumType, prevent_discriminator_from_changing
+from .name import Nameable
 
 __all__ = ('Credit', 'Franchise', 'Genre', 'Role', 'Work', 'WorkFranchise',
            'WorkGenre', 'World')
@@ -59,26 +60,23 @@ class Credit(Base):
                         default=now())
 
     __tablename__ = 'credits'
-    __repr_columns__ = person_id, work_id, team_id
+    __repr_columns__ = person_id, work_id, role, team_id
 
 
-class Franchise(Base):
+class Franchise(Nameable):
     """Multimedia franchise that is a franchise for which installments
     exist in multiple forms of media, such as books, comic books, and films,
     for example *The Lord of the Rings* and *Iron Man*.
     """
 
     #: (:class:`int`) The primary key integer.
-    id = Column(Integer, primary_key=True)
-
-    #: (:class:`str`) The name of the franchise.
-    name = Column(String, nullable=False, index=True)
+    id = Column(Integer, ForeignKey(Nameable.id), primary_key=True)
 
     #: (:class:`int`) :class:`World.id` of :attr:`world`.
     world_id = Column(Integer, ForeignKey('worlds.id'))
 
     #: (:class:`World`) The world which the franchise belongs to.
-    world = relationship('World')
+    world = relationship('World', foreign_keys=[world_id])
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkFranchise`\ s that the franchise has.
@@ -98,7 +96,10 @@ class Franchise(Base):
                         default=now())
 
     __tablename__ = 'franchises'
-    __repr_columns__ = id, name
+    __repr_columns__ = [id]
+    __mapper_args__ = {
+        'polymorphic_identity': 'franchises',
+    }
 
 
 class Genre(Base):
@@ -133,16 +134,13 @@ class Genre(Base):
     __repr_columns__ = id, name
 
 
-class Work(Base):
-    """Creative work(s) that could be a single work such as a film, or
+class Work(Nameable):
+    """Creative work(s) that could be a single work like a film, or
     a series of works such as a combic book series and a television series.
     """
 
     #: (:class:`int`) The primary key integer.
-    id = Column(Integer, primary_key=True)
-
-    #: (:class:`str`) The name of the work.
-    name = Column(String, nullable=False, index=True)
+    id = Column(Integer, ForeignKey(Nameable.id), primary_key=True)
 
     #: (:class:`datetime.date`) The publication date.
     published_at = Column(Date)
@@ -185,7 +183,10 @@ class Work(Base):
                         index=True)
 
     __tablename__ = 'works'
-    __repr_columns__ = id, name
+    __repr_columns__ = [id]
+    __mapper_args__ = {
+        'polymorphic_identity': 'works',
+    }
 
 
 class WorkFranchise(Base):
@@ -236,21 +237,20 @@ class WorkGenre(Base):
     __repr_columns__ = work_id, genre_id
 
 
-class World(Base):
+class World(Nameable):
     """Fictional universe that is a self-consistent fictional setting
     with elements that differ from the real world,
     for example *Middle-earth* and *Marvel Cinematic Universe*.
     """
 
     #: (:class:`int`) The primary key integer.
-    id = Column(Integer, primary_key=True)
-
-    #: (:class:`str`) The name of the world.
-    name = Column(String, nullable=False, index=True)
+    id = Column(Integer, ForeignKey(Nameable.id), primary_key=True)
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`Franchise`\ s that belong the world.
-    franchises = relationship(Franchise, collection_class=set)
+    franchises = relationship(Franchise,
+                              foreign_keys=[id],
+                              collection_class=set)
 
     #: (:class:`datetime.datetime`) The date and time on which
     #: the record was created.
@@ -258,4 +258,12 @@ class World(Base):
                         default=now())
 
     __tablename__ = 'worlds'
-    __repr_columns__ = id, name
+    __repr_columns__ = [id]
+    __mapper_args__ = {
+        'polymorphic_identity': 'worlds',
+    }
+
+
+prevent_discriminator_from_changing(Franchise.type)
+prevent_discriminator_from_changing(Work.type)
+prevent_discriminator_from_changing(World.type)

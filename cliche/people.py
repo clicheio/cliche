@@ -5,21 +5,19 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.sql.functions import now
-from sqlalchemy.types import Date, DateTime, Integer, String
+from sqlalchemy.types import Date, DateTime, Integer
 
 from .orm import Base
+from .name import Nameable
 
 __all__ = 'Person', 'Team', 'TeamMembership'
 
 
-class Person(Base):
+class Person(Nameable):
     """People i.e. artists, editors."""
 
     #: (:class:`int`) The primary key integer.
-    id = Column(Integer, primary_key=True)
-
-    #: (:class:`str`) His/her name.
-    name = Column(String, nullable=False, index=True)
+    id = Column(Integer, ForeignKey(Nameable.id), primary_key=True)
 
     #: (:class:`datetime.date`) The date of birth.
     dob = Column(Date)
@@ -52,17 +50,17 @@ class Person(Base):
                            collection_class=set)
 
     __tablename__ = 'people'
-    __repr_columns__ = id, name
+    __repr_columns__ = [id]
+    __mapper_args__ = {
+        'polymorphic_identity': 'people',
+    }
 
 
-class Team(Base):
+class Team(Nameable):
     """Teams (including ad-hoc teams)."""
 
     #: (:class:`int`) The primary key integer.
-    id = Column(Integer, primary_key=True)
-
-    #: (:class:`str`) The team name (if it's named).
-    name = Column(String, index=True)
+    id = Column(Integer, ForeignKey(Nameable.id), primary_key=True)
 
     #: (:class:`datetime.datetime`) The created time.
     created_at = Column(DateTime(timezone=True),
@@ -86,7 +84,10 @@ class Team(Base):
     credits = relationship('Credit', collection_class=set)
 
     __tablename__ = 'teams'
-    __repr_columns__ = id, name
+    __repr_columns__ = [id]
+    __mapper_args__ = {
+        'polymorphic_identity': 'teams',
+    }
 
 
 class TeamMembership(Base):

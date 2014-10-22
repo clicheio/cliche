@@ -15,11 +15,9 @@ def test_person_has_teams(fx_people, fx_teams):
 
 
 def test_membership_removed_with_team(fx_session, fx_people, fx_teams):
-    clamp_id = fx_people.clamp_member_1.id
-
     # before delete the team.
     num_memberships = fx_session.query(TeamMembership).\
-        filter_by(team_id=clamp_id).\
+        filter_by(team=fx_teams.clamp).\
         count()
     assert num_memberships == 4
 
@@ -28,17 +26,15 @@ def test_membership_removed_with_team(fx_session, fx_people, fx_teams):
 
     # after delete the team.
     num_memberships = fx_session.query(TeamMembership).\
-        filter_by(team_id=clamp_id).\
+        filter_by(team=fx_teams.clamp).\
         count()
     assert num_memberships == 0
 
 
 def test_membership_removed_with_person(fx_session, fx_people, fx_teams):
-    member_1_id = fx_people.clamp_member_1.id
-
     # before delete the person.
     num_memberships = fx_session.query(TeamMembership).\
-        filter_by(member_id=member_1_id).\
+        filter_by(member=fx_people.clamp_member_1).\
         count()
     assert num_memberships == 1
 
@@ -47,6 +43,6 @@ def test_membership_removed_with_person(fx_session, fx_people, fx_teams):
 
     # after delete the person.
     num_memberships = fx_session.query(TeamMembership).\
-        filter_by(member_id=member_1_id).\
+        filter_by(member=fx_people.clamp_member_1).\
         count()
     assert num_memberships == 0

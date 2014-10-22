@@ -4,15 +4,42 @@
 """
 import enum
 
-from sqlalchemy.types import Enum, SchemaType, TypeDecorator
+from babel import Locale
+from sqlalchemy.orm.events import event
+from sqlalchemy.sql.expression import func
+from sqlalchemy.types import Enum, SchemaType, String, TypeDecorator
+from sqlalchemy.util.langhelpers import _symbol
 
-__all__ = 'EnumType',
+__all__ = ('EnumType', 'HashableLocale', 'LocaleType',
+           'prevent_discriminator_from_changing', 'prevent_instantiating')
+
+
+def prevent_discriminator_from_changing(col):
+    def set_discriminator(target, value, oldvalue, initiator):
+        oldvalue_is_none = (
+            oldvalue.__class__ != _symbol or oldvalue.name != 'NO_VALUE'
+        )
+        value_is_wrong = (
+            value != target.__mapper_args__['polymorphic_identity']
+        )
+        if oldvalue_is_none or value_is_wrong:
+            raise AttributeError('discriminator column cannot be changed')
+
+    event.listen(col, 'set', set_discriminator)
+
+
+def prevent_instantiating(cls):
+    def init_non_instantiable_cls(target, args, kwargs):
+        raise Exception('{} cannot be instantiated'.format(target.__class__))
+
+    event.listen(cls, 'init', init_non_instantiable_cls)
 
 
 class EnumType(TypeDecorator, SchemaType):
-    """Enum type to be used as :class:`enum.Enum` in Python standard library.
-    It inherits :class:`sqlalchemy.types.SchemaType` since it requires
-    schema-level DDL. PostgreSQL ENUM type must be explicitly created/dropped.
+    """Custom enum type to be used as :class:`enum.Enum`in Python standard
+    library. It inherits :class:`sqlalchemy.types.SchemaType` since it
+    requires schema-level DDL. PostgreSQL ENUM type defined in an Alembic
+    script must be explicitly created/dropped.
     """
 
     impl = Enum
@@ -35,3 +62,37 @@ class EnumType(TypeDecorator, SchemaType):
     @property
     def python_type(self):
         return self._enum_class
+
+
+class HashableLocale(Locale):
+    """Hashable Locale"""
+
+    def __hash__(self):
+        return hash('{}_{}'.format(self.language, self.territory))
+
+
+class LocaleType(TypeDecorator):
+    """Custom locale type to be used as :class:`babel.Locale`."""
+
+    impl = String
+
+    def bind_processor(self, dialect):
+        def process_bind_param(value):
+            if not issubclass(value.__class__, Locale):
+                raise TypeError('expected babel.Locale instance')
+            return '{}_{}'.format(value.language, value.territory)
+        return process_bind_param
+
+    def result_processor(self, dialect, coltype):
+        def process_result_value(value):
+            return HashableLocale.parse(value)
+        return process_result_value
+
+    class comparator_factory(TypeDecorator.Comparator):
+        @property
+        def language(self):
+            return func.substr(self.expr, 1, 2)
+
+        @property
+        def territory(self):
+            return func.substr(self.expr, 4, 2)
