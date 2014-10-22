@@ -3,11 +3,14 @@
 set -e
 
 prepare() {
+	script_dir=$(dirname $0)
+	deploy_root=$(cd $(dirname $0)/..; pwd)
+	revision=$(cat $deploy_root/etc/revision.txt)
 	echo "Installing prerequisities."
 	sudo apt-get install -y python-software-properties
 	sudo add-apt-repository ppa:fkrull/deadsnakes -y
 	sudo apt-get update
-	packages="$(cat $(dirname $0)/apt-requirements.txt)"
+	packages="$(cat $script_dir/apt-requirements.txt)"
 	echo $packages
 	sudo apt-get install -y $packages
 
@@ -23,13 +26,11 @@ prepare() {
 	sudo -ucliche mkdir -p /home/cliche/etc
 	sudo -ucliche mkdir -p /home/cliche/bin
 
-	sudo mv /tmp/cliche-deploy-$(cat $(dirname $0)/etc/revision.txt).tar.gz /home/cliche
-	sudo -ucliche virtualenv -p `which python3.4` /home/cliche/venv_$(cat $(dirname $0)/etc/revision.txt)
-	sudo -ucliche /home/cliche/venv_$(cat $(dirname $0)/etc/revision.txt)/bin/pip install /tmp/$(cat $(dirname $0)/etc/revision.txt)/Cliche-*.whl
-	sudo -ucliche mkdir -p /home/cliche/venv_$(cat $(dirname $0)/etc/revision.txt)/etc
-	sudo -ucliche cp $(dirname $0)/etc/* /home/cliche/venv_$(cat $(dirname $0)/etc/revision.txt)/etc
-
-	revision="$(cat $(dirname $0)/etc/revision.txt)"
+	sudo mv /tmp/cliche-deploy-$revision.tar.gz /home/cliche
+	sudo -ucliche virtualenv -p `which python3.4` /home/cliche/venv_$revision
+	sudo -ucliche /home/cliche/venv_$revision/bin/pip install /tmp/$revision/Cliche-*.whl
+	sudo -ucliche mkdir -p /home/cliche/venv_$revision/etc
+	sudo -ucliche cp $deploy_root/etc/* /home/cliche/venv_$revision/etc
 
 	sudo -ucliche rm -f /home/cliche/bin/celery
 	sudo -ucliche ln -s /home/cliche/venv_$revision/bin/celery /home/cliche/bin/celery

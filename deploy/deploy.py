@@ -163,12 +163,17 @@ def upload(address, revision, config, workdir):
     subprocess.check_call(
         [
             'cp',
-            str(workdir / 'deploy' / 'prepare.sh'),
-            str(workdir / 'deploy' / 'upgrade.py'),
-            str(workdir / 'deploy' / 'promote.py'),
-            str(workdir / 'deploy' / 'apt-requirements.txt'),
             str(list((workdir / 'dist').glob('*.whl'))[0]),
             str(workdir / 'deploy' / 'tmp')
+        ]
+    )
+    subprocess.check_call(
+        [
+            'cp'
+        ] +
+        [str(path) for path in ((workdir / 'deploy' / 'scripts').glob('*'))] +
+        [
+            str(workdir / 'deploy' / 'tmp' / 'scripts')
         ]
     )
     subprocess.check_call(
@@ -226,9 +231,9 @@ def upload(address, revision, config, workdir):
             address,
             'chmod',
             '+x',
-            str(tmp / revision / 'prepare.sh'),
-            str(tmp / revision / 'upgrade.py'),
-            str(tmp / revision / 'promote.py')
+            str(tmp / revision / 'scripts' / 'prepare.sh'),
+            str(tmp / revision / 'scripts' / 'upgrade.py'),
+            str(tmp / revision / 'scripts' / 'promote.py')
         ]
     )
 
@@ -238,7 +243,7 @@ def execute_remote_script(address, revision, script_name):
         [
             'ssh',
             address,
-            str(tmp / revision / script_name)
+            str(tmp / revision / 'scripts' / script_name)
         ]
     )
 
