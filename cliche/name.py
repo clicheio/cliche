@@ -9,7 +9,7 @@ from sqlalchemy.sql.expression import select
 from sqlalchemy.types import Integer, String
 
 from .orm import Base
-from .sqltypes import LocaleType
+from .sqltypes import LocaleType, prevent_instantiating
 
 __all__ = ('Nameable', 'Name')
 
@@ -91,3 +91,6 @@ class Nameable(Base):
         'polymorphic_identity': 'nameables',
         'polymorphic_on': type
     }
+
+
+prevent_instantiating(Nameable)

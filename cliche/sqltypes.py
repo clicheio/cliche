@@ -5,10 +5,34 @@
 import enum
 
 from babel import Locale
+from sqlalchemy.orm.events import event
 from sqlalchemy.sql.expression import func
 from sqlalchemy.types import Enum, SchemaType, String, TypeDecorator
+from sqlalchemy.util.langhelpers import _symbol
 
-__all__ = 'EnumType', 'HashableLocale', 'LocaleType'
+__all__ = ('EnumType', 'HashableLocale', 'LocaleType',
+           'prevent_discriminator_from_changing', 'prevent_instantiating')
+
+
+def prevent_discriminator_from_changing(col):
+    def set_discriminator(target, value, oldvalue, initiator):
+        oldvalue_is_none = (
+            oldvalue.__class__ != _symbol or oldvalue.name != 'NO_VALUE'
+        )
+        value_is_wrong = (
+            value != target.__mapper_args__['polymorphic_identity']
+        )
+        if oldvalue_is_none or value_is_wrong:
+            raise AttributeError('discriminator column cannot be changed')
+
+    event.listen(col, 'set', set_discriminator)
+
+
+def prevent_instantiating(cls):
+    def init_non_instantiable_cls(target, args, kwargs):
+        raise Exception('{} cannot be instantiated'.format(target.__class__))
+
+    event.listen(cls, 'init', init_non_instantiable_cls)
 
 
 class EnumType(TypeDecorator, SchemaType):

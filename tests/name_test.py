@@ -154,3 +154,10 @@ def test_name(fx_session):
     two_id = two.id
     fx_session.delete(two)
     assert fx_session.query(Name).filter_by(nameable_id=two_id).count() == 0
+
+    # Try to create Nameable directly. Expect to rasie a exception.
+    try:
+        Nameable()
+        assert False
+    except Exception:
+        pass

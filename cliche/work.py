@@ -10,7 +10,7 @@ from sqlalchemy.sql.functions import now
 from sqlalchemy.types import Date, DateTime, Integer, String
 
 from .orm import Base
-from .sqltypes import EnumType
+from .sqltypes import EnumType, prevent_discriminator_from_changing
 from .name import Nameable
 
 __all__ = ('Credit', 'Franchise', 'Genre', 'Role', 'Work', 'WorkFranchise',
@@ -262,3 +262,8 @@ class World(Nameable):
     __mapper_args__ = {
         'polymorphic_identity': 'worlds',
     }
+
+
+prevent_discriminator_from_changing(Franchise.type)
+prevent_discriminator_from_changing(Work.type)
+prevent_discriminator_from_changing(World.type)
