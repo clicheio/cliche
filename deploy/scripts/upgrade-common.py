@@ -33,10 +33,13 @@ def main():
             'virtualenv',
             '-p',
             subprocess.check_output(
-                'sudo',
-                '-ucliche',
-                'which',
-                'python3.4',
+                [
+                    'sudo',
+                    '-ucliche',
+                    'which',
+                    'python3.4',
+                ],
+                universal_newlines=True
             ).strip(),
             str(venv_dir),
         ]
