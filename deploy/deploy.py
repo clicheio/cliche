@@ -127,6 +127,7 @@ def main():
         print('Uploading beat to ' + args.beat[0])
         upload(args.beat[0], revision, config, workdir)
         execute_remote_script(args.beat[0], revision, 'prepare-common.sh')
+        execute_remote_script(args.beat[0], revision, 'prepare-beat.sh')
         execute_remote_script(args.beat[0], revision, 'upgrade-common.py')
 
     for crawler in args.crawler or []:
@@ -139,11 +140,14 @@ def main():
         print('Uploading web worker to ' + web_worker[0])
         upload(web_worker[0], revision, config, workdir)
         execute_remote_script(web_worker[0], revision, 'prepare-common.sh')
+        execute_remote_script(web_worker[0], revision, 'prepare-web.sh')
         execute_remote_script(web_worker[0], revision, 'upgrade-common.py')
+        execute_remote_script(web_worker[0], revision, 'upgrade-web.py')
 
     if args.beat is not None and args.beat[0] is not None:
         print('Promoting beat at ' + args.beat[0])
         execute_remote_script(args.beat[0], revision, 'promote-common.py')
+        execute_remote_script(args.beat[0], revision, 'promote-beat.py')
 
     for crawler in args.crawler or []:
         print('Promoting crawler at ' + crawler[0])
@@ -152,6 +156,7 @@ def main():
     for web_worker in args.web_worker or []:
         print('Promoting web worker at ' + web_worker[0])
         execute_remote_script(web_worker[0], revision, 'promote-common.py')
+        execute_remote_script(web_worker[0], revision, 'promote-web.py')
 
 
 def upload(address, revision, config, workdir):
