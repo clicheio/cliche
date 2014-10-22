@@ -20,9 +20,10 @@ def main():
     subprocess.check_call(
         [
             'sudo',
-            'mv',
-            '/tmp/cliche-deploy-{}.tar.gz'.format(revision),
-            '/home/cliche',
+            '-ucliche',
+            'rm',
+            '-f',
+            '/home/cliche/bin/celery',
         ]
     )
 
@@ -30,15 +31,10 @@ def main():
         [
             'sudo',
             '-ucliche',
-            'virtualenv',
-            '-p',
-            subprocess.check_output(
-                'sudo',
-                '-ucliche',
-                'which',
-                'python3.4',
-            ).strip(),
-            str(venv_dir),
+            'ln',
+            '-fs',
+            str(venv_dir / 'bin' / 'celery'),
+            '/home/cliche/bin/celery',
         ]
     )
 
@@ -46,9 +42,9 @@ def main():
         [
             'sudo',
             '-ucliche',
-            str(venv_dir / 'bin' / 'pip').format(revision),
-            'install',
-            str(list(workdir.glob('*.whl'))[0]),
+            'rm',
+            '-f',
+            '/home/cliche/etc/cliche-celery-beat.conf',
         ]
     )
 
@@ -56,21 +52,26 @@ def main():
         [
             'sudo',
             '-ucliche',
-            'mkdir',
-            '-p',
-            str(venv_dir / 'etc'),
+            'ln',
+            '-fs',
+            str(venv_dir / 'etc' / 'cliche-celery-beat.conf'),
+            '/home/cliche/etc/cliche-celery-beat.conf',
+        ]
+    )
+
+    subprocess.call(
+        [
+            'sudo',
+            'stop',
+            'cliche-celery-beat',
         ]
     )
 
     subprocess.check_call(
         [
             'sudo',
-            '-ucliche',
-            'cp',
-        ] +
-        [str(path) for path in (workdir / 'etc').glob('*')] +
-        [
-            str(venv_dir / 'etc'),
+            'start',
+            'cliche-celery-beat',
         ]
     )
 

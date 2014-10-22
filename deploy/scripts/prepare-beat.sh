@@ -1,22 +1,12 @@
 #!/bin/bash
-# Script to prepare target for web deployment
+# Script to prepare target for celery beat deployment
 # Web installation that must be run only once
 # when deploying for the first time should be
 # placed on this script.
 set -e
 
 prepare() {
-    if [ ! "dpkg-query -W nginx | awk {'print $1'} = """ ]; then
-		echo "Installing nginx."
-		sudo apt-get install -y nginx
-    fi
-
-	sudo ln -fs /home/cliche/etc/cliche.io /etc/nginx/sites-available/cliche.io
-	sudo ln -fs /etc/nginx/sites-available/cliche.io /etc/nginx/sites-enabled/cliche.io
-
-	sudo sysv-rc-conf nginx on
-	sudo sysv-rc-conf --list nginx
-	sudo service nginx start
+	sudo ln -fs /home/cliche/etc/cliche-celery-beat.conf /etc/init/cliche-celery-beat.conf
 }
 
 not_compatible_with_os() {

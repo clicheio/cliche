@@ -1,6 +1,7 @@
 #!/bin/bash
 # Script to prepare target for deployment
 # Common installation that must be run only once
+# (i.e. result does not change over time)
 # when deploying for the first time should be
 # placed on this script.
 set -e
@@ -23,32 +24,6 @@ prepare() {
 
 	sudo -ucliche mkdir -p /home/cliche/etc
 	sudo -ucliche mkdir -p /home/cliche/bin
-
-	sudo mv /tmp/cliche-deploy-$revision.tar.gz /home/cliche
-	sudo -ucliche virtualenv -p `which python3.4` /home/cliche/venv_$revision
-	sudo -ucliche /home/cliche/venv_$revision/bin/pip install /tmp/$revision/Cliche-*.whl
-	sudo -ucliche mkdir -p /home/cliche/venv_$revision/etc
-	sudo -ucliche cp $deploy_root/etc/* /home/cliche/venv_$revision/etc
-
-	# celery
-	sudo -ucliche rm -f /home/cliche/bin/celery
-	sudo -ucliche ln -fs /home/cliche/venv_$revision/bin/celery /home/cliche/bin/celery
-
-	sudo -ucliche rm -f /home/cliche/etc/prod.cfg.yml /home/cliche/etc/cliche-celery-beat.conf /home/cliche/etc/cliche.io
-	sudo -ucliche ln -fs /home/cliche/venv_$revision/etc/prod.cfg.yml /home/cliche/etc/prod.cfg.yml
-	sudo -ucliche ln -fs /home/cliche/venv_$revision/etc/cliche-celery-beat.conf /home/cliche/etc/cliche-celery-beat.conf
-	sudo -ucliche ln -fs /home/cliche/venv_$revision/etc/cliche.io /home/cliche/etc/cliche.io
-
-	# Celery beat
-	sudo rm -f /etc/init/cliche-celery-beat.conf
-	sudo ln -fs /home/cliche/etc/cliche-celery-beat.conf /etc/init/cliche-celery-beat.conf
-
-	# Web
-	sudo rm -f /etc/nginx/sites-available/cliche.io
-	sudo ln -fs /home/cliche/etc/cliche.io /etc/nginx/sites-available/cliche.io
-
-	sudo rm -f /etc/nginx/sites-enabled/cliche.io
-	sudo ln -fs /etc/nginx/sites-available/cliche.io /etc/nginx/sites-enabled/cliche.io
 }
 
 not_compatible_with_os() {

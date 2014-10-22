@@ -23,7 +23,7 @@ def main():
             '-ucliche',
             'rm',
             '-f',
-            '/home/cliche/etc/prod.cfg.yml',
+            '/home/cliche/etc/cliche.io',
         ]
     )
 
@@ -33,8 +33,8 @@ def main():
             '-ucliche',
             'ln',
             '-fs',
-            str(venv_dir / 'etc' / 'prod.cfg.yml'),
-            '/home/cliche/etc/prod.cfg.yml',
+            str(venv_dir / 'etc' / 'cliche.io'),
+            '/home/cliche/etc/cliche.io',
         ]
     )
 
