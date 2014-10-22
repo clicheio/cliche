@@ -13,7 +13,6 @@ from alembic.util import CommandError
 from click import Path, argument, echo, group, option
 from flask import _request_ctx_stack
 from sassutils.wsgi import SassMiddleware
-from setuptools import find_packages
 from werkzeug.utils import import_string
 
 from .celery import app as celery_app
@@ -132,13 +131,14 @@ def upgrade(revision):
 @config
 def sync(service):  # FIXME available service listing
     """Sync to services."""
-    package = 'cliche.services.' + service
-    if package in find_packages():
-        import_string(package + ':sync').delay()
-    else:
+    try:
+        sync = import_string('cliche.services.' + service + ':sync')
+    except ImportError:
         echo('There is no such service \'{}\' suitable for synchronization.'
              .format(service),
              file=sys.stderr)
+    else:
+        sync.delay()
 
 
 @cli.command()
