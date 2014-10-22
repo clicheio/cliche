@@ -18,7 +18,7 @@
       <td>
         <ul>
           {% for val in work.genres %}
-            <li><a href="{{ url_for('.page', type_='genre', id=val.name) }}">{{ val.name }}</a></li>
+            <li><a href="{{ url_for('.page', type_='genre', title=val.name) }}">{{ val.name }}</a></li>
           {% endfor %}
         </ul>
       </td>
@@ -44,12 +44,12 @@
                 {% if team_id is none %}
                   <tr>
                     <td colspan="2" class="name">
-                      <a href="{{ url_for('.page', type_='person', id=credit.person.id) }}">
-                        {{- credit.person.canonical_name(locale).name -}}
+                      <a href="{{ url_for('.page', type_='person', title=credit.person.id) }}">
+                        {{- credit.person.canonical_name(locale) -}}
                       </a>
                     </td>
                     <td class="role">
-                      <a href="{{ url_for('.page', type_='role', id=credit.role.id) }}">
+                      <a href="{{ url_for('.page', type_='role', title=credit.role.id) }}">
                         {{- credit.role.value -}}
                       </a>
                     </td>
@@ -58,18 +58,18 @@
                   <tr>
                     {% if loop.first %}
                       <td rowspan="{{ loop.length }}" class="team">
-                        <a href="{{ url_for('.page', type_='team', id=credit.team.id) }}">
-                          {{- credit.team.canonical_name(locale).name -}}
+                        <a href="{{ url_for('.page', type_='team', title=credit.team.id) }}">
+                          {{- credit.team.canonical_name(locale) -}}
                         </a>
                       </td>
                     {% endif %}
                     <td class="name">
-                      <a href="{{ url_for('.page', type_='person', id=credit.person.id) }}">
-                        {{- credit.person.canonical_name(locale).name -}}
+                      <a href="{{ url_for('.page', type_='person', title=credit.person.id) }}">
+                        {{- credit.person.canonical_name(locale) -}}
                       </a>
                     </td>
                     <td class="role">
-                      <a href="{{ url_for('.page', type_='role', id=credit.role.value) }}">
+                      <a href="{{ url_for('.page', type_='role', title=credit.role.value) }}">
                         {{- credit.role.value -}}
                       </a>
                     </td>

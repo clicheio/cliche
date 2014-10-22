@@ -61,7 +61,9 @@ def test_work_page(fx_session, fx_flask_client):
     with fx_session.begin():
         fx_session.add(work)
 
-    rv = fx_flask_client.get('/work/{}/'.format(work.id))
+    rv = fx_flask_client.get(
+        '/work/{}/'.format(work.canonical_name(Locale.parse('en_US')))
+    )
     assert_contain_text('Story of Your Life', 'h1', rv.data)
     assert_contain_text('Story of Your Life', 'tr.name>td', rv.data)
 
@@ -70,21 +72,27 @@ def test_work_page(fx_session, fx_flask_client):
     with fx_session.begin():
         fx_session.add(work)
 
-    rv = fx_flask_client.get('/work/{}/'.format(work.id))
+    rv = fx_flask_client.get(
+        '/work/{}/'.format(work.canonical_name(Locale.parse('en_US')))
+    )
     assert_contain_text('2010-10-26', 'tr.published_at>td', rv.data)
 
     work.genres.add(Genre(name='Short Stories'))
     with fx_session.begin():
         fx_session.add(work)
 
-    rv = fx_flask_client.get('/work/{}/'.format(work.id))
+    rv = fx_flask_client.get(
+        '/work/{}/'.format(work.canonical_name(Locale.parse('en_US')))
+    )
     assert_contain_text('Short Stories', 'tr.genres>td', rv.data)
 
     work.genres.add(Genre(name='SF'))
     with fx_session.begin():
         fx_session.add(work)
 
-    rv = fx_flask_client.get('/work/{}/'.format(work.id))
+    rv = fx_flask_client.get(
+        '/work/{}/'.format(work.canonical_name(Locale.parse('en_US')))
+    )
     assert_contain_text('Short Stories', 'tr.genres>td', rv.data)
     assert_contain_text('SF', 'tr.genres>td', rv.data)
 
@@ -99,7 +107,9 @@ def test_work_page(fx_session, fx_flask_client):
     with fx_session.begin():
         fx_session.add(credit)
 
-    rv = fx_flask_client.get('/work/{}/'.format(work.id))
+    rv = fx_flask_client.get(
+        '/work/{}/'.format(work.canonical_name(Locale.parse('en_US')))
+    )
     assert_contain_text('Ted Chiang', 'tr.credits>td>table>tbody>tr>td.name',
                         rv.data)
     assert_contain_text(Role.author.value,
@@ -151,7 +161,9 @@ def test_complex_credits(fx_session, fx_flask_client):
         fx_session.add(author_credit)
         fx_session.add_all(artist_credits)
 
-    rv = fx_flask_client.get('/work/{}/'.format(work.id))
+    rv = fx_flask_client.get(
+        '/work/{}/'.format(work.canonical_name(Locale.parse('en_US')))
+    )
     assert document_fromstring(rv.data).xpath(
         '//tr/td[@class="name"]/a[text()="Akihiko Uda"]'
         '/../../td[@class="role"]/a[text()="{}"]'.format(Role.author.value)

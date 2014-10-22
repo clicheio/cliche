@@ -12,7 +12,7 @@ import itertools
 
 from cliche.sqltypes import HashableLocale as Locale
 from flask import Blueprint, abort, render_template
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from .db import session
 from ..work import Credit, Work
@@ -43,13 +43,25 @@ def list_():
     )
 
 
-@ontology.route('/work/<path:id>/')
-def page(id):
+@ontology.route('/work/<path:title>/')
+def page(title):
     """More detailed data of a work."""
     try:
-        work = session.query(Work).filter_by(id=id).one()
+        stmt = session.query(
+            Work.id,
+            Work.canonical_name(Locale.parse('en_US')).label('canonical_name')
+        ).subquery()
+        res = session.query(stmt.c.id, stmt.c.canonical_name) \
+                     .filter(stmt.c.canonical_name == title) \
+                     .one()
     except NoResultFound:
         abort(404)
+    except MultipleResultsFound:
+        # When there are works with the same canonical name,
+        # the ambiguity should be solved in a appropriate way.
+        abort(404)
+    work = session.query(Work).filter_by(id=res.id).one()
+
     credits = session.query(Credit) \
                      .filter_by(work=work) \
                      .order_by(Credit.team_id)

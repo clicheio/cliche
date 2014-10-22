@@ -106,36 +106,36 @@ def test_name(fx_session):
 
     # Find the canonical name with the same locale.
     # Expect the name which was the most referenced in the same locale.
-    assert one.canonical_name(kokr).name == '일'
+    assert one.canonical_name(kokr) == '일'
     assert canonical_name_in_expr(one, kokr) == '일'
-    assert one.canonical_name(enus).name == 'one'
+    assert one.canonical_name(enus) == 'one'
     assert canonical_name_in_expr(one, enus) == 'one'
-    assert mystr.canonical_name(kokr).name == '나의 문자열'
+    assert mystr.canonical_name(kokr) == '나의 문자열'
     assert canonical_name_in_expr(mystr, kokr) == '나의 문자열'
-    assert mystr.canonical_name(enus).name == 'my string'
+    assert mystr.canonical_name(enus) == 'my string'
     assert canonical_name_in_expr(mystr, enus) == 'my string'
 
     # Find the canonical name with different territory but the same language.
     # Expect the name which was the most referenced in the same language.
-    assert one.canonical_name(enca).name == 'one'
+    assert one.canonical_name(enca) == 'one'
     assert canonical_name_in_expr(one, enca) == 'one'
 
     # Find the canonical name with different language but the same territory.
     # Expect the name which was the most referenced in the same territory.
-    assert one.canonical_name(esus).name == 'one'
+    assert one.canonical_name(esus) == 'one'
     assert canonical_name_in_expr(one, esus) == 'one'
 
     # Find the canonical name with a entirely different locale.
     # Expect the name which was the most referenced regardless of a locale.
-    assert one.canonical_name(jajp).name == '일'
+    assert one.canonical_name(jajp) == '일'
     assert canonical_name_in_expr(one, jajp) == '일'
 
     # Find the canonical names when there are two or more candidates
     # (the same number of reference count and locale) for the canonical name.
     # Expect lexicographically earlier one.
-    assert two.canonical_name(kokr).name == '둘'
+    assert two.canonical_name(kokr) == '둘'
     assert canonical_name_in_expr(two, kokr) == '둘'
-    assert two.canonical_name(enus).name == 'second'
+    assert two.canonical_name(enus) == 'second'
     assert canonical_name_in_expr(two, enus) == 'second'
 
     # Try to find the canonical name of nameable instance

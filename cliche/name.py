@@ -66,7 +66,7 @@ class Nameable(Base):
                 name.name
             )
         if(self.names):
-            return min(self.names, key=name_key)
+            return min(self.names, key=name_key).name
         else:
             return None
 
