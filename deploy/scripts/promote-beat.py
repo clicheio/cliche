@@ -41,21 +41,10 @@ def main():
     subprocess.check_call(
         [
             'sudo',
-            '-ucliche',
-            'rm',
+            'cp',
             '-f',
-            '/home/cliche/etc/cliche-celery-beat.conf',
-        ]
-    )
-
-    subprocess.check_call(
-        [
-            'sudo',
-            '-ucliche',
-            'ln',
-            '-fs',
             str(venv_dir / 'etc' / 'cliche-celery-beat.conf'),
-            '/home/cliche/etc/cliche-celery-beat.conf',
+            '/etc/init/cliche-celery-beat.conf',
         ]
     )
 
