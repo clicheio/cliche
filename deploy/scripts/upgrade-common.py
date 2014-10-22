@@ -15,7 +15,7 @@ def main():
     workdir = pathlib.Path(__file__).resolve().parent.parent
     with (workdir / 'etc' / 'revision.txt').open('r') as revision_file:
         revision = (revision_file.readline().strip())
-    venv_dir = pathlib.Path('/home/cliche/venv_{}'.format(revision)).resolve()
+    venv_dir = pathlib.Path('/home/cliche/venv_{}'.format(revision))
 
     subprocess.check_call(
         [
