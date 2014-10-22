@@ -151,6 +151,7 @@ def main():
     for crawler in args.crawler or []:
         print('Promoting crawler at ' + crawler[0])
         execute_remote_script(crawler[0], revision, 'promote-common.py')
+        execute_remote_script(crawler[0], revision, 'promote-crawler.py')
 
     for web_worker in args.web_worker or []:
         print('Promoting web worker at ' + web_worker[0])
