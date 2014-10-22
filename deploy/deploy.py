@@ -20,13 +20,9 @@ def main():
     parser.add_argument('-c', '--config-template', nargs=1, required=True,
                         help='Template of config file to be deployed.')
     parser.add_argument('-d', '--db-host', nargs=1, required=True,
-                        help='Database host address to use. '
-                             'Username for db installation may also be '
-                             'provided with.')
+                        help='Database host address to use.')
     parser.add_argument('-r', '--redis-host', nargs=1, required=True,
-                        help='Redis cache host address to use. '
-                             'Username for redis installation may also be '
-                             'provided with.')
+                        help='Redis cache host address to use.')
     parser.add_argument(
         '--crawler', action='append', nargs=1,
         help="""
