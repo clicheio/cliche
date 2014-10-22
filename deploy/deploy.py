@@ -236,11 +236,9 @@ def upload(address, revision, config, workdir):
             address,
             'chmod',
             '+x',
-        ] +
-        [str(path.relative_to(tmp / revision / 'scripts'))
-         for path in ((tmp / revision / 'scripts').glob('*.sh'))] +
-        [str(path.relative_to(tmp / revision / 'scripts'))
-         for path in ((tmp / revision / 'scripts').glob('*.py'))]
+            str(tmp / revision / 'scripts' / '*.sh'),
+            str(tmp / revision / 'scripts' / '*.py'),
+        ]
     )
 
 
