@@ -7,8 +7,9 @@ from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.sql.functions import now
 from sqlalchemy.types import Date, DateTime, Integer
 
-from .orm import Base
 from .name import Nameable
+from .orm import Base
+from .sqltypes import prevent_discriminator_from_changing
 
 __all__ = 'Person', 'Team', 'TeamMembership'
 
@@ -110,3 +111,7 @@ class TeamMembership(Base):
 
     __tablename__ = 'team_memberships'
     __repr_columns__ = team_id, member_id
+
+
+prevent_discriminator_from_changing(Person.type)
+prevent_discriminator_from_changing(Team.type)
