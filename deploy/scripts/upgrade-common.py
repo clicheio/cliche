@@ -49,26 +49,6 @@ def main():
         [
             'sudo',
             '-ucliche',
-            str(venv_dir / 'bin' / 'pip').format(revision),
-            'install',
-            str(list(workdir.glob('*.whl'))[0]),
-        ]
-    )
-
-    subprocess.check_call(
-        [
-            'sudo',
-            '-ucliche',
-            str(venv_dir / 'bin' / 'pip').format(revision),
-            'install',
-            'redis',
-        ]
-    )
-
-    subprocess.check_call(
-        [
-            'sudo',
-            '-ucliche',
             'mkdir',
             '-p',
             str(venv_dir / 'etc'),
@@ -84,6 +64,37 @@ def main():
         [str(path) for path in (workdir / 'etc').glob('*')] +
         [
             str(venv_dir / 'etc'),
+        ]
+    )
+
+    subprocess.check_call(
+        [
+            'sudo',
+            '-ucliche',
+            str(venv_dir / 'bin' / 'pip'),
+            'install',
+            'redis',
+        ]
+    )
+
+    subprocess.check_call(
+        [
+            'sudo',
+            '-ucliche',
+            str(venv_dir / 'bin' / 'pip'),
+            'install',
+            str(list(workdir.glob('*.whl'))[0]),
+        ]
+    )
+
+    subprocess.check_call(
+        [
+            'sudo',
+            '-ucliche',
+            str(venv_dir / 'bin' / 'cliche'),
+            'upgrade',
+            '-c',
+            str(venv_dir / 'etc' / 'prod.cfg.yml'),
         ]
     )
 
