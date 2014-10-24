@@ -38,7 +38,7 @@ def test_crawler(monkeypatch, fx_session, fx_celery_app):
                 return {"results": {"bindings": fakeResult}}
 
     monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", FakeQuery)
-    dbpedia.crawl_page(1, relation_num, 0)
+    dbpedia.crawl_relation(1, relation_num, 0)
     num = fx_session.query(Work).count()
     assert fx_session.query(func.max(Work.revision)).scalar() > 0
     assert num == 100

@@ -37,6 +37,34 @@ def test_count_by_relation(monkeypatch):
     assert res > 250000
 
 
+def test_count_by_classes(monkeypatch):
+    class FakeQuery(object):
+        def convert(self):
+            return {
+                "results": {
+                    "bindings": [
+                        {"callret-0": {"value": "826905"}}
+                    ]
+                }
+            }
+
+    monkeypatch.setattr("SPARQLWrapper.SPARQLWrapper.query", FakeQuery)
+    res = dbpedia.count_by_class(
+        class_list=[
+            'dbpedia-owl:Artist',
+            'dbpedia-owl:Artwork',
+            'dbpedia-owl:Book',
+            'dbpedia-owl:Comic',
+            'dbpedia-owl:Comics',
+            'dbpedia-owl:ComicsCreator',
+            'dbpedia-owl:Drama',
+            'dbpedia-owl:Writer',
+            'dbpedia-owl:WrittenWork',
+        ]
+    )
+    assert res > 820000
+
+
 def test_select_by_relation(monkeypatch):
     class FakeQuery(object):
         offset = 0

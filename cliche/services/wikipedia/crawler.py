@@ -120,6 +120,34 @@ def count_by_relation(p):
     return int(select_dbpedia(query)[0]['callret-0'])
 
 
+def count_by_class(class_list):
+    """Get count of a ontology class
+
+    :param list class_list: List of properties
+    :rtype: :class:`int`
+    """
+
+    if not class_list:
+        raise ValueError('at least one property required')
+
+    classes = ''
+    for x in class_list[:-1]:
+        classes += '{{ ?subject a {} . }} UNION'.format(class_list[0])
+
+    classes += '{{ ?subject a {} . }}'.format(class_list[-1])
+
+    query = '''PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
+PREFIX dbpprop: <http://dbpedia.org/property/>
+SELECT DISTINCT
+    count(?subject)
+WHERE {{
+    {classes}
+}}
+    '''.format(classes=classes)
+    print(query)
+    return int(select_dbpedia(query)[0]['callret-0'])
+
+
 def select_by_relation(p, revision, s_name='subject', o_name='object', page=1):
     """Find author of something
 
@@ -268,7 +296,12 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
 
 
 @app.task
-def crawl_page(page, relation_num, revision):
+def crawl_classes(page, class_num, revision):
+    pass
+
+
+@app.task
+def crawl_relation(page, relation_num, revision):
     session = get_session()
     res = select_by_relation(
         p=[
@@ -297,8 +330,11 @@ def crawl_page(page, relation_num, revision):
     result_len = len(res)
     current_retrieved = (page * PAGE_ITEM_COUNT) + result_len
     if (relation_num <= current_retrieved and result_len == PAGE_ITEM_COUNT):
-        crawl_page.delay(page + 1,
-                         current_retrieved + PAGE_ITEM_COUNT, revision)
+        crawl_relation.delay(
+            page + 1,
+            current_retrieved + PAGE_ITEM_COUNT,
+            revision
+        )
 
     if app.conf['CELERY_ALWAYS_EAGER']:
         return
@@ -317,4 +353,20 @@ def crawl():
         ]
     )
     for x in range(0, relation_num // PAGE_ITEM_COUNT + 1):
-        crawl_page.delay(x, relation_num, revision)
+        crawl_relation.delay(x, relation_num, revision)
+
+    class_num = count_by_class(
+        class_list=[
+            'dbpedia-owl:Artist',
+            'dbpedia-owl:Artwork',
+            'dbpedia-owl:Book',
+            'dbpedia-owl:Comic',
+            'dbpedia-owl:Comics',
+            'dbpedia-owl:ComicsCreator',
+            'dbpedia-owl:Drama',
+            'dbpedia-owl:Writer',
+            'dbpedia-owl:WrittenWork',
+        ]
+    )
+    for x in range(0, class_num // PAGE_ITEM_COUNT + 1):
+        crawl_classes.delay(x, class_num, revision)
