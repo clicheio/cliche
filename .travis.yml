@@ -5,6 +5,8 @@ python:
 addons:
   postgresql: "9.3"
 install:
+# gcc >= 4.7 is needed for -std=c++11
+- ./script/install-gcc
 - pip install -e .[tests]
 - pip install pytest-cov flake8 coveralls
 before_script:
