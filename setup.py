@@ -51,7 +51,7 @@ install_requires = {
     # Locale
     'Babel >= 1.3',
     # SCSS
-    'libsass >= 0.5.1',
+    'libsass >= 0.6.0',
 }
 
 if sys.version_info < (3, 4, 0):
