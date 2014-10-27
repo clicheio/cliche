@@ -31,19 +31,10 @@ def upgrade():
         sa.PrimaryKeyConstraint('nameable_id', 'name', 'locale')
     )
 
-    op.drop_index('ix_franchises_name', table_name='franchises')
     op.drop_column('franchises', 'name')
-
-    op.drop_index('ix_people_name', table_name='people')
     op.drop_column('people', 'name')
-
-    op.drop_index('ix_teams_name', table_name='teams')
     op.drop_column('teams', 'name')
-
-    op.drop_index('ix_works_name', table_name='works')
     op.drop_column('works', 'name')
-
-    op.drop_index('ix_worlds_name', table_name='worlds')
     op.drop_column('worlds', 'name')
 
 
