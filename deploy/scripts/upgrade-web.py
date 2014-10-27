@@ -13,14 +13,17 @@ def main():
         sys.exit(errno.EPERM)
 
     workdir = pathlib.Path(__file__).resolve().parent.parent
+    with (workdir / 'etc' / 'revision.txt').open('r') as revision_file:
+        revision = (revision_file.readline().strip())
+    venv_dir = pathlib.Path('/home/cliche/venv_{}'.format(revision))
 
     subprocess.check_call(
         [
-            'cp'
-        ] +
-        [str(path) for path in ((workdir / 'scripts').glob('*'))] +
-        [
-            str(workdir / 'deploy' / 'tmp' / 'scripts')
+            'sudo',
+            '-ucliche',
+            str(venv_dir / 'bin' / 'pip'),
+            'install',
+            'uwsgi',
         ]
     )
 
