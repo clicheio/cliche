@@ -1,5 +1,7 @@
 @import "../bootstrap-sass/assets/stylesheets/bootstrap";
 
+@import url(http://fonts.googleapis.com/css?family=Lobster);
+
 @mixin make-middle($width) {
   @include make-sm-column($width);
   @include make-sm-column-push(($grid-columns - $width) / 2);
@@ -9,9 +11,16 @@
   @include make-lg-column-push(($grid-columns - $width) / 2);
 }
 
-main {
-  @include make-row();
+header {
+  nav {
+    .navbar-brand {
+      font-family: 'Lobster', cursive;
+    }
+  }
+}
 
+main {
+  @include clearfix();
   h1 {
     @include make-middle(10);
   }
