@@ -38,6 +38,83 @@ def main():
         ]
     )
 
+    subprocess.check_call(
+        [
+            'sudo',
+            'service',
+            'nginx',
+            'reload',
+        ]
+    )
+
+    subprocess.check_call(
+        [
+            'sudo',
+            '-ucliche',
+            'rm',
+            '-f',
+            '/home/cliche/bin/uwsgi',
+        ]
+    )
+
+    subprocess.check_call(
+        [
+            'sudo',
+            '-ucliche',
+            'ln',
+            '-fs',
+            str(venv_dir / 'bin' / 'uwsgi'),
+            '/home/cliche/bin/uwsgi',
+        ]
+    )
+
+    subprocess.check_call(
+        [
+            'sudo',
+            '-ucliche',
+            'rm',
+            '-f',
+            '/home/cliche/etc/cliche-uwsgi.ini',
+        ]
+    )
+
+    subprocess.check_call(
+        [
+            'sudo',
+            '-ucliche',
+            'ln',
+            '-fs',
+            str(venv_dir / 'etc' / 'cliche-uwsgi.ini'),
+            '/home/cliche/etc/cliche-uwsgi.ini',
+        ]
+    )
+
+    subprocess.check_call(
+        [
+            'sudo',
+            'cp',
+            '-f',
+            str(venv_dir / 'etc' / 'cliche-uwsgi.conf'),
+            '/etc/init/cliche-uwsgi.conf',
+        ]
+    )
+
+    subprocess.call(
+        [
+            'sudo',
+            'stop',
+            'cliche-uwsgi',
+        ]
+    )
+
+    subprocess.check_call(
+        [
+            'sudo',
+            'start',
+            'cliche-uwsgi',
+        ]
+    )
+
 
 if __name__ == '__main__':
     main()
