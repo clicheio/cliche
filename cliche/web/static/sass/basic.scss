@@ -37,3 +37,9 @@ table.list, table.page, table.page table {
   @extend .table-bordered;
 
 }
+
+footer {
+  p {
+    text-align: center;
+  }
+}
