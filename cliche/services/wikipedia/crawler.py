@@ -19,7 +19,7 @@ from SPARQLWrapper import JSON, SPARQLWrapper
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import func
 
-from .work import Work
+from .work import Entity, Relation
 from ...celery import app, get_session
 
 
@@ -137,14 +137,12 @@ def count_by_class(class_list):
     classes += '{{ ?subject a {} . }}'.format(class_list[-1])
 
     query = '''PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
-PREFIX dbpprop: <http://dbpedia.org/property/>
-SELECT DISTINCT
-    count(?subject)
-WHERE {{
-    {classes}
-}}
-    '''.format(classes=classes)
-    print(query)
+    PREFIX dbpprop: <http://dbpedia.org/property/>
+    SELECT DISTINCT
+        count(?subject)
+    WHERE {{
+        {classes}
+    }}'''.format(classes=classes)
     return int(select_dbpedia(query)[0]['callret-0'])
 
 
@@ -189,34 +187,36 @@ def select_by_relation(p, revision, s_name='subject', o_name='object', page=1):
     for x in p[1:]:
         filt += '\n            || ?p = {}'.format(x)
     query = '''PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
-        PREFIX dbpprop: <http://dbpedia.org/property/>
-        SELECT DISTINCT
-            ?{s_name}
-            (group_concat( STR(?revision); SEPARATOR="$") as ?revision)
-            (group_concat( STR(?{o_name}) ; SEPARATOR="\\n") as ?{o_name})
-        WHERE {{
-            ?{s_name} ?p ?{o_name} .
-        FILTER(
-            (  {filt}  )
-            && STRSTARTS(STR(?{s_name}), "http://dbpedia.org/")) .
-            ?{s_name} dbpedia-owl:wikiPageRevisionID ?revision .
-            FILTER( ?revision > {revision} )
-        }}
-        GROUP BY ?{s_name}
-        LIMIT {limit}
-        OFFSET {offset}'''.format(
-            s_name=s_name,
-            o_name=o_name,
-            filt=filt,
-            limit=PAGE_ITEM_COUNT,
-            offset=PAGE_ITEM_COUNT * page,
-            revision=revision,
-        )
-
-    query_out = select_dbpedia(query)
-    for x in query_out:
-        x['revision'] = int(x['revision'].split('$')[0])
-    return query_out
+    PREFIX dbpprop: <http://dbpedia.org/property/>
+    SELECT DISTINCT
+        ?{s_name}
+        ?{s_name}_label
+        ?{o_name}
+        ?{o_name}_label
+        ?revision
+    WHERE {{
+        ?{s_name} ?p ?{o_name} .
+        ?{s_name} rdfs:label ?{s_name}_label .
+        ?{o_name} rdfs:label ?{o_name}_label .
+    FILTER langMatches( lang(?{s_name}_label), "EN" ) .
+    FILTER langMatches( lang(?{o_name}_label), "EN" ) .
+    FILTER(
+        (  {filt}  )
+        && STRSTARTS(STR(?{s_name}), "http://dbpedia.org/")) .
+        ?{s_name} dbpedia-owl:wikiPageRevisionID ?revision .
+        FILTER( ?revision > {revision} )
+    }}
+    GROUP BY ?{s_name}
+    LIMIT {limit}
+    OFFSET {offset}'''.format(
+        s_name=s_name,
+        o_name=o_name,
+        filt=filt,
+        limit=PAGE_ITEM_COUNT,
+        offset=PAGE_ITEM_COUNT * page,
+        revision=revision,
+    )
+    return select_dbpedia(query)
 
 
 def select_by_class(s, s_name='subject', entities=None, page=1):
@@ -260,6 +260,9 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
 
     group_concat = ''
     s_property_o = ''
+    filt = ''
+    if 'rdfs:label' in entities:
+        filt = 'filter langMatches( lang(?label), "EN" )'
 
     for entity in entities:
         if ':' in entity:
@@ -269,22 +272,22 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
         else:
             col_name = entity[:3]
 
-        group_concat += ('(group_concat( STR(?{}) ; '
-                         'SEPARATOR="\\n") as ?{})\n').format(
-            col_name, col_name
+        group_concat += ('?{}\n').format(
+            col_name
         )
-        s_property_o += '        ?{} {} ?{} .\n'.format(
+        s_property_o += '?{} {} ?{} .\n'.format(
             s_name, entity, col_name
         )
 
     query += group_concat
-    query += '''    WHERE {{
+    query += '''WHERE {{
         {{ ?{} a {} . }}'''.format(s_name, s[0])
     for x in s[1:]:
         query += '''UNION
         {{ ?{} a {} . }}\n'''.format(s_name, x)
     query += s_property_o
-    query += '''        }}
+    query += filt
+    query += '''}}
     GROUP BY ?{s_name}
     LIMIT {limit}
     OFFSET {offset}'''.format(
@@ -292,12 +295,60 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
         limit=PAGE_ITEM_COUNT,
         offset=PAGE_ITEM_COUNT * (page - 1)
     )
-    return select_dbpedia(query)
+    query_out = select_dbpedia(query)
+    return query_out
 
 
 @app.task
 def crawl_classes(page, class_num, revision):
-    pass
+    session = get_session()
+    res = select_by_class(
+        s=[
+            'dbpedia-owl:Artist',
+            'dbpedia-owl:Artwork',
+            'dbpedia-owl:Book',
+            'dbpedia-owl:Comic',
+            'dbpedia-owl:Comics',
+            'dbpedia-owl:ComicsCreator',
+            'dbpedia-owl:Drama',
+            'dbpedia-owl:Writer',
+            'dbpedia-owl:WrittenWork',
+        ],
+        s_name='work',
+        entities=[
+            'dbpedia-owl:wikiPageRevisionID',
+            'rdfs:label',
+            'dbpprop:country',
+        ],
+        page=page
+    )
+
+    for item in res:
+        try:
+            with session.begin():
+                pass
+                new_entity = Entity(
+                    name=item['work'],
+                    revision=item['wikiPageRevisionID'],
+                    label=item['label'],
+                    country=item['country'],
+                )
+                session.add(new_entity)
+        except IntegrityError:
+            pass
+
+    result_len = len(res)
+    current_retrieved = (page * PAGE_ITEM_COUNT) + result_len
+
+    if (class_num <= current_retrieved and result_len == PAGE_ITEM_COUNT):
+        crawl_classes.delay(
+            page + 1,
+            current_retrieved + PAGE_ITEM_COUNT,
+            revision
+        )
+
+    if app.conf['CELERY_ALWAYS_EAGER']:
+        return
 
 
 @app.task
@@ -318,15 +369,16 @@ def crawl_relation(page, relation_num, revision):
     for item in res:
         try:
             with session.begin():
-                new_entity = Work(
+                new_entity = Relation(
                     work=item['work'],
+                    work_label=item['work_label'],
                     author=item['author'],
-                    revision=item['revision']
+                    author_label=item['author_label'],
+                    revision=item['revision'],
                 )
                 session.add(new_entity)
         except IntegrityError:
             pass
-
     result_len = len(res)
     current_retrieved = (page * PAGE_ITEM_COUNT) + result_len
     if (relation_num <= current_retrieved and result_len == PAGE_ITEM_COUNT):
@@ -342,9 +394,10 @@ def crawl_relation(page, relation_num, revision):
 
 @app.task
 def crawl():
-    revision = get_session().query(func.max(Work.revision)).scalar()
-    if not revision:
-        revision = 0
+    relation_revision = \
+        get_session().query(func.max(Relation.revision)).scalar()
+    if not relation_revision:
+        relation_revision = 0
     relation_num = count_by_relation(
         p=[
             'dbpprop:author',
@@ -353,8 +406,11 @@ def crawl():
         ]
     )
     for x in range(0, relation_num // PAGE_ITEM_COUNT + 1):
-        crawl_relation.delay(x, relation_num, revision)
+        crawl_relation.delay(x, relation_num, relation_revision)
 
+    class_revision = get_session().query(func.max(Entity.revision)).scalar()
+    if not class_revision:
+        class_revision = 0
     class_num = count_by_class(
         class_list=[
             'dbpedia-owl:Artist',
@@ -369,4 +425,4 @@ def crawl():
         ]
     )
     for x in range(0, class_num // PAGE_ITEM_COUNT + 1):
-        crawl_classes.delay(x, class_num, revision)
+        crawl_classes.delay(x, class_num, class_revision)

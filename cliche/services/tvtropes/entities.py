@@ -24,7 +24,7 @@ class Entity(Base):
     type = Column(String, nullable=False)
 
     relations = relationship(
-        'Relation',
+        lambda: Relation,
         foreign_keys=[namespace, name],
         primaryjoin=lambda:
             and_(Entity.namespace == Relation.origin_namespace,
@@ -51,7 +51,7 @@ class Redirection(Base):
     original_namespace = Column(String, nullable=False)
     original_name = Column(String, nullable=False)
 
-    original_entity = relationship('Entity',
+    original_entity = relationship(lambda: Entity,
                                    foreign_keys=[original_namespace,
                                                  original_name])
 
@@ -75,7 +75,7 @@ class Relation(Base):
     destination_namespace = Column(String, primary_key=True)
     destination_name = Column(String, primary_key=True)
 
-    origin_entity = relationship('Entity',
+    origin_entity = relationship(lambda: Entity,
                                  foreign_keys=[origin_namespace, origin_name])
 
     __table_args__ = (
