@@ -14,6 +14,7 @@ down_revision = '11f224ecae'
 
 
 def upgrade():
+    op.drop_table('wikipedia_works')
     op.create_table(
         'wikipedia_entities',
         sa.Column('name', sa.String(), nullable=False),
@@ -36,3 +37,10 @@ def upgrade():
 def downgrade():
     op.drop_table('wikipedia_relations')
     op.drop_table('wikipedia_entities')
+    op.create_table(
+        'wikipedia_works',
+        sa.Column('work', sa.String(), nullable=False),
+        sa.Column('revision', sa.Integer(), nullable=True),
+        sa.Column('author', sa.String(), nullable=True),
+        sa.PrimaryKeyConstraint('work')
+    )

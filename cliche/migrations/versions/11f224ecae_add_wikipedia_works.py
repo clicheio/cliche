@@ -14,14 +14,7 @@ down_revision = '123119b63b1'
 
 
 def upgrade():
-    op.create_table(
-        'wikipedia_works',
-        sa.Column('work', sa.String(), nullable=False),
-        sa.Column('revision', sa.Integer(), nullable=True),
-        sa.Column('author', sa.String(), nullable=True),
-        sa.PrimaryKeyConstraint('work')
-    )
-
+	pass
 
 def downgrade():
-    op.drop_table('wikipedia_works')
+	pass
