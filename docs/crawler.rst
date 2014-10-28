@@ -43,6 +43,7 @@ You can run Wikipedia crawler in the same way using :program:`cliche crawler`
 command with :program:`celery worker`:
 
 .. code-block:: console
+
    $ celery worker -A cliche.services.wikipedia.crawler \
      --config dev.py
    $ cliche sync wikipedia -c CONFIG_FILENAME_WITHOUT_EXT
