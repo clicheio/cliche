@@ -15,7 +15,7 @@ down_revision = 'f0492b40e6'
 def upgrade():
     op.add_column(
         'wikipedia_works',
-        sa.Column('revision', sa.String(), nullable=True)
+        sa.Column('revision', sa.Integer(), nullable=True)
     )
 
 
