@@ -46,6 +46,10 @@ def upgrade():
             type_=new_credits_role,
         )
 
+    op.drop_constraint('credits_pkey', 'credits', 'primary')
+    op.create_primary_key('credits_pkey', 'credits',
+                          ['work_id', 'person_id', 'role'])
+
 
 def downgrade():
     if driver_name == 'postgresql':

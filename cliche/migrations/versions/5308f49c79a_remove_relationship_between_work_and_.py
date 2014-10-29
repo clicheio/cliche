@@ -16,10 +16,14 @@ down_revision = '56cf8a7b4ce'
 
 def upgrade():
     op.add_column('credits', sa.Column('team_id', sa.Integer(), nullable=True))
+    op.create_foreign_key("credits_team_id_fkey", "credits", "teams",
+                          ["team_id"], ["id"])
     op.drop_column('works', 'team_id')
 
 
 def downgrade():
-    op.add_column('works', sa.Column('team_id', sa.INTEGER(),
+    op.add_column('works', sa.Column('team_id', sa.Integer(),
                                      autoincrement=False, nullable=True))
+    op.create_foreign_key("works_team_id_fkey", "works", "teams",
+                          ["team_id"], ["id"])
     op.drop_column('credits', 'team_id')

@@ -117,7 +117,11 @@ def downgrade():
     # drop franchises table
     op.drop_index(op.f('ix_franchises_name'), table_name='franchises')
     op.drop_table('franchises')
+    if driver_name == 'postgresql':
+        op.execute('DROP SEQUENCE franchises_id_seq')
 
     # drop worlds table
     op.drop_index(op.f('ix_worlds_name'), table_name='worlds')
     op.drop_table('worlds')
+    if driver_name == 'postgresql':
+        op.execute('DROP SEQUENCE worlds_id_seq')
