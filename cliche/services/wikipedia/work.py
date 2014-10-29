@@ -29,6 +29,20 @@ class Entity(Base):
         'polymorphic_identity': 'entity'
     }
 
+    def get_identity(ontology):
+        return 'dbpedia-owl:' + ontology
+
+    def get_entities():
+        entities = [
+            'dbpedia-owl:wikiPageRevisionID',
+            'rdfs:label',
+            'dbpprop:country',
+        ]
+        return entities
+
+    def get_properties():
+        return []
+
 
 class Relation(Base):
     """Representation of relations."""
@@ -46,12 +60,24 @@ class Relation(Base):
 class Artist(Entity):
     """Representation of artist as an ontology."""
     notableWork = Column(String)
-    type = Column(String(20))
 
     __mapper_args__ = {
-        'polymorphic_on': type,
         'polymorphic_identity': 'artist'
     }
+
+    def get_identity():
+        return 'dbpedia-owl:Artist'
+
+    def get_entities():
+        return Entity.get_entities() + ['dbpedia-owl:notableWork']
+
+    def get_properties():
+        p = [
+            'dbpedia-owl:writer',
+            'dbpedia-owl:author',
+            'dbpedia-owl:author'
+        ]
+        return p
 
 
 class Work(Entity):
@@ -60,17 +86,56 @@ class Work(Entity):
     author = Column(String)
     mainCharacter = Column(String)
     previousWork = Column(String)
-    type = Column(String(20))
 
     __mapper_args__ = {
-        'polymorphic_on': type,
         'polymorphic_identity': 'work'
     }
+
+    def get_identity():
+        return 'dbpedia-owl:Work'
+
+    def get_entities():
+        entities = [
+            'dbpedia-owl:writer',
+            'dbpedia-owl:author',
+            'dbpedia-owl:mainCharacter',
+            'dbpedia-owl:previousWork',
+        ]
+        return Entity.get_entities() + entities
 
 
 class Film(Work):
     """Representation of film as an ontology."""
     director = Column(String)
+
     __mapper_args__ = {
         'polymorphic_identity': 'film'
     }
+
+    def get_identity():
+        return 'dbpedia-owl:Film'
+
+    def get_entities():
+        return Work.get_entities() + ['dbpedia-owl:director']
+
+
+class Book(Work):
+    """Representation of book as an ontology."""
+    illustrator = Column(String)
+    isbn = Column(Integer)
+    numberOfPages = Column(Integer)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'book'
+    }
+
+    def get_identity():
+        return 'dbpedia-owl:Book'
+
+    def get_entities():
+        entities = [
+            'dbpedia-owl:illustrator',
+            'dbpedia-owl:isbn',
+            'dbpedia-owl:numberOfPages',
+        ]
+        return Work.get_entities() + entities

@@ -24,6 +24,18 @@ from ...celery import app, get_session
 
 
 PAGE_ITEM_COUNT = 100
+CLASSES = [
+    'dbpedia-owl:Artist',
+    'dbpedia-owl:Book',
+    'dbpedia-owl:Cartoon',
+    'dbpedia-owl:Film',
+    'dbpedia-owl:WrittenWork',
+]
+PROPERTIES = [
+    'dbpedia-owl:writer',
+    'dbpedia-owl:author',
+    'dbpprop:author',
+]
 
 
 def select_dbpedia(query):
@@ -219,7 +231,7 @@ def select_by_relation(p, revision, s_name='subject', o_name='object', page=1):
     return select_dbpedia(query)
 
 
-def select_by_class(s, s_name='subject', entities=None, page=1):
+def select_by_class(s, s_name='subject', entities=[], p=[], page=1):
     """List of **s** which as property as **entities**
 
     :param str s: Ontology name of subject.
@@ -250,8 +262,6 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
     """
     if not s:
         raise ValueError('at least one class required')
-    if entities is None:
-        entities = []
 
     query = '''PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
         PREFIX dbpprop: <http://dbpedia.org/property/>
@@ -281,10 +291,12 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
 
     query += group_concat
     query += '''WHERE {{
-        {{ ?{} a {} . }}'''.format(s_name, s[0])
+        {{ ?{} a {} . }}\n'''.format(s_name, s[0])
     for x in s[1:]:
         query += '''UNION
         {{ ?{} a {} . }}\n'''.format(s_name, x)
+    for prop in p:
+        query += '''UNION {{ ?{} ?{} ?prop . }}\n'''.format(s_name, prop)
     query += s_property_o
     query += filt
     query += '''}}
@@ -295,38 +307,27 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
         limit=PAGE_ITEM_COUNT,
         offset=PAGE_ITEM_COUNT * (page - 1)
     )
-    query_out = select_dbpedia(query)
-    return query_out
+    return select_dbpedia(query)
 
 
 @app.task
 def crawl_classes(page, class_num, revision):
     session = get_session()
     res = select_by_class(
-        s=[
-            'dbpedia-owl:Artist',
-            'dbpedia-owl:Artwork',
-            'dbpedia-owl:Book',
-            'dbpedia-owl:Comic',
-            'dbpedia-owl:Comics',
-            'dbpedia-owl:ComicsCreator',
-            'dbpedia-owl:Drama',
-            'dbpedia-owl:Writer',
-            'dbpedia-owl:WrittenWork',
-        ],
+        s=CLASSES,
         s_name='work',
         entities=[
             'dbpedia-owl:wikiPageRevisionID',
             'rdfs:label',
             'dbpprop:country',
         ],
-        page=page
+        page=page,
+        p=PROPERTIES,
     )
 
     for item in res:
         try:
             with session.begin():
-                pass
                 new_entity = Entity(
                     name=item['work'],
                     revision=item['wikiPageRevisionID'],
@@ -412,17 +413,7 @@ def crawl():
     if not class_revision:
         class_revision = 0
     class_num = count_by_class(
-        class_list=[
-            'dbpedia-owl:Artist',
-            'dbpedia-owl:Artwork',
-            'dbpedia-owl:Book',
-            'dbpedia-owl:Comic',
-            'dbpedia-owl:Comics',
-            'dbpedia-owl:ComicsCreator',
-            'dbpedia-owl:Drama',
-            'dbpedia-owl:Writer',
-            'dbpedia-owl:WrittenWork',
-        ]
+        class_list=CLASSES
     )
     for x in range(0, class_num // PAGE_ITEM_COUNT + 1):
         crawl_classes.delay(x, class_num, class_revision)
