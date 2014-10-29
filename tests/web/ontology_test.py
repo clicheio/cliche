@@ -5,25 +5,8 @@ from lxml.html import document_fromstring
 from cliche.name import Name
 from cliche.people import Person, Team
 from cliche.sqltypes import HashableLocale as Locale
+from ..web_utils import assert_contain_text
 from cliche.work import Credit, Genre, Role, Work
-
-
-def assert_contain_text(text, expr, data):
-    def traverse(elements):
-        for element in elements:
-            if text in element.text_content():
-                return True
-        else:
-            return False
-
-    tree = document_fromstring(str(data)).cssselect(expr)
-    assert tree
-    assert traverse(tree)
-
-
-def test_index(fx_session, fx_flask_client):
-    rv = fx_flask_client.get('/')
-    assert 'Hello cliche!' in str(rv.data)
 
 
 def test_work_list(fx_session, fx_flask_client):

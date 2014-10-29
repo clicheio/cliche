@@ -7,3 +7,5 @@
       web/app
       web/db
       web/ontology
+      web/social
+      web/user
