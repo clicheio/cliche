@@ -15,6 +15,7 @@ script:
 - echo "DATABASE_URL = 'postgresql:///alembic_test?user=postgres'" > alembic_test.cfg.py
 - cliche upgrade -c alembic_test.cfg.py 27e81ea4d86
 - cliche upgrade -c alembic_test.cfg.py
+- cliche upgrade -c alembic_test.cfg.py 27e81ea4d86
 # setup.py test
 - python setup.py history -c alembic_test.cfg.py
 # unit test
