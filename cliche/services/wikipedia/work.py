@@ -11,7 +11,7 @@ from sqlalchemy import Column, Integer, String
 from ...orm import Base
 
 
-__all__ = 'Entity', 'Relation', 'Artist', 'Work', 'Film'
+__all__ = 'Entity', 'Relation', 'Artist', 'Work', 'Film', 'Book'
 
 
 class Entity(Base):
@@ -29,7 +29,13 @@ class Entity(Base):
         'polymorphic_identity': 'entity'
     }
 
-    def get_identity(ontology):
+    def __init__(self, item):
+        self.name = item.get('name', None)
+        self.revision = item.get('wikiPageRevisionID', None)
+        self.label = item.get('label', None)
+        self.country = item.get('country', None)
+
+    def get_identities(ontology='Thing'):
         return 'dbpedia-owl:' + ontology
 
     def get_entities():
@@ -65,7 +71,11 @@ class Artist(Entity):
         'polymorphic_identity': 'artist'
     }
 
-    def get_identity():
+    def __init__(self, item):
+        super().__init__(item)
+        self.notableWork = item.get('notableWork', None)
+
+    def get_identities():
         return 'dbpedia-owl:Artist'
 
     def get_entities():
@@ -91,7 +101,7 @@ class Work(Entity):
         'polymorphic_identity': 'work'
     }
 
-    def get_identity():
+    def get_identities():
         return 'dbpedia-owl:Work'
 
     def get_entities():
@@ -112,7 +122,7 @@ class Film(Work):
         'polymorphic_identity': 'film'
     }
 
-    def get_identity():
+    def get_identities():
         return 'dbpedia-owl:Film'
 
     def get_entities():
@@ -129,7 +139,13 @@ class Book(Work):
         'polymorphic_identity': 'book'
     }
 
-    def get_identity():
+    def __init__(self, item):
+        super().__init__(item)
+        self.illustrator = item.get('illustrator', None)
+        self.isbn = item.get('isbn', None)
+        self.numberOfPages = item.get('numberOfPages', None)
+
+    def get_identities():
         return 'dbpedia-owl:Book'
 
     def get_entities():

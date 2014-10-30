@@ -24,18 +24,6 @@ from ...celery import app, get_session
 
 
 PAGE_ITEM_COUNT = 100
-CLASSES = [
-    'dbpedia-owl:Artist',
-    'dbpedia-owl:Book',
-    'dbpedia-owl:Cartoon',
-    'dbpedia-owl:Film',
-    'dbpedia-owl:WrittenWork',
-]
-PROPERTIES = [
-    'dbpedia-owl:writer',
-    'dbpedia-owl:author',
-    'dbpprop:author',
-]
 
 
 def select_dbpedia(query):
@@ -231,7 +219,7 @@ def select_by_relation(p, revision, s_name='subject', o_name='object', page=1):
     return select_dbpedia(query)
 
 
-def select_by_class(s, s_name='subject', entities=[], p=[], page=1):
+def select_by_class(s, s_name='subject',  p=[], entities=[], page=1):
     """List of **s** which as property as **entities**
 
     :param str s: Ontology name of subject.
@@ -246,6 +234,7 @@ def select_by_class(s, s_name='subject', entities=[], p=[], page=1):
 
         select_by_class (s_name='author',
         s=['dbpedia-owl:Artist', 'dbpedia-owl:ComicsCreator'],
+        p=['dbpedia-owl:author', 'dbpprop:author', 'dbpedia-owl:writer'],
         entities=['dbpedia-owl:birthDate', 'dbpprop:shortDescription'])
 
 
@@ -285,7 +274,7 @@ def select_by_class(s, s_name='subject', entities=[], p=[], page=1):
         group_concat += ('?{}\n').format(
             col_name
         )
-        s_property_o += '?{} {} ?{} .\n'.format(
+        s_property_o += 'OPTIONAL {{ ?{} {} ?{} . }}\n'.format(
             s_name, entity, col_name
         )
 
@@ -296,7 +285,7 @@ def select_by_class(s, s_name='subject', entities=[], p=[], page=1):
         query += '''UNION
         {{ ?{} a {} . }}\n'''.format(s_name, x)
     for prop in p:
-        query += '''UNION {{ ?{} ?{} ?prop . }}\n'''.format(s_name, prop)
+        query += '''UNION {{ ?{} {} ?prop . }}\n'''.format(s_name, prop)
     query += s_property_o
     query += filt
     query += '''}}
@@ -311,45 +300,23 @@ def select_by_class(s, s_name='subject', entities=[], p=[], page=1):
 
 
 @app.task
-def crawl_classes(page, class_num, revision):
+def fetch_classes(page, Object, identity):
     session = get_session()
     res = select_by_class(
-        s=CLASSES,
-        s_name='work',
-        entities=[
-            'dbpedia-owl:wikiPageRevisionID',
-            'rdfs:label',
-            'dbpprop:country',
-        ],
+        s=identity,
+        s_name='name',
+        entities=Object.get_entities(),
         page=page,
-        p=PROPERTIES,
+        p=Object.get_properties(),
     )
 
     for item in res:
         try:
             with session.begin():
-                new_entity = Entity(
-                    name=item['work'],
-                    revision=item['wikiPageRevisionID'],
-                    label=item['label'],
-                    country=item['country'],
-                )
+                new_entity = Object(item)
                 session.add(new_entity)
         except IntegrityError:
             pass
-
-    result_len = len(res)
-    current_retrieved = (page * PAGE_ITEM_COUNT) + result_len
-
-    if (class_num <= current_retrieved and result_len == PAGE_ITEM_COUNT):
-        crawl_classes.delay(
-            page + 1,
-            current_retrieved + PAGE_ITEM_COUNT,
-            revision
-        )
-
-    if app.conf['CELERY_ALWAYS_EAGER']:
-        return
 
 
 @app.task
@@ -409,11 +376,21 @@ def crawl():
     for x in range(0, relation_num // PAGE_ITEM_COUNT + 1):
         crawl_relation.delay(x, relation_num, relation_revision)
 
-    class_revision = get_session().query(func.max(Entity.revision)).scalar()
-    if not class_revision:
-        class_revision = 0
-    class_num = count_by_class(
-        class_list=CLASSES
-    )
-    for x in range(0, class_num // PAGE_ITEM_COUNT + 1):
-        crawl_classes.delay(x, class_num, class_revision)
+    entity_num = count_by_class([
+        'dbpedia-owl:Cartoon',
+        'dbpedia-owl:MovieDirector',
+        'dbpedia-owl:Producer',
+        'dbpedia-owl:TheatreDirector',
+        'dbpedia-owl:TelevisionDirector',
+        'dbpedia-owl:TelevisionPersonality'
+    ])
+
+    for x in range(0, entity_num // PAGE_ITEM_COUNT + 1):
+        fetch_classes(x, Entity, [
+            'dbpedia-owl:Cartoon',
+            'dbpedia-owl:MovieDirector',
+            'dbpedia-owl:Producer',
+            'dbpedia-owl:TheatreDirector',
+            'dbpedia-owl:TelevisionDirector',
+            'dbpedia-owl:TelevisionPersonality'
+        ])
