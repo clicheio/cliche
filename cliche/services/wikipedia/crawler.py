@@ -294,7 +294,7 @@ def select_by_class(s, s_name='subject',  p=[], entities=[], page=1):
     OFFSET {offset}'''.format(
         s_name=s_name,
         limit=PAGE_ITEM_COUNT,
-        offset=PAGE_ITEM_COUNT * (page - 1)
+        offset=PAGE_ITEM_COUNT * page
     )
     return select_dbpedia(query)
 

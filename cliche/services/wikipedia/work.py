@@ -132,7 +132,7 @@ class Film(Work):
 class Book(Work):
     """Representation of book as an ontology."""
     illustrator = Column(String)
-    isbn = Column(Integer)
+    isbn = Column(String)
     numberOfPages = Column(Integer)
 
     __mapper_args__ = {

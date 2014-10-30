@@ -21,7 +21,7 @@ def upgrade():
     op.add_column('wikipedia_entities',
                   sa.Column('illustrator', sa.String(), nullable=True))
     op.add_column('wikipedia_entities',
-                  sa.Column('isbn', sa.Integer(), nullable=True))
+                  sa.Column('isbn', sa.String(), nullable=True))
     op.add_column('wikipedia_entities',
                   sa.Column('mainCharacter', sa.String(), nullable=True))
     op.add_column('wikipedia_entities',
