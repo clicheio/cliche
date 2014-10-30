@@ -230,7 +230,7 @@ def import_all_modules(dry_run=False):  # FIXME
     import cliche.web.db
     import cliche.web.ontology
     import cliche.work  # noqa
-    return [
+    return frozenset([
         'cliche',
         'cliche.celery',
         'cliche.cli',
@@ -251,7 +251,7 @@ def import_all_modules(dry_run=False):  # FIXME
         'cliche.web.db',
         'cliche.web.ontology',
         'cliche.work'
-    ]
+    ])
 
     # current_dir = os.path.join(os.path.dirname(__file__), '..')
     # modules = frozenset(mod
