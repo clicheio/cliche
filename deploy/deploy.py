@@ -70,22 +70,22 @@ def main():
     with config_file.open('r') as config_data:
         config = load(config_data)
 
-    config['database_url'] = 'postgres://'
+    config['database_url'] = 'postgresql+psycopg2://'
     if args.db_username is not None and args.db_username[0] is not None:
-        config['database_url'] << args.db_username[0]
+        config['database_url'] += args.db_username[0]
     if args.db_password is not None and args.db_password[0] is not None:
-        config['database_url'] << ':' << args.db_password[0]
+        config['database_url'] += ':' + args.db_password[0]
     if (args.db_username is not None and args.db_username[0] is not None) or \
        (args.db_password is not None and args.db_password[0] is not None):
-        config['database_url'] << '@'
-    config['database_url'] << '{}/cliche' \
+        config['database_url'] += '@'
+    config['database_url'] += '{}/cliche?sslmode=require' \
                               .format(args.db_host[0].rpartition('@')[2])
 
     config['broker_url'] = 'redis://'
     if args.redis_password is not None and \
        args.redis_password[0] is not None:
-        config['broker_url'] << ':' << args.redis_password[0] << '@'
-    config['broker_url'] << '{}/1' \
+        config['broker_url'] += ':' + args.redis_password[0] + '@'
+    config['broker_url'] += '{}/1' \
                             .format(args.redis_host[0].rpartition('@')[2])
 
     os.chdir(str(workdir))
