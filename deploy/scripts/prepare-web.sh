@@ -6,13 +6,13 @@
 set -e
 
 prepare() {
-    if [ ! "dpkg-query -W nginx | awk {'print $1'} = """ ]; then
+    if ! dpkg-query -Wf'${db:Status-abbrev}' nginx 2>/dev/null | grep -q '^i'; then
 		echo "Installing nginx."
 		sudo apt-get install -y nginx
     fi
 
-	sudo ln -fs /home/cliche/etc/cliche.io /etc/nginx/sites-available/cliche.io
-	sudo ln -fs /etc/nginx/sites-available/cliche.io /etc/nginx/sites-enabled/cliche.io
+	sudo ln -sf /home/cliche/etc/cliche.io /etc/nginx/sites-available/cliche.io
+	sudo ln -sf /etc/nginx/sites-available/cliche.io /etc/nginx/sites-enabled/cliche.io
 
 	sudo sysv-rc-conf nginx on
 	sudo sysv-rc-conf --list nginx
