@@ -18,7 +18,7 @@ prepare() {
 	echo $packages
 	sudo apt-get install -y $packages
 
-	if [[ `id -u cliche >/dev/null 2>cliche` ]]; then
+	if [ -z "$(getent passwd cliche)" ]; then
 		sudo useradd -m -G users cliche
 	fi
 
