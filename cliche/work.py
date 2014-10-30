@@ -4,7 +4,7 @@
 """
 import enum
 
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy.orm import foreign, relationship, remote
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.sql.functions import now
 from sqlalchemy.types import Date, DateTime, Integer, String
@@ -40,10 +40,15 @@ class Character(Nameable):
     #: is derived.
     original_character = relationship(
         'Character',
-        foreign_keys=[original_character_id],
-        remote_side=[id],
-        backref=backref('derived_characters',
-                        collection_class=set)
+        primaryjoin=foreign(original_character_id) == remote(id)
+    )
+
+    #: (:class:'collections.abc.MutableSet') The set of :class:`Character`\ s
+    #: which is derived from this character
+    derived_characters = relationship(
+        'Character',
+        primaryjoin=remote(original_character_id) == id,
+        collection_class=set
     )
 
     #: (:class:`collections.abc.MutableSet`) The set of

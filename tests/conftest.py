@@ -269,6 +269,14 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     Create *Saiyuki* (comic book)
     which is a Japanese comic book series
     and loosely based on the *Journey to the West*.
+
+    Create *Saiyuki* (comic book)
+    which is a Japanese comic book series
+    and loosely based on the *Journey to the West*.
+
+    Create *날아라 슈퍼보드* (anime)
+    which is a korean animation series
+    and loosely based on the *Journey to the West*.
     """
     f = FixtureModule('fx_works')
     f += fx_teams
@@ -371,6 +379,15 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     })
     fx_session.add(f.saiyuki)
 
+    # create '날아라 슈퍼보드' animation series
+    f.superboard = Work()
+    f.superboard.names.update({
+        Name(nameable=f.superboard,
+             name='날아라 슈퍼보드',
+             locale=Locale.parse('ko_KR'))
+    })
+    fx_session.add(f.superboard)
+
     fx_session.flush()
     return f
 
@@ -378,7 +395,7 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
 @fixture
 def fx_characters(fx_session, fx_works):
     """create fictional characters: Iron Man, Hulk, Frodo, Xuanzang,
-    and Genjo Sanzo
+    and some characters who is derived from Xuanzang
     """
     f = FixtureModule('fx_characters')
     f += fx_works
@@ -436,9 +453,19 @@ def fx_characters(fx_session, fx_works):
     f.sanzo.original_character = f.xuanzang
     fx_works.saiyuki.characters.update({f.sanzo})
 
+    # create '삼장 법사' who is appeared in '날아라 슈퍼보드'
+    f.samjang = Character()
+    f.samjang.names.update({
+        Name(nameable=f.samjang,
+             name='삼장 법사',
+             locale=Locale.parse('ko_KR'))
+    })
+    f.samjang.original_character = f.xuanzang
+    fx_works.saiyuki.characters.update({f.samjang})
+
     with fx_session.begin():
         fx_session.add_all([f.iron_man_character, f.hulk_character, f.frodo,
-                            f.xuanzang, f.sanzo])
+                            f.xuanzang, f.sanzo, f.samjang])
     return f
 
 

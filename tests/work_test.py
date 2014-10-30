@@ -128,8 +128,10 @@ def test_character_is_in_works(fx_session, fx_works, fx_characters):
 def test_character_is_derived(fx_session, fx_characters):
     sanzo = fx_characters.sanzo
     xuanzang = fx_characters.xuanzang
+    samjang = fx_characters.samjang
     assert sanzo.original_character == xuanzang
-    assert xuanzang.derived_characters == {sanzo}
+    assert samjang.original_character == xuanzang
+    assert xuanzang.derived_characters == {sanzo, samjang}
 
 
 def test_discriminator():
