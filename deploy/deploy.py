@@ -21,8 +21,14 @@ def main():
                         help='Template of config file to be deployed.')
     parser.add_argument('-d', '--db-host', nargs=1, required=True,
                         help='Database host address to use.')
+    parser.add_argument('--db-username', nargs=1,
+                        help='OPTIONAL: Database username to use.')
+    parser.add_argument('--db-password', nargs=1,
+                        help='OPTIONAL: Database password to use.')
     parser.add_argument('-r', '--redis-host', nargs=1, required=True,
                         help='Redis cache host address to use.')
+    parser.add_argument('--redis-password', nargs=1,
+                        help='OPTIONAL: Redis cache host password to use.')
     parser.add_argument(
         '--crawler', action='append', nargs=1,
         help="""
@@ -64,11 +70,23 @@ def main():
     with config_file.open('r') as config_data:
         config = load(config_data)
 
-    config['database_url'] = 'postgres://{}/cliche' \
-                             .format(args.db_host[0].rpartition('@')[2])
+    config['database_url'] = 'postgres://'
+    if args.db_username is not None and args.db_username[0] is not None:
+        config['database_url'] << args.db_username[0]
+    if args.db_password is not None and args.db_password[0] is not None:
+        config['database_url'] << ':' << args.db_password[0]
+    if (args.db_username is not None and args.db_username[0] is not None) or \
+       (args.db_password is not None and args.db_password[0] is not None):
+        config['database_url'] << '@'
+    config['database_url'] << '{}/cliche' \
+                              .format(args.db_host[0].rpartition('@')[2])
 
-    config['broker_url'] = 'redis://{}/1' \
-                           .format(args.redis_host[0].rpartition('@')[2])
+    config['broker_url'] = 'redis://'
+    if args.redis_password is not None and \
+       args.redis_password[0] is not None:
+        config['broker_url'] << ':' << args.redis_password[0] << '@'
+    config['broker_url'] << '{}/1' \
+                            .format(args.redis_host[0].rpartition('@')[2])
 
     os.chdir(str(workdir))
 
