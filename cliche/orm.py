@@ -210,7 +210,6 @@ def import_all_modules(dry_run=False):  # FIXME
     :rtype: :class:`collections.abc.Set`
 
     """
-    import cliche
     import cliche.celery
     import cliche.cli
     import cliche.config
@@ -231,7 +230,6 @@ def import_all_modules(dry_run=False):  # FIXME
     import cliche.web.ontology
     import cliche.work  # noqa
     return frozenset([
-        'cliche',
         'cliche.celery',
         'cliche.cli',
         'cliche.config',
