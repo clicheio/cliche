@@ -23,8 +23,8 @@ In order to define a persist model class, just subclass :class:`Base`::
 .. _SQLAlchemy: http://www.sqlalchemy.org/
 
 """
-import os.path
-import pkgutil
+import os.path  # noqa
+import pkgutil  # noqa
 
 from alembic.command import downgrade, stamp
 from alembic.config import Config
@@ -201,7 +201,7 @@ def downgrade_database(engine, revision):
     downgrade(config, revision)
 
 
-def import_all_modules(dry_run=False):
+def import_all_modules(dry_run=False):  # FIXME
     """Import all submodules of :mod:`cliche` to ensure every ORM
     entity classes are ready to use.  It's useful for being ready to
     auto-generate a migration script.
@@ -210,10 +210,53 @@ def import_all_modules(dry_run=False):
     :rtype: :class:`collections.abc.Set`
 
     """
-    current_dir = os.path.join(os.path.dirname(__file__), '..')
-    modules = frozenset(mod
-                        for _, mod, __ in pkgutil.walk_packages(current_dir)
-                        if mod.startswith('cliche.'))
-    for mod in modules:
-        __import__(mod)
-    return modules
+    import cliche
+    import cliche.celery
+    import cliche.cli
+    import cliche.config
+    import cliche.name
+    import cliche.orm
+    import cliche.people
+    import cliche.services
+    import cliche.services.tvtropes
+    import cliche.services.tvtropes.crawler
+    import cliche.services.tvtropes.entities
+    import cliche.services.wikipedia
+    import cliche.services.wikipedia.crawler
+    import cliche.services.wikipedia.work
+    import cliche.sqltypes
+    import cliche.web
+    import cliche.web.app
+    import cliche.web.db
+    import cliche.web.ontology
+    import cliche.work  # noqa
+    return [
+        'cliche',
+        'cliche.celery',
+        'cliche.cli',
+        'cliche.config',
+        'cliche.name',
+        'cliche.orm',
+        'cliche.people',
+        'cliche.services',
+        'cliche.services.tvtropes',
+        'cliche.services.tvtropes.crawler',
+        'cliche.services.tvtropes.entities',
+        'cliche.services.wikipedia',
+        'cliche.services.wikipedia.crawler',
+        'cliche.services.wikipedia.work',
+        'cliche.sqltypes',
+        'cliche.web',
+        'cliche.web.app',
+        'cliche.web.db',
+        'cliche.web.ontology',
+        'cliche.work'
+    ]
+
+    # current_dir = os.path.join(os.path.dirname(__file__), '..')
+    # modules = frozenset(mod
+    #                     for _, mod, __ in pkgutil.walk_packages(current_dir)
+    #                     if mod.startswith('cliche.'))
+    # for mod in modules:
+    #     __import__(mod)
+    # return modules
