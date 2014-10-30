@@ -1,4 +1,5 @@
 import enum
+import uuid
 
 from babel import Locale
 from sqlalchemy.schema import Column, ForeignKey
@@ -6,7 +7,7 @@ from sqlalchemy.types import Integer, String
 
 from cliche.sqltypes import (EnumType, LocaleType,
                              prevent_discriminator_from_changing,
-                             prevent_instantiating)
+                             prevent_instantiating, UuidType)
 from cliche.orm import Base
 
 
@@ -54,6 +55,24 @@ def test_locale_type(fx_session):
                        .filter(LocaleTable.locale == Locale.parse('de_DE')) \
                        .one()
     assert result.locale == Locale.parse('de_DE')
+
+
+class UuidTable(Base):
+    __tablename__ = 'uuid_table'
+
+    id = Column(UuidType, primary_key=True, default=uuid.uuid4)
+    uuid = Column(UuidType, default=uuid.uuid4)
+
+
+def test_uuid_type(fx_session):
+    some_entity_1 = UuidTable()
+    some_entity_2 = UuidTable()
+    with fx_session.begin():
+        fx_session.add_all([some_entity_1, some_entity_2])
+    assert some_entity_1.id != some_entity_2.id
+
+    some_entity_2.id = uuid.UUID(str(some_entity_1.id))
+    assert some_entity_1.id == some_entity_2.id
 
 
 class Employee(Base):

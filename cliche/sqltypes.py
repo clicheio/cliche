@@ -3,11 +3,13 @@
 
 """
 import enum
+import uuid
 
 from babel import Locale
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm.events import event
 from sqlalchemy.sql.expression import func
-from sqlalchemy.types import Enum, SchemaType, String, TypeDecorator
+from sqlalchemy.types import CHAR, Enum, SchemaType, String, TypeDecorator
 from sqlalchemy.util.langhelpers import _symbol
 
 __all__ = ('EnumType', 'HashableLocale', 'LocaleType',
@@ -85,6 +87,8 @@ class LocaleType(TypeDecorator):
 
     def result_processor(self, dialect, coltype):
         def process_result_value(value):
+            if value is None:
+                return value
             return HashableLocale.parse(value)
         return process_result_value
 
@@ -96,3 +100,36 @@ class LocaleType(TypeDecorator):
         @property
         def territory(self):
             return func.substr(self.expr, 4, 2)
+
+
+class UuidType(TypeDecorator):
+    """Custom UUID type to be used as :class:`uuid.UUID`."""
+
+    impl = CHAR
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == 'postgresql':
+            return dialect.type_descriptor(UUID())
+        else:
+            return dialect.type_descriptor(CHAR(32))
+
+    def bind_processor(self, dialect):
+        def process_bind_param(value):
+            if value is None:
+                return value
+            if not isinstance(value, uuid.UUID):
+                raise TypeError('expected uuid.UUID instance')
+
+            if dialect.name == 'postgresql':
+                return str(value)
+            else:
+                return '{0:032x}'.format(int(value))
+        return process_bind_param
+
+    def result_processor(self, dialect, coltype):
+        def process_result_value(value):
+            if value is None:
+                return value
+            else:
+                return uuid.UUID(value)
+        return process_result_value
