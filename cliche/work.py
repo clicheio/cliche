@@ -4,7 +4,7 @@
 """
 import enum
 
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import foreign, relationship, remote
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.sql.functions import now
 from sqlalchemy.types import Date, DateTime, Integer, String
@@ -13,8 +13,8 @@ from .orm import Base
 from .sqltypes import EnumType, prevent_discriminator_from_changing
 from .name import Nameable
 
-__all__ = ('Credit', 'Franchise', 'Genre', 'Role', 'Work', 'WorkFranchise',
-           'WorkGenre', 'World')
+__all__ = ('Character', 'Credit', 'Franchise', 'Genre', 'Role', 'Work',
+           'WorkCharacter', 'WorkFranchise', 'WorkGenre', 'World')
 
 
 class Role(enum.Enum):
@@ -25,6 +25,43 @@ class Role(enum.Enum):
     director = 'director'
     editor = 'editor'
     unknown = 'unknown'
+
+
+class Character(Nameable):
+    """Fictional character that appears in creative work."""
+
+    #: (:class:`int`) The primary key integer.
+    id = Column(Integer, ForeignKey(Nameable.id), primary_key=True)
+
+    #: (:class:'int') :class:`Character.id` of :attr:`original_character`.
+    original_character_id = Column(Integer, ForeignKey('characters.id'))
+
+    #: (:class:'Character') The original character from which this character
+    #: is derived.
+    original_character = relationship(
+        'Character',
+        primaryjoin=foreign(original_character_id) == remote(id)
+    )
+
+    #: (:class:'collections.abc.MutableSet') The set of :class:`Character`\ s
+    #: which is derived from this character
+    derived_characters = relationship(
+        'Character',
+        primaryjoin=remote(original_character_id) == id,
+        collection_class=set
+    )
+
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`Work`\ s in which the character appeared.
+    works = relationship('cliche.work.Work',
+                         secondary='work_characters',
+                         collection_class=set)
+
+    __tablename__ = 'characters'
+    __repr_columns__ = [id]
+    __mapper_args__ = {
+        'polymorphic_identity': 'characters',
+    }
 
 
 class Credit(Base):
@@ -175,6 +212,12 @@ class Work(Nameable):
                               secondary='work_franchises',
                               collection_class=set)
 
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`Character`\ s that appeared in the work.
+    characters = relationship(Character,
+                              secondary='work_characters',
+                              collection_class=set)
+
     #: (:class:`datetime.datetime`) The date and time on which
     #: the record was created.
     created_at = Column(DateTime(timezone=True),
@@ -189,8 +232,34 @@ class Work(Nameable):
     }
 
 
+class WorkCharacter(Base):
+    """Relationship between the character and the work.
+    Describe that the character appeared in the work.
+    """
+
+    #: (:class:`int`) :class:`Work.id` of :attr:`work`.
+    work_id = Column(Integer, ForeignKey(Work.id), primary_key=True)
+
+    #: (:class:`Work`) The work in which the :attr:`character` appeared.
+    work = relationship(Work)
+
+    #: (:class:`int`) :class:`Character.id` of :attr:`character`.
+    character_id = Column(Integer, ForeignKey(Character.id), primary_key=True)
+
+    #: (:class:`Character`) The character that appeared in the :attr:`work`.
+    character = relationship(Character)
+
+    #: (:class:`datetime.datetime`) The date and time on which
+    #: the record was created.
+    created_at = Column(DateTime(timezone=True), nullable=False,
+                        default=now())
+
+    __tablename__ = 'work_characters'
+    __repr_columns__ = work_id, character_id
+
+
 class WorkFranchise(Base):
-    """Relationship between the work and the Franchise. """
+    """Relationship between the work and the Franchise."""
 
     #: (:class:`int`) :class:`Work.id` of :attr:`work`.
     work_id = Column(Integer, ForeignKey(Work.id), primary_key=True)

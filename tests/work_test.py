@@ -42,7 +42,7 @@ def test_franchise_has_works(fx_works, fx_franchises):
         fx_works.lord_of_rings_film
     }
     assert fx_franchises.iron_man.works == {
-        fx_works.avengers
+        fx_works.iron_man_film, fx_works.avengers
     }
 
 
@@ -99,6 +99,39 @@ def test_credit_removed_with_person(fx_session, fx_works, fx_people):
         filter_by(person_id=member_1_id).\
         count()
     assert num_credits == 0
+
+
+def test_work_has_characters(fx_session, fx_works, fx_characters):
+    assert fx_works.avengers.characters == {
+        fx_characters.iron_man_character, fx_characters.hulk_character
+    }
+    assert fx_works.iron_man_film.characters == {
+        fx_characters.iron_man_character
+    }
+    assert fx_works.lord_of_rings_film.characters == {
+        fx_characters.frodo
+    }
+
+
+def test_character_is_in_works(fx_session, fx_works, fx_characters):
+    assert fx_characters.iron_man_character.works == {
+        fx_works.avengers, fx_works.iron_man_film
+    }
+    assert fx_characters.hulk_character.works == {
+        fx_works.avengers
+    }
+    assert fx_characters.frodo.works == {
+        fx_works.lord_of_rings_film
+    }
+
+
+def test_character_is_derived(fx_session, fx_characters):
+    sanzo = fx_characters.sanzo
+    xuanzang = fx_characters.xuanzang
+    samjang = fx_characters.samjang
+    assert sanzo.original_character == xuanzang
+    assert samjang.original_character == xuanzang
+    assert xuanzang.derived_characters == {sanzo, samjang}
 
 
 def test_discriminator():

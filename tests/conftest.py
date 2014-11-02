@@ -12,7 +12,7 @@ from cliche.name import Name
 from cliche.people import Person, Team
 from cliche.sqltypes import HashableLocale as Locale
 from cliche.web.app import app
-from cliche.work import Credit, Franchise, Genre, Role, Work, World
+from cliche.work import Character, Credit, Franchise, Genre, Role, Work, World
 
 from .db import DEFAULT_DATABASE_URL, get_session
 
@@ -259,13 +259,31 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     Create *The Avengers* (flim),
     which belongs to *Iron Man*, *Captain America*, *Hulk*,
     and *Thor* franchise.
+
+    Create *Iron Man* (flim),
+    which belongs to *Iron Man* franchise.
+
+    Create *Journey to the West* (novel)
+    which is a Chinese novel published in the 16th century.
+
+    Create *Saiyuki* (comic book)
+    which is a Japanese comic book series
+    and loosely based on the *Journey to the West*.
+
+    Create *Saiyuki* (comic book)
+    which is a Japanese comic book series
+    and loosely based on the *Journey to the West*.
+
+    Create *날아라 슈퍼보드* (anime)
+    which is a korean animation series
+    and loosely based on the *Journey to the West*.
     """
     f = FixtureModule('fx_works')
     f += fx_teams
     f += fx_genres
     f += fx_franchises
 
-    # create 'Cardcaptor Sakura'
+    # create 'Cardcaptor Sakura' combic book series
     f.cardcaptor_sakura = Work(published_at=datetime.date(1996, 11, 22))
     f.cardcaptor_sakura.genres.update({f.comic, f.romance})
     f.cardcaptor_sakura.names.update({
@@ -299,7 +317,7 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
                                    role=Role.artist)
     fx_session.add(f.skura_member_asso_4)
 
-    # create 'The Lord of the Rings: The Fellowship of the Ring'
+    # create 'The Lord of the Rings: The Fellowship of the Ring' film
     f.lord_of_rings_film = Work()
     f.lord_of_rings_film.names.update({
         Name(nameable=f.lord_of_rings_film,
@@ -315,7 +333,7 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     f.lord_of_rings_film.franchises.update({f.lord_of_rings})
     fx_session.add(f.lord_of_rings_film)
 
-    # create 'The Avengers'
+    # create 'The Avengers' film
     f.avengers = Work()
     f.avengers.names.update({
         Name(nameable=f.avengers,
@@ -327,7 +345,127 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     })
     fx_session.add(f.avengers)
 
+    # create 'Iron Man' film
+    f.iron_man_film = Work()
+    f.iron_man_film.names.update({
+        Name(nameable=f.iron_man_film,
+             name='Iron Man',
+             locale=Locale.parse('en_US'))
+    })
+    f.iron_man_film.franchises.update({f.iron_man})
+    fx_session.add(f.iron_man_film)
+
+    # create 'Journey to the West' novel
+    f.journey_west = Work()
+    f.journey_west.names.update({
+        Name(nameable=f.journey_west,
+             name='Journey to the West',
+             locale=Locale.parse('en_US')),
+        Name(nameable=f.journey_west,
+             name='서유기',
+             locale=Locale.parse('ko_KR'))
+    })
+    fx_session.add(f.journey_west)
+
+    # create 'Saiyuki' comic book series
+    f.saiyuki = Work()
+    f.saiyuki.names.update({
+        Name(nameable=f.saiyuki,
+             name='Saiyuki',
+             locale=Locale.parse('en_US')),
+        Name(nameable=f.saiyuki,
+             name='환상마전 최유기',
+             locale=Locale.parse('ko_KR'))
+    })
+    fx_session.add(f.saiyuki)
+
+    # create '날아라 슈퍼보드' animation series
+    f.superboard = Work()
+    f.superboard.names.update({
+        Name(nameable=f.superboard,
+             name='날아라 슈퍼보드',
+             locale=Locale.parse('ko_KR'))
+    })
+    fx_session.add(f.superboard)
+
     fx_session.flush()
+    return f
+
+
+@fixture
+def fx_characters(fx_session, fx_works):
+    """create fictional characters: Iron Man, Hulk, Frodo, Xuanzang,
+    and some characters who is derived from Xuanzang
+    """
+    f = FixtureModule('fx_characters')
+    f += fx_works
+
+    # create 'Iron Man' character
+    f.iron_man_character = Character()
+    f.iron_man_character.names.update({
+        Name(nameable=f.iron_man_character,
+             name='Iron Man',
+             locale=Locale.parse('en_US'))
+    })
+    fx_works.avengers.characters.update({f.iron_man_character})
+    fx_works.iron_man_film.characters.update({f.iron_man_character})
+
+    # create 'Hulk' character
+    f.hulk_character = Character()
+    f.hulk_character.names.update({
+        Name(nameable=f.hulk_character,
+             name='Hulk',
+             locale=Locale.parse('en_US'))
+    })
+    fx_works.avengers.characters.update({f.hulk_character})
+
+    # create 'Frodo Baggins' character
+    f.frodo = Character()
+    f.frodo.names.update({
+        Name(nameable=f.frodo,
+             name='Frodo Baggins',
+             locale=Locale.parse('en_US'))
+    })
+    fx_works.lord_of_rings_film.characters.update({f.frodo})
+
+    # create 'Xuanzang' character
+    f.xuanzang = Character()
+    f.xuanzang.names.update({
+        Name(nameable=f.xuanzang,
+             name='Xuanzang',
+             locale=Locale.parse('en_US')),
+        Name(nameable=f.xuanzang,
+             name='삼장',
+             locale=Locale.parse('ko_KR'))
+    })
+    fx_works.journey_west.characters.update({f.xuanzang})
+
+    # create 'Genjo Sanzo' character
+    f.sanzo = Character()
+    f.sanzo.names.update({
+        Name(nameable=f.sanzo,
+             name='Genjo Sanzo',
+             locale=Locale.parse('en_US')),
+        Name(nameable=f.sanzo,
+             name='삼장',
+             locale=Locale.parse('ko_KR'))
+    })
+    f.sanzo.original_character = f.xuanzang
+    fx_works.saiyuki.characters.update({f.sanzo})
+
+    # create '삼장 법사' who is appeared in '날아라 슈퍼보드'
+    f.samjang = Character()
+    f.samjang.names.update({
+        Name(nameable=f.samjang,
+             name='삼장 법사',
+             locale=Locale.parse('ko_KR'))
+    })
+    f.samjang.original_character = f.xuanzang
+    fx_works.saiyuki.characters.update({f.samjang})
+
+    with fx_session.begin():
+        fx_session.add_all([f.iron_man_character, f.hulk_character, f.frodo,
+                            f.xuanzang, f.sanzo, f.samjang])
     return f
 
 
