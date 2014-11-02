@@ -158,21 +158,28 @@ def shell():
 @option('--threaded', is_flag=True)
 @option('--processes', type=int, default=1)
 @option('--passthrough-errors', is_flag=True)
-@option('--debug/--no-debug', '-d/-D', default=False,
+@option('--debug/--no-debug', '-d/-D', default=None,
         help='enable the Werkzeug debugger'
              ' (DO NOT use in production code)')
-@option('--reload/--no-reload', '-r/-R', default=False,
+@option('--reload/--no-reload', '-r/-R', default=None,
         help='monitor Python files for changes'
              ' (not 100% safe for production use)')
 @config
 def runserver(host, port, threaded, processes,
               passthrough_errors, debug, reload):
     """Run the Flask development server i.e. app.run()"""
+
     if flask_app.debug:
         # scss compile automatically in debug mode
         flask_app.wsgi_app = SassMiddleware(flask_app.wsgi_app, {
             'cliche.web': ('static/sass', 'static/css', '/static/css')
         })
+
+    if debug is None:
+        debug = flask_app.config['DEBUG'] or True
+    if reload is None:
+        reload = flask_app.config['DEBUG'] or True
+
     flask_app.run(host=host,
                   port=port,
                   debug=debug,
