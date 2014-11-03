@@ -15,11 +15,15 @@ Crawling DBpedia tables into a relational database
 References
 ----------
 """
+from urllib.error import HTTPError, URLError
+
 from SPARQLWrapper import JSON, SPARQLWrapper
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import func
 
-from .work import Entity, Relation
+from .work import (
+    Artist, Book, Entity, Film, Relation, Work
+)
 from ...celery import app, get_session
 
 
@@ -30,8 +34,15 @@ def select_dbpedia(query):
     sparql = SPARQLWrapper("http://dbpedia.org/sparql")
     sparql.setReturnFormat(JSON)
     sparql.setQuery(query)
-    tuples = sparql.query().convert()['results']['bindings']
-    return[{k: v['value'] for k, v in tupl.items()} for tupl in tuples]
+    while True:
+        try:
+            tuples = sparql.query().convert()['results']['bindings']
+        except HTTPError as e:
+            print('HTTPError', e.code, e.reason)
+        except URLError as e:
+            print('URLError', e.code, e.reason)
+        else:
+            return[{k: v['value'] for k, v in tupl.items()} for tupl in tuples]
 
 
 def select_property(s, s_name='property', return_json=False):
@@ -132,7 +143,7 @@ def count_by_class(class_list):
 
     classes = ''
     for x in class_list[:-1]:
-        classes += '{{ ?subject a {} . }} UNION'.format(class_list[0])
+        classes += '{{ ?subject a {} . }} UNION'.format(x)
 
     classes += '{{ ?subject a {} . }}'.format(class_list[-1])
 
@@ -143,7 +154,15 @@ def count_by_class(class_list):
     WHERE {{
         {classes}
     }}'''.format(classes=classes)
-    return int(select_dbpedia(query)[0]['callret-0'])
+
+    print(query)
+    while True:
+        try:
+            count = int(select_dbpedia(query)[0]['callret-0'])
+        except IndexError:
+            pass
+        else:
+            return count
 
 
 def select_by_relation(p, revision, s_name='subject', o_name='object', page=1):
@@ -319,6 +338,21 @@ def fetch_classes(page, Object, identity):
             pass
 
 
+def crawl_classes(identity):
+    entity_num = count_by_class(identity)
+    sql_classes = {
+        'dbpedia-owl:Artist': Artist,
+        'dbpedia-owl:Book': Book,
+        'dbpedia-owl:Entity': Entity,
+        'dbpedia-owl:Film': Film,
+        'dbpedia-owl:Relation': Relation,
+        'dbpedia-owl:Work': Work
+    }
+
+    for x in range(0, entity_num // PAGE_ITEM_COUNT + 1):
+        fetch_classes(x, sql_classes.get(identity[0], Entity), identity)
+
+
 @app.task
 def crawl_relation(page, relation_num, revision):
     session = get_session()
@@ -376,21 +410,8 @@ def crawl():
     for x in range(0, relation_num // PAGE_ITEM_COUNT + 1):
         crawl_relation.delay(x, relation_num, relation_revision)
 
-    entity_num = count_by_class([
-        'dbpedia-owl:Cartoon',
-        'dbpedia-owl:MovieDirector',
-        'dbpedia-owl:Producer',
-        'dbpedia-owl:TheatreDirector',
-        'dbpedia-owl:TelevisionDirector',
-        'dbpedia-owl:TelevisionPersonality'
-    ])
-
-    for x in range(0, entity_num // PAGE_ITEM_COUNT + 1):
-        fetch_classes(x, Entity, [
-            'dbpedia-owl:Cartoon',
-            'dbpedia-owl:MovieDirector',
-            'dbpedia-owl:Producer',
-            'dbpedia-owl:TheatreDirector',
-            'dbpedia-owl:TelevisionDirector',
-            'dbpedia-owl:TelevisionPersonality'
-        ])
+    crawl_classes(['dbpedia-owl:Artist'])
+    crawl_classes(['dbpedia-owl:Book', 'dbpedia-owl:Novel'])
+    crawl_classes(['dbpedia-owl:Cartoon'])
+    crawl_classes(['dbpedia-owl:Film'])
+    crawl_classes(['dbpedia-owl:Work'])

@@ -4,7 +4,7 @@ from sqlalchemy.sql.expression import func
 
 from cliche.services.wikipedia import crawler as dbpedia
 from cliche.services.wikipedia.work import (
-    Entity, Relation, Artist, Work, Film, Book
+    Artist, Book, Entity, Film, Relation, Work
 )
 
 
