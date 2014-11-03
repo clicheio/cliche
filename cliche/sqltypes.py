@@ -13,7 +13,8 @@ from sqlalchemy.types import CHAR, Enum, SchemaType, String, TypeDecorator
 from sqlalchemy.util.langhelpers import _symbol
 
 __all__ = ('EnumType', 'HashableLocale', 'LocaleType',
-           'prevent_discriminator_from_changing', 'prevent_instantiating')
+           'prevent_discriminator_from_changing', 'prevent_instantiating',
+           'UuidType')
 
 
 def prevent_discriminator_from_changing(col):
