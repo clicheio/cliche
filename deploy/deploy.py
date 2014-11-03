@@ -254,7 +254,7 @@ def main():
 
     if args.beat is not None and args.beat[0] is not None:
         print('Starting beat at ' + args.beat[0])
-        subprocess.all(
+        subprocess.call(
             [
                 'ssh',
                 args.beat[0],
