@@ -17,6 +17,7 @@ References
 """
 from urllib.error import HTTPError, URLError
 
+from celery.utils.log import get_task_logger
 from SPARQLWrapper import JSON, SPARQLWrapper
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import func
@@ -24,23 +25,25 @@ from sqlalchemy.sql.expression import func
 from .work import (
     Artist, Book, Entity, Film, Relation, Work
 )
-from ...celery import app, get_session
+from ...celery import app, get_session, get_wikipedia_limit
 
 
 PAGE_ITEM_COUNT = 100
 
 
 def select_dbpedia(query):
+    logger = get_task_logger(__name__ + '.select_dbpedia')
     sparql = SPARQLWrapper("http://dbpedia.org/sparql")
     sparql.setReturnFormat(JSON)
     sparql.setQuery(query)
-    while True:
+    tried = 0
+    wikipedia_limit = get_wikipedia_limit()
+    while tried < wikipedia_limit:
         try:
             tuples = sparql.query().convert()['results']['bindings']
-        except HTTPError as e:
-            print('HTTPError', e.code, e.reason)
-        except URLError as e:
-            print('URLError', e.code, e.reason)
+            tried += 1
+        except (HTTPError, URLError) as e:
+            logger.warning('%s: %s', e.code, e.reason)
         else:
             return[{k: v['value'] for k, v in tupl.items()} for tupl in tuples]
 
@@ -155,14 +158,7 @@ def count_by_class(class_list):
         {classes}
     }}'''.format(classes=classes)
 
-    print(query)
-    while True:
-        try:
-            count = int(select_dbpedia(query)[0]['callret-0'])
-        except IndexError:
-            pass
-        else:
-            return count
+    return int(select_dbpedia(query)[0]['callret-0'])
 
 
 def select_by_relation(p, revision, s_name='subject', o_name='object', page=1):

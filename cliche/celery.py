@@ -145,6 +145,10 @@ class Loader(BaseLoader):
         return config
 
 
+def get_wikipedia_limit():
+    return current_app.conf.get('WIKIPEDIA_RETRY_LIMIT', 12)
+
+
 def get_database_engine() -> Engine:
     """Get a database engine.
 
