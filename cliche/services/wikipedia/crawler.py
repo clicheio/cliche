@@ -25,10 +25,14 @@ from sqlalchemy.sql.expression import func
 from .work import (
     Artist, Book, Entity, Film, Relation, Work
 )
-from ...celery import app, get_session, get_wikipedia_limit
+from ...celery import app, get_session
 
 
 PAGE_ITEM_COUNT = 100
+
+
+def get_wikipedia_limit():
+    return app.conf.get('WIKIPEDIA_RETRY_LIMIT', 12)
 
 
 def select_dbpedia(query):
