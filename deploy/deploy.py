@@ -130,6 +130,8 @@ def main():
           'revision.txt').open('w') as revision_file:
         revision_file.write(revision + '\n')
 
+    venv_dir = pathlib.Path('/home/cliche/venv_{}'.format(revision))
+
     subprocess.check_call(
         [
             'python',
@@ -160,6 +162,117 @@ def main():
         execute_remote_script(web_worker[0], revision, 'prepare-web.sh')
         execute_remote_script(web_worker[0], revision, 'upgrade-common.py')
         execute_remote_script(web_worker[0], revision, 'upgrade-web.py')
+
+    if args.beat is not None and args.beat[0] is not None:
+        print('Stopping beat at ' + args.beat[0])
+        subprocess.call(
+            [
+                'ssh',
+                args.beat[0],
+                'stop',
+                'cliche-celery-beat',
+            ]
+        )
+
+    for crawler in args.crawler or []:
+        print('Stopping crawler on ' + crawler[0])
+        subprocess.call(
+            [
+                'ssh',
+                crawler[0],
+                'stop',
+                'cliche-celery-worker',
+            ]
+        )
+
+    for web_worker in args.web_worker or []:
+        print('Stopping web worker on ' + web_worker[0])
+        subprocess.call(
+            [
+                'ssh',
+                web_worker[0],
+                'stop',
+                'cliche-uwsgi',
+            ]
+        )
+
+    if args.beat is not None and args.beat[0] is not None:
+        print('Migrating database on beat at ' + args.beat[0])
+        subprocess.check_call(
+            [
+                'ssh',
+                args.beat[0],
+                'sudo',
+                '-ucliche',
+                str(venv_dir / 'bin' / 'cliche'),
+                'upgrade',
+                '-c',
+                str(venv_dir / 'etc' / 'prod.cfg.yml'),
+            ]
+        )
+
+    for crawler in args.crawler or []:
+        print('Migrating database on crawler at ' + crawler[0])
+        subprocess.check_call(
+            [
+                'ssh',
+                crawler[0],
+                'sudo',
+                '-ucliche',
+                str(venv_dir / 'bin' / 'cliche'),
+                'upgrade',
+                '-c',
+                str(venv_dir / 'etc' / 'prod.cfg.yml'),
+            ]
+        )
+
+    for web_worker in args.web_worker or []:
+        print('Migrating database on web worker at ' + web_worker[0])
+        subprocess.check_call(
+            [
+                'ssh',
+                web_worker[0],
+                'sudo',
+                '-ucliche',
+                str(venv_dir / 'bin' / 'cliche'),
+                'upgrade',
+                '-c',
+                str(venv_dir / 'etc' / 'prod.cfg.yml'),
+            ]
+        )
+
+    for web_worker in args.web_worker or []:
+        print('Starting web worker on ' + web_worker[0])
+        subprocess.call(
+            [
+                'ssh',
+                web_worker[0],
+                'start',
+                'cliche-uwsgi',
+            ]
+        )
+
+    if args.beat is not None and args.beat[0] is not None:
+        print('Starting beat at ' + args.beat[0])
+        subprocess.all(
+            [
+                'ssh',
+                args.beat[0],
+                'start',
+                'cliche-celery-beat',
+            ]
+        )
+
+    for crawler in args.crawler or []:
+        print('Starting crawler on ' + crawler[0])
+        subprocess.call(
+            [
+                'ssh',
+                crawler[0],
+                'start',
+                'cliche-celery-worker',
+            ]
+        )
 
     if args.beat is not None and args.beat[0] is not None:
         print('Promoting beat at ' + args.beat[0])

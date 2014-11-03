@@ -87,17 +87,6 @@ def main():
         ]
     )
 
-    subprocess.check_call(
-        [
-            'sudo',
-            '-ucliche',
-            str(venv_dir / 'bin' / 'cliche'),
-            'upgrade',
-            '-c',
-            str(venv_dir / 'etc' / 'prod.cfg.yml'),
-        ]
-    )
-
     with (venv_dir / 'etc' / 'cliche-uwsgi.ini').open('a+') as uwsgi_conf:
         uwsgi_conf.write('virtualenv={}\n'.format(str(venv_dir)))
 
