@@ -15,6 +15,7 @@ Crawling DBpedia tables into a relational database
 References
 ----------
 """
+import datetime
 from urllib.error import HTTPError, URLError
 
 from celery.utils.log import get_task_logger
@@ -319,23 +320,22 @@ def select_by_class(s, s_name='subject',  p=[], entities=[], page=1):
 
 
 @app.task
-def fetch_classes(page, Object, identity):
+def fetch_classes(page, object_, identity):
     session = get_session()
     res = select_by_class(
         s=identity,
         s_name='name',
-        entities=Object.get_entities(),
+        entities=object_.get_entities(),
         page=page,
-        p=Object.get_properties(),
+        p=object_.get_properties(),
     )
 
+    current_time = datetime.datetime.now(datetime.timezone.utc)
     for item in res:
-        try:
-            with session.begin():
-                new_entity = Object(item)
-                session.add(new_entity)
-        except IntegrityError:
-            pass
+        with session.begin():
+            new_entity = object_(item)
+            object_.last_crawled = current_time
+            session.add(new_entity)
 
 
 def crawl_classes(identity):
