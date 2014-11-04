@@ -46,14 +46,15 @@ def select_dbpedia(query):
     wikipedia_limit = get_wikipedia_limit()
     while tried < wikipedia_limit:
         try:
+            tried = tried + 1
             tuples = sparql.query().convert()['results']['bindings']
-            tried += 1
         except HTTPError as e:
-            logger.warning('HTTPError %s: %s', e.code, e.reason)
+            logger.warning('HTTPError %s: %s, tried %d/%d', e.code, e.reason, tried, wikipedia_limit)
         except URLError as e:
-            logger.warning('URLError %s', e.args)
+            logger.warning('URLError %s, tried %d/%d', e.args, tried, wikipedia_limit)
         else:
             return[{k: v['value'] for k, v in tupl.items()} for tupl in tuples]
+    return []
 
 
 def select_property(s, s_name='property', return_json=False):
@@ -133,7 +134,11 @@ def count_by_relation(p):
     }}
     '''.format(filt=' || '.join('?p = %s\n' % x for x in p))
 
-    return int(select_dbpedia(query)[0]['callret-0'])
+    cnt = select_dbpedia(query)
+    if cnt:
+        return int(cnt[0]['callret-0'])
+    else:
+        return 0
 
 
 def count_by_class(class_list):
@@ -153,7 +158,11 @@ def count_by_class(class_list):
     }}'''.format(classes=' UNION '.join('{ ?subject a %s . }'
                                         % x for x in class_list))
 
-    return int(select_dbpedia(query)[0]['callret-0'])
+    cnt = select_dbpedia(query)
+    if cnt:
+        return int(cnt[0]['callret-0'])
+    else:
+        return 0
 
 
 def select_by_relation(p, revision, s_name='subject', o_name='object', page=1):
@@ -300,6 +309,7 @@ def select_by_class(s, s_name='subject',  p=[], entities=[], page=1):
 
 @app.task
 def fetch_classes(page, object_, identity):
+    logger = get_task_logger(__name__ + '.fetch_classes')
     session = get_session()
     res = select_by_class(
         s=identity,
@@ -310,11 +320,22 @@ def fetch_classes(page, object_, identity):
     )
 
     current_time = datetime.datetime.now(datetime.timezone.utc)
+    logger.warning('fetching %s, %d', identity, len(res))
     for item in res:
-        with session.begin():
-            new_entity = object_(item)
-            new_entity.last_crawled = current_time
-            session.add(new_entity)
+        try:
+            with session.begin():
+                new_entity = object_(item)
+                new_entity.last_crawled = current_time
+                session.add(new_entity)
+        except IntegrityError:
+            entity = session.query(object_) \
+                .filter_by(
+                    name=item['name']
+                ) \
+                .one()
+            entity.last_crawled = current_time
+            entity.__init__(item)
+
 
 
 def crawl_classes(identity):
@@ -348,18 +369,16 @@ def crawl_relation(page, relation_num, revision):
     )
 
     for item in res:
-        try:
-            with session.begin():
-                new_entity = Relation(
-                    work=item['work'],
-                    work_label=item['work_label'],
-                    author=item['author'],
-                    author_label=item['author_label'],
-                    revision=item['revision'],
-                )
-                session.add(new_entity)
-        except IntegrityError:
-            pass
+        with session.begin():
+            new_entity = Relation(
+                work=item['work'],
+                work_label=item['work_label'],
+                author=item['author'],
+                author_label=item['author_label'],
+                revision=item['revision'],
+            )
+            session.add(new_entity)
+        
     result_len = len(res)
     current_retrieved = (page * PAGE_ITEM_COUNT) + result_len
     if (relation_num <= current_retrieved and result_len == PAGE_ITEM_COUNT):
