@@ -1,5 +1,6 @@
 *.cfg.py
 *.cfg.yml
+!deploy/prod.cfg.yml
 *.db
 *.db-journal
 *.egg
