@@ -20,4 +20,4 @@ def upgrade():
 
 
 def downgrade():
-    op.drop_table('characters')
+    op.drop_column('wikipedia_works', 'last_crawled')
