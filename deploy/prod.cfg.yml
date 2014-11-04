@@ -5,10 +5,10 @@ broker_url: 'redis://localhost/1'
 
 CELERYBEAT_SCHEDULE:
   'tvtropes-sync':
-    task: 'cliche.services.tvtropes.sync'
+    task: 'cliche.services.tvtropes.crawler.crawl'
     schedule: !!python/object/apply:datetime.timedelta [1, 0, 0]
   'wikipedia-sync':
-    task: 'cliche.services.wikipedia.sync'
+    task: 'cliche.services.wikipedia.crawler.crawl'
     schedule: !!python/object/apply:datetime.timedelta [1, 0, 0]
 
 CELERY_TIMEZONE: 'UTC'
