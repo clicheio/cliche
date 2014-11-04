@@ -6,7 +6,7 @@ All classes in this file are rdfs:domain of its columns.
 .. _Wikipedia: http://wikipedia.org/
 
 """
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, DateTime, Integer, String
 
 from ...orm import Base
 
@@ -16,10 +16,12 @@ __all__ = 'Entity', 'Relation', 'Artist', 'Work', 'Film', 'Book'
 
 class Entity(Base):
     """Representation of entities."""
+
     name = Column(String, primary_key=True)
     revision = Column(Integer)
     label = Column(String)
     country = Column(String)
+    last_crawled = Column(DateTime(timezone=True), nullable=False, default=now())
     type = Column(String(20))
 
     __tablename__ = 'wikipedia_entities'
@@ -65,6 +67,7 @@ class Relation(Base):
 
 class Artist(Entity):
     """Representation of artist as an ontology."""
+
     notableWork = Column(String)
 
     __mapper_args__ = {
@@ -92,6 +95,7 @@ class Artist(Entity):
 
 class Work(Entity):
     """Representation of work as an ontology."""
+
     writer = Column(String)
     author = Column(String)
     mainCharacter = Column(String)
@@ -116,6 +120,7 @@ class Work(Entity):
 
 class Film(Work):
     """Representation of film as an ontology."""
+
     director = Column(String)
 
     __mapper_args__ = {
@@ -131,6 +136,7 @@ class Film(Work):
 
 class Book(Work):
     """Representation of book as an ontology."""
+
     illustrator = Column(String)
     isbn = Column(String)
     numberOfPages = Column(Integer)
