@@ -49,9 +49,11 @@ def select_dbpedia(query):
             tried = tried + 1
             tuples = sparql.query().convert()['results']['bindings']
         except HTTPError as e:
-            logger.warning('HTTPError %s: %s, tried %d/%d', e.code, e.reason, tried, wikipedia_limit)
+            logger.warning('HTTPError %s: %s, tried %d/%d',
+                           e.code, e.reason, tried, wikipedia_limit)
         except URLError as e:
-            logger.warning('URLError %s, tried %d/%d', e.args, tried, wikipedia_limit)
+            logger.warning('URLError %s, tried %d/%d',
+                           e.args, tried, wikipedia_limit)
         else:
             return[{k: v['value'] for k, v in tupl.items()} for tupl in tuples]
     return []
@@ -337,7 +339,6 @@ def fetch_classes(page, object_, identity):
             entity.__init__(item)
 
 
-
 def crawl_classes(identity):
     entity_num = count_by_class(identity)
     sql_classes = {
@@ -378,7 +379,7 @@ def crawl_relation(page, relation_num, revision):
                 revision=item['revision'],
             )
             session.add(new_entity)
-        
+
     result_len = len(res)
     current_retrieved = (page * PAGE_ITEM_COUNT) + result_len
     if (relation_num <= current_retrieved and result_len == PAGE_ITEM_COUNT):
