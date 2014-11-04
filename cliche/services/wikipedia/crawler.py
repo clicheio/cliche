@@ -48,8 +48,10 @@ def select_dbpedia(query):
         try:
             tuples = sparql.query().convert()['results']['bindings']
             tried += 1
-        except (HTTPError, URLError) as e:
-            logger.warning('%s: %s', e.code, e.reason)
+        except HTTPError as e:
+            logger.warning('HTTPError %s: %s', e.code, e.reason)
+        except URLError as e:
+            logger.warning('URLError %s', e.args)
         else:
             return[{k: v['value'] for k, v in tupl.items()} for tupl in tuples]
 
@@ -311,7 +313,7 @@ def fetch_classes(page, object_, identity):
     for item in res:
         with session.begin():
             new_entity = object_(item)
-            object_.last_crawled = current_time
+            new_entity.last_crawled = current_time
             session.add(new_entity)
 
 

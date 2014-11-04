@@ -21,7 +21,7 @@ class Entity(Base):
     revision = Column(Integer)
     label = Column(String)
     country = Column(String)
-    last_crawled = Column(DateTime(timezone=True), nullable=False, default=now())
+    last_crawled = Column(DateTime(timezone=True), nullable=False)
     type = Column(String(20))
 
     __tablename__ = 'wikipedia_entities'
