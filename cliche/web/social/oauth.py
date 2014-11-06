@@ -22,8 +22,8 @@ from .provider import twitter
 from ...user import User
 
 
-__all__ = ('OAuthVendorConverter', 'Vendor', 'login', 'oauth_app',
-           'oauth_authorized', 'vendors', 'version')
+__all__ = ('OAuthVendorConverter', 'Vendor', 'Version', 'login', 'oauth_app',
+           'oauth_authorized', 'vendors')
 
 
 oauth_app = Blueprint('oauth', __name__)
@@ -34,13 +34,13 @@ Vendor = collections.namedtuple(
 )
 
 
-class version(enum.Enum):
+class Version(enum.Enum):
     oauth1 = 1
     oauth2 = 2
 
 
 vendors = [
-    Vendor('twitter', TwitterCredential, version.oauth1, twitter,
+    Vendor('twitter', TwitterCredential, Version.oauth1, twitter,
            ('screen_name', 'user_id'))
 ]
 
@@ -89,7 +89,7 @@ def oauth_authorized(vendor):
             social = make_account(vendor.credential_table, user_name, user_id)
             sa_session.add(social)
 
-        if vendor.oauth_version == version.oauth1:
+        if vendor.oauth_version == Version.oauth1:
             social.token = resp['oauth_token']
             social.token_secret = resp['oauth_token_secret']
 

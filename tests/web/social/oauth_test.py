@@ -2,7 +2,7 @@ import datetime
 
 from cliche.credentials import TwitterCredential
 from cliche.user import User
-from cliche.web.social.oauth import Vendor, version
+from cliche.web.social.oauth import Vendor, Version
 from ...web_utils import assert_contain_text, get_url
 
 
@@ -60,7 +60,7 @@ def test_authorize_who_logged(fx_session, fx_flask_client, fx_twitter_config):
 def test_twitter_authorize_failed(fx_flask_client,
                                   fx_twitter_config, monkeypatch):
     fake_vendors = [
-        Vendor('twitter', TwitterCredential, version.oauth1,
+        Vendor('twitter', TwitterCredential, Version.oauth1,
                FakeProvider(None), ('screen_name', 'user_id'))
     ]
 
@@ -84,7 +84,7 @@ def test_twitter_authorize_new_id(fx_session, fx_flask_client,
         oauth_token_secret='QWERTYUIOP{}',
     )
     fake_vendors = [
-        Vendor('twitter', TwitterCredential, version.oauth1,
+        Vendor('twitter', TwitterCredential, Version.oauth1,
                FakeProvider(fake_res), ('screen_name', 'user_id'))
     ]
 
@@ -139,7 +139,7 @@ def test_twitter_authorize_old_id(fx_session, fx_flask_client,
         oauth_token_secret='}{POIUYTREWQ',
     )
     fake_new_vendors = [
-        Vendor('twitter', TwitterCredential, version.oauth1,
+        Vendor('twitter', TwitterCredential, Version.oauth1,
                FakeProvider(fake_new_res), ('screen_name', 'user_id'))
     ]
 
