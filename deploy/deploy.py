@@ -119,9 +119,13 @@ def main():
     gitdir = workdir / '.git'
 
     with (gitdir / 'HEAD').open('r') as head:
-        with (gitdir / head.readline().split()[1]).open('r') as head_file:
-            revision = (args.build_number[0] + '_' +
-                        head_file.readline().strip())
+        content = head.readline()
+        if content.startswith('ref:'):
+            with (gitdir / content.split()[1]).open('r') as head_file:
+                revision = (args.build_number[0] + '_' +
+                            head_file.readline().strip())
+        else:
+            revision = content
 
     with (workdir /
           'deploy' /
