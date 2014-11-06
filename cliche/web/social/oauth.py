@@ -7,7 +7,7 @@ It widely uses Flask-OAuthlib_ as its OAuth framework.
 .. _Flask-OAuthlib: https://flask-oauthlib.readthedocs.org/
 
 """
-
+import collections
 import datetime
 import enum
 
@@ -21,10 +21,15 @@ from .provider import twitter
 from ...user import User
 
 
-__all__ = ('login', 'oauth_app', 'oauth_authorized', 'vendors', 'version')
+__all__ = ('Vendor', 'login', 'oauth_app', 'oauth_authorized', 'vendors',
+           'version')
 
 
 oauth_app = Blueprint('oauth', __name__)
+Vendor = collections.namedtuple(
+    'Vendor',
+    ['credential_table', 'oauth_version', 'oauth_client', 'key_names']
+)
 
 
 class version(enum.Enum):
@@ -33,8 +38,8 @@ class version(enum.Enum):
 
 
 vendors = dict(
-    twitter=(TwitterCredential, version.oauth1, twitter,
-             ('screen_name', 'user_id'))
+    twitter=Vendor(TwitterCredential, version.oauth1, twitter,
+                   ('screen_name', 'user_id'))
 )
 
 
@@ -45,8 +50,8 @@ def login(vendor_name):
         return redirect(url_for('index'))
 
     try:
-        oauth_client = vendors.get(vendor_name, None)[2]
-    except (KeyError, TypeError):
+        oauth_client = vendors.get(vendor_name, None).oauth_client
+    except (AttributeError, TypeError):
         flash('Unknown vendor name.')
         return redirect(url_for('index'))
 
@@ -68,15 +73,14 @@ def oauth_authorized(vendor_name):
     next_url = request.args.get('next') or url_for('index')
 
     try:
-        credential_table, oauth_version, oauth_client, keys = \
-            vendors[vendor_name]
+        vendor = vendors[vendor_name]
     except KeyError:
         flash('Unknown vendor name.')
         return redirect(url_for('index'))
 
-    name_key, id_key = keys
+    name_key, id_key = vendor.key_names
 
-    resp = oauth_client.authorized_response()
+    resp = vendor.oauth_client.authorized_response()
     if resp is None:
         flash('You denied the request to sign in.')
         return redirect(next_url)
@@ -88,14 +92,14 @@ def oauth_authorized(vendor_name):
 
     with sa_session.begin():
         try:
-            social = sa_session.query(credential_table) \
+            social = sa_session.query(vendor.credential_table) \
                                .filter_by(identifier=user_id) \
                                .one()
         except NoResultFound:
-            social = make_account(credential_table, user_name, user_id)
+            social = make_account(vendor.credential_table, user_name, user_id)
             sa_session.add(social)
 
-        if oauth_version == version.oauth1:
+        if vendor.oauth_version == version.oauth1:
             social.token = resp['oauth_token']
             social.token_secret = resp['oauth_token_secret']
 
