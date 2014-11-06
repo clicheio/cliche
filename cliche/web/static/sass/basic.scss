@@ -1,0 +1,45 @@
+@import "../bootstrap-sass/assets/stylesheets/bootstrap";
+
+@import url(http://fonts.googleapis.com/css?family=Lobster);
+
+@mixin make-middle($width) {
+  @include make-sm-column($width);
+  @include make-sm-column-push(($grid-columns - $width) / 2);
+  @include make-md-column($width);
+  @include make-md-column-push(($grid-columns - $width) / 2);
+  @include make-lg-column($width);
+  @include make-lg-column-push(($grid-columns - $width) / 2);
+}
+
+header {
+  nav {
+    .navbar-brand {
+      font-family: 'Lobster', cursive;
+    }
+  }
+}
+
+main {
+  @include clearfix();
+  h1 {
+    @include make-middle(10);
+  }
+}
+
+table.list, table.page {
+  @include make-middle(10);
+}
+
+table.list, table.page, table.page table {
+  @include make-middle(10);
+
+  @extend .table;
+  @extend .table-bordered;
+
+}
+
+footer {
+  p {
+    text-align: center;
+  }
+}

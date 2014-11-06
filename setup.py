@@ -50,6 +50,8 @@ install_requires = {
     'click >= 3.3',
     # Locale
     'Babel >= 1.3',
+    # SCSS
+    'libsass >= 0.6.0',
 }
 
 if sys.version_info < (3, 4, 0):
@@ -239,5 +241,8 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Internet :: WWW/HTTP :: Indexing/Search',
         'Topic :: Internet :: WWW/HTTP :: WSGI :: Application'
-    ]
+    ],
+    sass_manifests={
+        'cliche.web': ('static/sass', 'static/css', '/static/css')
+    }
 )

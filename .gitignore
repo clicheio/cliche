@@ -23,3 +23,9 @@ htmlcov
 
 # ignore intellij/pycharm project conf file
 *.iml
+
+# css file
+cliche/web/static/css/*
+
+# ruby sass command cache file
+.sass-cache

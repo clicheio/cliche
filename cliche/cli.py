@@ -12,6 +12,7 @@ import sys
 from alembic.util import CommandError
 from click import Path, argument, echo, group, option
 from flask import _request_ctx_stack
+from sassutils.wsgi import SassMiddleware
 from setuptools import find_packages
 from werkzeug.utils import import_string
 
@@ -167,6 +168,11 @@ def shell():
 def runserver(host, port, threaded, processes,
               passthrough_errors, debug, reload):
     """Run the Flask development server i.e. app.run()"""
+    if flask_app.debug:
+        # scss compile automatically in debug mode
+        flask_app.wsgi_app = SassMiddleware(flask_app.wsgi_app, {
+            'cliche.web': ('static/sass', 'static/css', '/static/css')
+        })
     flask_app.run(host=host,
                   port=port,
                   debug=debug,

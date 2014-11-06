@@ -2,14 +2,48 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>clicie.io{% block title %}{% endblock %}</title>
+  <!--[if lt IE 9]>
+  <script type="text/javascript" src="{{ url_for('static', filename='html5shiv/dist/html5shiv.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='html5shiv/dist/html5shiv-printshiv.min.js') }}"></script>
+  <![endif]-->
+  <link href="{{ url_for('static', filename='css/basic.scss.css') }}"
+        rel="stylesheet" media="screen" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='bootstrap-sass/assets/javascripts/bootstrap.js') }}"></script>
+
 </head>
 <body>
 <header>
-  <a href="/">cliche.io</a> - ontology database
+  <nav class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">Cliche.io</a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="navbar">
+      </div>
+    </div>
+  </nav>
 </header>
 <main>
   {% block body %}{% endblock %}
 </main>
+<footer>
+  <p><iframe src="http://ghbtns.com/github-btn.html?user=clicheio&repo=cliche&type=watch&count=true"
+             allowtransparency="true" frameborder="0" scrolling="0" width="95" height="20"></iframe>
+    <iframe src="http://ghbtns.com/github-btn.html?user=clicheio&repo=cliche&type=fork&count=true"
+             allowtransparency="true" frameborder="0" scrolling="0" width="95" height="20"></iframe></p>
+  <p>Cliche.io website code licensed under <a href="https://github.com/clicheio/cliche/raw/master/LICENSE">AGPLv3 or later</a>.</p>
+  <p>Everyone can see code at <a href="https://github.com/clicheio/cliche/">GitHub</a> and contribute.</p>
+</footer>
 </body>
 </html>
