@@ -1,3 +1,6 @@
 [submodule "bootstrap-sass"]
 	path = cliche/web/static/bootstrap-sass
 	url = https://github.com/twbs/bootstrap-sass.git
+[submodule "html5shiv"]
+	path = cliche/web/static/html5shiv
+	url = https://github.com/aFarkas/html5shiv.git
