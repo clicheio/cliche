@@ -25,6 +25,8 @@ def main():
                         help='OPTIONAL: Database username to use.')
     parser.add_argument('--db-password', nargs=1,
                         help='OPTIONAL: Database password to use.')
+    parser.add_argument('-i', '--identity', nargs=1,
+                        help='SSH identity file to use.')
     parser.add_argument('-r', '--redis-host', nargs=1, required=True,
                         help='Redis cache host address to use.')
     parser.add_argument('--redis-password', nargs=1,
@@ -88,6 +90,9 @@ def main():
     config['broker_url'] += '{}/1' \
                             .format(args.redis_host[0].rpartition('@')[2])
 
+    if args.identity is not None and args.identity[0] is not None:
+        args.identity[0] = os.path.abspath(args.identity[0])
+
     os.chdir(str(workdir))
 
     subprocess.check_call(
@@ -125,7 +130,7 @@ def main():
                 revision = (args.build_number[0] + '_' +
                             head_file.readline().strip())
         else:
-            revision = content
+            revision = content.strip()
 
     with (workdir /
           'deploy' /
@@ -149,152 +154,180 @@ def main():
 
     if args.beat is not None and args.beat[0] is not None:
         print('Uploading beat to ' + args.beat[0])
-        upload(args.beat[0], revision, config, workdir)
-        execute_remote_script(args.beat[0], revision, 'prepare-common.sh')
-        execute_remote_script(args.beat[0], revision, 'upgrade-common.py')
+        upload(args.beat[0], revision, config, workdir, args.identity)
+        execute_remote_script(
+            args.beat[0], revision, 'prepare-common.sh', args.identity
+        )
+        execute_remote_script(
+            args.beat[0], revision, 'upgrade-common.py', args.identity
+        )
 
     for crawler in args.crawler or []:
         print('Uploading crawler to ' + crawler[0])
-        upload(crawler[0], revision, config, workdir)
-        execute_remote_script(crawler[0], revision, 'prepare-common.sh')
-        execute_remote_script(crawler[0], revision, 'upgrade-common.py')
+        upload(crawler[0], revision, config, workdir, args.identity)
+        execute_remote_script(
+            crawler[0], revision, 'prepare-common.sh', args.identity
+        )
+        execute_remote_script(
+            crawler[0], revision, 'upgrade-common.py', args.identity
+        )
 
     for web_worker in args.web_worker or []:
         print('Uploading web worker to ' + web_worker[0])
-        upload(web_worker[0], revision, config, workdir)
-        execute_remote_script(web_worker[0], revision, 'prepare-common.sh')
-        execute_remote_script(web_worker[0], revision, 'prepare-web.sh')
-        execute_remote_script(web_worker[0], revision, 'upgrade-common.py')
-        execute_remote_script(web_worker[0], revision, 'upgrade-web.py')
+        upload(web_worker[0], revision, config, workdir, args.identity)
+        execute_remote_script(
+            web_worker[0], revision, 'prepare-common.sh', args.identity
+        )
+        execute_remote_script(
+            web_worker[0], revision, 'prepare-web.sh', args.identity
+        )
+        execute_remote_script(
+            web_worker[0], revision, 'upgrade-common.py', args.identity
+        )
+        execute_remote_script(
+            web_worker[0], revision, 'upgrade-web.py', args.identity
+        )
 
     if args.beat is not None and args.beat[0] is not None:
         print('Stopping beat at ' + args.beat[0])
-        subprocess.call(
+        ssh(
+            args.beat[0],
             [
-                'ssh',
-                args.beat[0],
                 'stop',
                 'cliche-celery-beat',
-            ]
+            ],
+            args.identity
         )
 
     for crawler in args.crawler or []:
         print('Stopping crawler on ' + crawler[0])
-        subprocess.call(
+        ssh(
+            crawler[0],
             [
-                'ssh',
-                crawler[0],
                 'stop',
                 'cliche-celery-worker',
-            ]
+            ],
+            args.identity
         )
 
     for web_worker in args.web_worker or []:
         print('Stopping web worker on ' + web_worker[0])
-        subprocess.call(
+        ssh(
+            web_worker[0],
             [
-                'ssh',
-                web_worker[0],
                 'stop',
                 'cliche-uwsgi',
-            ]
+            ],
+            args.identity
         )
 
     if args.beat is not None and args.beat[0] is not None:
         print('Migrating database on beat at ' + args.beat[0])
-        subprocess.check_call(
+        check_ssh(
+            args.beat[0],
             [
-                'ssh',
-                args.beat[0],
                 'sudo',
                 '-ucliche',
                 str(venv_dir / 'bin' / 'cliche'),
                 'upgrade',
                 '-c',
                 str(venv_dir / 'etc' / 'prod.cfg.yml'),
-            ]
+            ],
+            args.identity
         )
 
     for crawler in args.crawler or []:
         print('Migrating database on crawler at ' + crawler[0])
-        subprocess.check_call(
+        check_ssh(
+            crawler[0],
             [
-                'ssh',
-                crawler[0],
                 'sudo',
                 '-ucliche',
                 str(venv_dir / 'bin' / 'cliche'),
                 'upgrade',
                 '-c',
                 str(venv_dir / 'etc' / 'prod.cfg.yml'),
-            ]
+            ],
+            args.identity
         )
 
     for web_worker in args.web_worker or []:
         print('Migrating database on web worker at ' + web_worker[0])
-        subprocess.check_call(
+        check_ssh(
+            web_worker[0],
             [
-                'ssh',
-                web_worker[0],
                 'sudo',
                 '-ucliche',
                 str(venv_dir / 'bin' / 'cliche'),
                 'upgrade',
                 '-c',
                 str(venv_dir / 'etc' / 'prod.cfg.yml'),
-            ]
+            ],
+            args.identity
         )
 
     for web_worker in args.web_worker or []:
         print('Starting web worker on ' + web_worker[0])
-        subprocess.call(
+        ssh(
+            web_worker[0],
             [
-                'ssh',
-                web_worker[0],
                 'start',
                 'cliche-uwsgi',
-            ]
+            ],
+            args.identity
         )
 
     if args.beat is not None and args.beat[0] is not None:
         print('Starting beat at ' + args.beat[0])
-        subprocess.call(
+        ssh(
+            args.beat[0],
             [
-                'ssh',
-                args.beat[0],
                 'start',
                 'cliche-celery-beat',
-            ]
+            ],
+            args.identity
         )
 
     for crawler in args.crawler or []:
         print('Starting crawler on ' + crawler[0])
-        subprocess.call(
+        ssh(
+            crawler[0],
             [
-                'ssh',
-                crawler[0],
                 'start',
                 'cliche-celery-worker',
-            ]
+            ],
+            args.identity
         )
 
     if args.beat is not None and args.beat[0] is not None:
         print('Promoting beat at ' + args.beat[0])
-        execute_remote_script(args.beat[0], revision, 'promote-common.py')
-        execute_remote_script(args.beat[0], revision, 'promote-beat.py')
+        execute_remote_script(
+            args.beat[0], revision, 'promote-common.py', args.identity
+        )
+        execute_remote_script(
+            args.beat[0], revision, 'promote-beat.py', args.identity
+        )
 
     for crawler in args.crawler or []:
         print('Promoting crawler at ' + crawler[0])
-        execute_remote_script(crawler[0], revision, 'promote-common.py')
-        execute_remote_script(crawler[0], revision, 'promote-crawler.py')
+        execute_remote_script(
+            crawler[0], revision, 'promote-common.py', args.identity
+        )
+        execute_remote_script(
+            crawler[0], revision, 'promote-crawler.py', args.identity
+        )
 
     for web_worker in args.web_worker or []:
         print('Promoting web worker at ' + web_worker[0])
-        execute_remote_script(web_worker[0], revision, 'promote-common.py')
-        execute_remote_script(web_worker[0], revision, 'promote-web.py')
+        execute_remote_script(
+            web_worker[0], revision, 'promote-common.py', args.identity
+        )
+        execute_remote_script(
+            web_worker[0], revision, 'promote-web.py', args.identity
+        )
 
 
-def upload(address, revision, config, workdir):
+def upload(address, revision, config, workdir, identity):
     with (workdir /
           'deploy' /
           'tmp' /
@@ -337,55 +370,88 @@ def upload(address, revision, config, workdir):
              for path in ((workdir / 'deploy' / 'tmp').glob('*'))],
         cwd=str(workdir / 'deploy' / 'tmp')
     )
-    subprocess.check_call(
+    check_scp(
         [
-            'scp',
             str(workdir /
                 'deploy' /
                 'cliche-deploy-{}.tar.gz'.format(revision)),
             address + ':' + str(tmp),
-        ]
+        ],
+        identity
     )
-    subprocess.check_call(
+    check_ssh(
+        address,
         [
-            'ssh',
-            address,
             'mkdir',
             '-p',
             str(tmp / revision),
-        ]
+        ],
+        identity
     )
-    subprocess.check_call(
+    check_ssh(
+        address,
         [
-            'ssh',
-            address,
             'tar',
             'Cxvf',
             str(tmp / revision),
-            str(tmp /
-                'cliche-deploy-{}.tar.gz'.format(revision)),
-        ]
+            str(tmp / 'cliche-deploy-{}.tar.gz'.format(revision)),
+        ],
+        identity
     )
-    subprocess.check_call(
+    check_ssh(
+        address,
         [
-            'ssh',
-            address,
             'chmod',
             '+x',
             str(tmp / revision / 'scripts' / '*.sh'),
             str(tmp / revision / 'scripts' / '*.py'),
-        ]
+        ],
+        identity
     )
 
 
-def execute_remote_script(address, revision, script_name):
-    subprocess.check_call(
+def execute_remote_script(address, revision, script_name, identity):
+    check_ssh(
+        address,
         [
-            'ssh',
-            address,
             str(tmp / revision / 'scripts' / script_name)
-        ]
+        ],
+        identity
     )
+
+
+def ssh(address, command_list, identity):
+    return subprocess.call(
+        build_ssh_command(address, command_list, identity)
+    )
+
+
+def check_ssh(address, command_list, identity):
+    return subprocess.check_call(
+        build_ssh_command(address, command_list, identity)
+    )
+
+
+def build_ssh_command(address, command_list, identity):
+    command = [
+        'ssh',
+        '-o',
+        'StrictHostKeyChecking=no',
+    ]
+    if identity is not None and identity[0] is not None:
+        command += ['-i', identity[0]]
+    return command + [address] + command_list
+
+
+def check_scp(args, identity):
+    command = [
+        'scp',
+        '-o',
+        'StrictHostKeyChecking=no',
+    ]
+    if identity is not None and identity[0] is not None:
+        command += ['-i', identity[0]]
+    return subprocess.check_call(command + args)
 
 
 if __name__ == '__main__':
