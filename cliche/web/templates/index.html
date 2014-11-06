@@ -22,7 +22,7 @@
       {% if g.user %}
         <li><a href="{{ url_for('.user.logout') }}">Logout</a></li>
       {% else %}
-        <li><a href="{{ url_for('.oauth.login', vendor_name='twitter') }}">Login with twitter</a></li>
+        <li><a href="{{ url_for('.oauth.login', vendor='twitter') }}">Login with twitter</a></li>
       {% endif %}
     </ul>
   </main>

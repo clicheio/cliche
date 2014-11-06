@@ -12,7 +12,7 @@ from ..user import User
 from .db import setup_session
 from .db import session as sa_session
 from .ontology import ontology
-from .social.oauth import oauth_app
+from .social.oauth import OAuthVendorConverter, oauth_app
 from .user import user_app
 
 
@@ -25,6 +25,8 @@ oauth = OAuth()
 
 setup_session(app)
 oauth.init_app(app)
+
+app.url_map.converters['oauth_vendor'] = OAuthVendorConverter
 
 app.register_blueprint(ontology)
 app.register_blueprint(user_app)

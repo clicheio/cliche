@@ -15,12 +15,9 @@ class FakeProvider:
         return self.res
 
 
-def test_undefined_provider_login(fx_flask_client, fx_twitter_config):
-    rv = fx_flask_client.get(get_url('oauth.login', vendor_name='naver'))
-    assert rv.status_code == 302
-
-    rv = fx_flask_client.get(get_url('index'))
-    assert_contain_text('Unknown vendor name.', 'ul.flush>li', rv.data)
+def test_undefined_vendor_login(fx_flask_client, fx_twitter_config):
+    rv = fx_flask_client.get(get_url('oauth.login', vendor='naver'))
+    assert rv.status_code == 404
 
 
 def test_login_who_logged(fx_session, fx_flask_client, fx_twitter_config):
@@ -32,22 +29,18 @@ def test_login_who_logged(fx_session, fx_flask_client, fx_twitter_config):
         sess['logged_id'] = user.id
         sess['logged_time'] = datetime.datetime.utcnow()
 
-    rv = fx_flask_client.get(get_url('oauth.login', vendor_name='twitter'))
+    rv = fx_flask_client.get(get_url('oauth.login', vendor='twitter'))
     assert rv.status_code == 302
 
 
 def test_twitter_login(fx_flask_client, fx_twitter_config):
-    rv = fx_flask_client.get(get_url('oauth.login', vendor_name='twitter'))
+    rv = fx_flask_client.get(get_url('oauth.login', vendor='twitter'))
     assert rv.status_code == 302
 
 
-def test_undefined_authorize(fx_flask_client, fx_twitter_config):
-    rv = fx_flask_client.get(get_url('oauth.oauth_authorized',
-                                     vendor_name='naver'))
-    assert rv.status_code == 302
-
-    rv = fx_flask_client.get(get_url('index'))
-    assert_contain_text('Unknown vendor name.', 'ul.flush>li', rv.data)
+def test_undefined_vendor_authorize(fx_flask_client, fx_twitter_config):
+    rv = fx_flask_client.get(get_url('oauth.oauth_authorized', vendor='naver'))
+    assert rv.status_code == 404
 
 
 def test_authorize_who_logged(fx_session, fx_flask_client, fx_twitter_config):
@@ -60,22 +53,26 @@ def test_authorize_who_logged(fx_session, fx_flask_client, fx_twitter_config):
         sess['logged_time'] = datetime.datetime.utcnow()
 
     rv = fx_flask_client.get(get_url('oauth.oauth_authorized',
-                                     vendor_name='twitter'))
+                                     vendor='twitter'))
     assert rv.status_code == 302
 
 
 def test_twitter_authorize_failed(fx_flask_client,
                                   fx_twitter_config, monkeypatch):
-    fake_vendor = dict(
-        twitter=Vendor(TwitterCredential, 1, FakeProvider(None),
-                       ('screen_name', 'user_id'))
-    )
+    fake_vendors = [
+        Vendor('twitter', TwitterCredential, version.oauth1,
+               FakeProvider(None), ('screen_name', 'user_id'))
+    ]
 
-    monkeypatch.setattr('cliche.web.social.oauth.vendors', fake_vendor)
+    monkeypatch.setattr('cliche.web.social.oauth.vendors', fake_vendors)
 
     rv = fx_flask_client.get(get_url('oauth.oauth_authorized',
-                                     vendor_name='twitter'))
+                                     vendor='twitter'))
     assert rv.status_code == 302
+
+    rv = fx_flask_client.get(get_url('index'))
+    assert_contain_text('You denied the request to sign in.', 'ul.flush>li',
+                        rv.data)
 
 
 def test_twitter_authorize_new_id(fx_session, fx_flask_client,
@@ -86,15 +83,15 @@ def test_twitter_authorize_new_id(fx_session, fx_flask_client,
         oauth_token='ASDFGHJKL:"',
         oauth_token_secret='QWERTYUIOP{}',
     )
-    fake_vendor = dict(
-        twitter=Vendor(TwitterCredential, version.oauth1,
-                       FakeProvider(fake_res), ('screen_name', 'user_id'))
-    )
+    fake_vendors = [
+        Vendor('twitter', TwitterCredential, version.oauth1,
+               FakeProvider(fake_res), ('screen_name', 'user_id'))
+    ]
 
-    monkeypatch.setattr('cliche.web.social.oauth.vendors', fake_vendor)
+    monkeypatch.setattr('cliche.web.social.oauth.vendors', fake_vendors)
 
     rv = fx_flask_client.get(get_url('oauth.oauth_authorized',
-                                     vendor_name='twitter'))
+                                     vendor='twitter'))
     assert rv.status_code == 302
 
     created_user = fx_session.query(User).\
@@ -141,15 +138,15 @@ def test_twitter_authorize_old_id(fx_session, fx_flask_client,
         oauth_token='":LKJHGFDSA',
         oauth_token_secret='}{POIUYTREWQ',
     )
-    fake_new_vendor = dict(
-        twitter=Vendor(TwitterCredential, version.oauth1,
-                       FakeProvider(fake_new_res), ('screen_name', 'user_id'))
-    )
+    fake_new_vendors = [
+        Vendor('twitter', TwitterCredential, version.oauth1,
+               FakeProvider(fake_new_res), ('screen_name', 'user_id'))
+    ]
 
-    monkeypatch.setattr('cliche.web.social.oauth.vendors', fake_new_vendor)
+    monkeypatch.setattr('cliche.web.social.oauth.vendors', fake_new_vendors)
 
     rv = fx_flask_client.get(get_url('oauth.oauth_authorized',
-                                     vendor_name='twitter'))
+                                     vendor='twitter'))
     assert rv.status_code == 302
 
     created_new_user = fx_session.query(User). \
