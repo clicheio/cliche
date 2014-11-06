@@ -34,3 +34,4 @@ cliche/web/static/css/*
 # ignore temporary deployment file
 deploy/tmp
 cliche-deploy-*.tar.gz
+deploy/cliche_deploy_key
