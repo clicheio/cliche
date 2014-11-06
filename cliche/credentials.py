@@ -21,10 +21,10 @@ class TwitterCredential(Credential):
     identifier = Column(BigInteger, nullable=False, unique=True)
 
     #: (:class:`str`) The oauth token.
-    token = Column(String, nullable=False)
+    token = Column(String)
 
     #: (:class:`str`) The oauth secret token.
-    token_secret = Column(String, nullable=False)
+    token_secret = Column(String)
 
     __tablename__ = 'twitter_credential'
     __mapper_args__ = {'polymorphic_identity': 'twitter'}
