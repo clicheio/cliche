@@ -212,10 +212,10 @@ def select_by_relation(p, revision, s_name='subject', o_name='object', page=1):
         ?revision
     WHERE {{
         ?{s_name} ?p ?{o_name} .
-        ?{s_name} rdfs:label ?{s_name}_label .
-        ?{o_name} rdfs:label ?{o_name}_label .
-    FILTER langMatches( lang(?{s_name}_label), "EN" ) .
-    FILTER langMatches( lang(?{o_name}_label), "EN" ) .
+        OPTIONAL {{ ?{s_name} rdfs:label ?{s_name}_label .
+                FILTER langMatches( lang(?{s_name}_label), "EN" ) . }}
+        OPTIONAL {{ ?{o_name} rdfs:label ?{o_name}_label .
+                FILTER langMatches( lang(?{o_name}_label), "EN" ) . }}
     FILTER(
         (  {filt}  )
         && STRSTARTS(STR(?{s_name}), "http://dbpedia.org/")) .
@@ -286,7 +286,6 @@ def select_by_class(s, s_name='subject',  p=[], entities=[], page=1):
             {is_in_class}
             {has_property}
             {optional_properties}
-            {label}
         }}
         GROUP BY ?{s_name}
         LIMIT {limit}
@@ -301,11 +300,12 @@ def select_by_class(s, s_name='subject',  p=[], entities=[], page=1):
         optional_properties=''.join('OPTIONAL { ?%s %s ?%s . }\n'
                                     % (s_name, entity, parse_entity(entity))
                                     for entity in entities),
-        label='' if 'rdfs:label' not in entities
-                 else 'filter langMatches( lang(?label), "EN" )',
         limit=PAGE_ITEM_COUNT,
         offset=PAGE_ITEM_COUNT * page
     )
+    query.replace(':label ?label . ',
+                  ':label ?label .  filter langMatches( lang(?label), "EN" )')
+
     return select_dbpedia(query)
 
 
