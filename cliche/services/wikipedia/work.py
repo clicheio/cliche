@@ -31,11 +31,12 @@ class Entity(Base):
         'polymorphic_identity': 'entity'
     }
 
-    def initialize(self, item):
-        self.name = item.get('name', None)
-        self.revision = item.get('wikiPageRevisionID', None)
-        self.label = item.get('label', None)
-        self.country = item.get('country', None)
+    @classmethod
+    def initialize(cls, item):
+        return cls(name=item.get('name', None),
+                   revision=item.get('wikiPageRevisionID', None),
+                   label=item.get('label', None),
+                   country=item.get('country', None))
 
     def get_identities(ontology='Thing'):
         return 'dbpedia-owl:' + ontology
@@ -74,9 +75,11 @@ class Artist(Entity):
         'polymorphic_identity': 'artist'
     }
 
-    def initialize(self, item):
-        super().initialize(item)
-        self.notable_work = item.get('notableWork', None)
+    @classmethod
+    def initialize(cls, item):
+        temp = super().initialize(item)
+        temp.notable_work = item.get('notableWork', None)
+        return temp
 
     def get_identities():
         return 'dbpedia-owl:Artist'
@@ -105,6 +108,15 @@ class Work(Entity):
         'polymorphic_identity': 'work'
     }
 
+    @classmethod
+    def initialize(cls, item):
+        temp = super().initialize(item)
+        temp.writer = item.get('writer', None)
+        temp.author = item.get('author', None)
+        temp.main_character = item.get('mainCharacter', None)
+        temp.previous_work = item.get('previousWork', None)
+        return temp
+
     def get_identities():
         return 'dbpedia-owl:Work'
 
@@ -127,6 +139,12 @@ class Film(Work):
         'polymorphic_identity': 'film'
     }
 
+    @classmethod
+    def initialize(cls, item):
+        temp = super().initialize(item)
+        temp.director = item.get('director', None)
+        return temp
+
     def get_identities():
         return 'dbpedia-owl:Film'
 
@@ -145,11 +163,13 @@ class Book(Work):
         'polymorphic_identity': 'book'
     }
 
-    def initialize(self, item):
-        super().initialize(item)
-        self.illustrator = item.get('illustrator', None)
-        self.isbn = item.get('isbn', None)
-        self.number_of_pages = item.get('numberOfPages', None)
+    @classmethod
+    def initialize(cls, item):
+        temp = super().initialize(item)
+        temp.illustrator = item.get('illustrator', None)
+        temp.isbn = item.get('isbn', None)
+        temp.number_of_pages = item.get('numberOfPages', None)
+        return temp
 
     def get_identities():
         return 'dbpedia-owl:Book'

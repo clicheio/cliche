@@ -331,8 +331,7 @@ def fetch_classes(page, object_, identity):
     for item in res:
         try:
             with session.begin():
-                new_entity = object_()
-                new_entity.initialize(item)
+                new_entity = object_.initialize(item)
                 new_entity.last_crawled = current_time
                 new_entity = session.merge(new_entity)
                 session.add(new_entity)
