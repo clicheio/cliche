@@ -262,10 +262,12 @@ def select_by_class(s, s_name='subject',  p=[], entities=[], page=1):
 
     For example::
 
-        select_by_class (s_name='author',
-        s=['dbpedia-owl:Artist', 'dbpedia-owl:ComicsCreator'],
-        p=['dbpedia-owl:author', 'dbpprop:author', 'dbpedia-owl:writer'],
-        entities=['dbpedia-owl:birthDate', 'dbpprop:shortDescription'])
+        select_by_class (
+            s_name='author',
+            s=['dbpedia-owl:Artist', 'dbpedia-owl:ComicsCreator'],
+            p=['dbpedia-owl:author', 'dbpprop:author', 'dbpedia-owl:writer'],
+            entities=['dbpedia-owl:birthDate', 'dbpprop:shortDescription']
+        )
 
 
     .. code-block:: json
@@ -329,7 +331,8 @@ def fetch_classes(page, object_, identity):
     for item in res:
         try:
             with session.begin():
-                new_entity = object_(item)
+                new_entity = object_()
+                new_entity.initialize(item)
                 new_entity.last_crawled = current_time
                 new_entity = session.merge(new_entity)
                 session.add(new_entity)
@@ -341,7 +344,7 @@ def fetch_classes(page, object_, identity):
             if entities.count() > 0:
                 entity = entities.one()
                 entity.last_crawled = current_time
-                entity.__init__(item)
+                entity.initalize(item)
 
 
 def crawl_classes(identity):

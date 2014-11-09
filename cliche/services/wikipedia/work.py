@@ -31,7 +31,7 @@ class Entity(Base):
         'polymorphic_identity': 'entity'
     }
 
-    def __init__(self, item):
+    def initialize(self, item):
         self.name = item.get('name', None)
         self.revision = item.get('wikiPageRevisionID', None)
         self.label = item.get('label', None)
@@ -74,8 +74,8 @@ class Artist(Entity):
         'polymorphic_identity': 'artist'
     }
 
-    def __init__(self, item):
-        super().__init__(item)
+    def initialize(self, item):
+        super().initialize(item)
         self.notableWork = item.get('notableWork', None)
 
     def get_identities():
@@ -145,8 +145,8 @@ class Book(Work):
         'polymorphic_identity': 'book'
     }
 
-    def __init__(self, item):
-        super().__init__(item)
+    def initialize(self, item):
+        super().initialize(item)
         self.illustrator = item.get('illustrator', None)
         self.isbn = item.get('isbn', None)
         self.numberOfPages = item.get('numberOfPages', None)

@@ -1,4 +1,5 @@
 import json
+import os.path
 
 from cliche.services.wikipedia import crawler as dbpedia
 
@@ -6,7 +7,8 @@ from cliche.services.wikipedia import crawler as dbpedia
 def test_select_property(monkeypatch):
     class FakeQuery(object):
         def convert(self):
-            with open('tests/select_property.json') as fp:
+            with open(os.path.join(os.path.dirname(__file__),
+                      'select_property.json')) as fp:
                 fakeResult = (json.load(fp))
                 return {"results": {"bindings": fakeResult}}
 
@@ -70,7 +72,8 @@ def test_select_by_relation(monkeypatch):
         offset = 0
 
         def convert(self):
-            with open('tests/select_relation.json') as fp:
+            with open(os.path.join(os.path.dirname(__file__),
+                      'select_relation.json')) as fp:
                 offset = FakeQuery.offset
                 fakeResult = (json.load(fp))[offset:offset+100:]
                 FakeQuery.offset += 100
@@ -97,7 +100,8 @@ def test_select_by_class(monkeypatch):
         offset = 0
 
         def convert(self):
-            with open('tests/select_class.json') as fp:
+            with open(os.path.join(os.path.dirname(__file__),
+                      'select_class.json')) as fp:
                 offset = FakeQuery.offset
                 fakeResult = json.load(fp)[offset:offset+100:]
                 FakeQuery.offset += 100

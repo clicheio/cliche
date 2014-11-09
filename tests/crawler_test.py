@@ -1,4 +1,5 @@
 import json
+import os.path
 
 from sqlalchemy.sql.expression import func
 
@@ -34,7 +35,8 @@ def test_revision_crawler(monkeypatch, fx_session, fx_celery_app):
         offset = 0
 
         def convert(self):
-            with open('tests/select_relation.json') as fp:
+            with open(os.path.join(os.path.dirname(__file__),
+                      'select_relation.json')) as fp:
                 offset = FakeQuery.offset
                 fakeResult = (json.load(fp))[offset:offset+100:]
                 FakeQuery.offset += 100
@@ -53,7 +55,8 @@ def test_fetch_Entity(monkeypatch, fx_session, fx_celery_app):
         offset = 0
 
         def convert(self):
-            with open('tests/select_class_with_revision.json') as fp:
+            with open(os.path.join(os.path.dirname(__file__),
+                      'select_class_with_revision.json')) as fp:
                 offset = FakeQuery.offset
                 fakeResult = (json.load(fp))[offset:offset+100:]
                 FakeQuery.offset += 100
@@ -79,7 +82,8 @@ def test_fetch_Artist(monkeypatch, fx_session, fx_celery_app):
         offset = 0
 
         def convert(self):
-            with open('tests/fetch_artist.json') as fp:
+            with open(os.path.join(os.path.dirname(__file__),
+                      'fetch_artist.json')) as fp:
                 offset = FakeQuery.offset
                 fakeResult = (json.load(fp))[offset:offset+100:]
                 FakeQuery.offset += 100
@@ -97,7 +101,8 @@ def test_fetch_Work(monkeypatch, fx_session, fx_celery_app):
         offset = 0
 
         def convert(self):
-            with open('tests/fetch_work.json') as fp:
+            with open(os.path.join(os.path.dirname(__file__),
+                      'fetch_work.json')) as fp:
                 offset = FakeQuery.offset
                 fakeResult = (json.load(fp))[offset:offset+100:]
                 FakeQuery.offset += 100
@@ -115,7 +120,8 @@ def test_fetch_Film(monkeypatch, fx_session, fx_celery_app):
         offset = 0
 
         def convert(self):
-            with open('tests/fetch_film.json') as fp:
+            with open(os.path.join(os.path.dirname(__file__),
+                      'fetch_film.json')) as fp:
                 offset = FakeQuery.offset
                 fakeResult = (json.load(fp))[offset:offset+100:]
                 FakeQuery.offset += 100
@@ -133,7 +139,8 @@ def test_fetch_Book(monkeypatch, fx_session, fx_celery_app):
         offset = 0
 
         def convert(self):
-            with open('tests/fetch_book.json') as fp:
+            with open(os.path.join(os.path.dirname(__file__),
+                      'fetch_book.json')) as fp:
                 offset = FakeQuery.offset
                 fakeResult = (json.load(fp))[offset:offset+100:]
                 FakeQuery.offset += 100
