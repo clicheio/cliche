@@ -24,7 +24,7 @@ def logout():
     except KeyError:
         pass
 
-    flash('You were logged out.')
+    flash('You were logged out.', 'success')
 
     next_url = request.referrer or url_for('index')
     return redirect(next_url)

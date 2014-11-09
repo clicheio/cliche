@@ -72,7 +72,7 @@ def oauth_authorized(vendor):
 
     resp = vendor.oauth_client.authorized_response()
     if resp is None:
-        flash('You denied the request to sign in.')
+        flash('You denied the request to sign in.', 'danger')
         return redirect(next_url)
 
     now = datetime.datetime.utcnow()
@@ -96,7 +96,7 @@ def oauth_authorized(vendor):
     flask_session['logged_id'] = social.user_id
     flask_session['logged_time'] = now
 
-    flash('You were signed in as %s' % user_name)
+    flash('You were signed in as %s' % user_name, 'success')
     return redirect(next_url)
 
 
