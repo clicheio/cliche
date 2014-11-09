@@ -176,9 +176,9 @@ def runserver(host, port, threaded, processes,
         })
 
     if debug is None:
-        debug = flask_app.config['DEBUG'] or True
+        debug = flask_app.config.get('DEBUG', True)
     if reload is None:
-        reload = flask_app.config['DEBUG'] or True
+        reload = flask_app.config.get('DEBUG', True)
 
     flask_app.run(host=host,
                   port=port,
