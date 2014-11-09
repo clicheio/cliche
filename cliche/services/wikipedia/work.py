@@ -68,7 +68,7 @@ class Relation(Base):
 class Artist(Entity):
     """Representation of artist as an ontology."""
 
-    notableWork = Column(String)
+    notable_work = Column(String)
 
     __mapper_args__ = {
         'polymorphic_identity': 'artist'
@@ -76,7 +76,7 @@ class Artist(Entity):
 
     def initialize(self, item):
         super().initialize(item)
-        self.notableWork = item.get('notableWork', None)
+        self.notable_work = item.get('notableWork', None)
 
     def get_identities():
         return 'dbpedia-owl:Artist'
@@ -98,8 +98,8 @@ class Work(Entity):
 
     writer = Column(String)
     author = Column(String)
-    mainCharacter = Column(String)
-    previousWork = Column(String)
+    main_character = Column(String)
+    previous_work = Column(String)
 
     __mapper_args__ = {
         'polymorphic_identity': 'work'
@@ -139,7 +139,7 @@ class Book(Work):
 
     illustrator = Column(String)
     isbn = Column(String)
-    numberOfPages = Column(Integer)
+    number_of_pages = Column(Integer)
 
     __mapper_args__ = {
         'polymorphic_identity': 'book'
@@ -149,7 +149,7 @@ class Book(Work):
         super().initialize(item)
         self.illustrator = item.get('illustrator', None)
         self.isbn = item.get('isbn', None)
-        self.numberOfPages = item.get('numberOfPages', None)
+        self.number_of_pages = item.get('numberOfPages', None)
 
     def get_identities():
         return 'dbpedia-owl:Book'
