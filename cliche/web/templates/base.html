@@ -30,6 +30,13 @@
 
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="navbar">
+        <ul class="nav navbar-nav navbar-right">
+          {% if g.user %}
+            <li><a href="{{ url_for('user.logout') }}">Logout</a></li>
+          {% else %}
+            <li><a href="{{ url_for('oauth.login', vendor='twitter') }}">Login</a></li>
+          {% endif %}
+        </ul>
       </div>
     </div>
   </nav>

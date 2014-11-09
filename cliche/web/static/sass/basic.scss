@@ -24,6 +24,9 @@ main {
   h1 {
     @include make-middle(10);
   }
+  ul.flash {
+    @include make-middle(10);
+  }
 }
 
 table.list, table.page {

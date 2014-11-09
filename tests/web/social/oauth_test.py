@@ -71,7 +71,7 @@ def test_twitter_authorize_failed(fx_flask_client,
     assert rv.status_code == 302
 
     rv = fx_flask_client.get(get_url('index'))
-    assert_contain_text('You denied the request to sign in.', 'ul.flush>li',
+    assert_contain_text('You denied the request to sign in.', 'ul.flash>li',
                         rv.data)
 
 

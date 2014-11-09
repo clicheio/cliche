@@ -17,7 +17,7 @@ def test_logout_logged_user(fx_session, fx_flask_client):
     assert rv.status_code == 302
 
     rv = fx_flask_client.get(get_url('index'))
-    assert_contain_text('You were logged out.', 'ul.flush>li', rv.data)
+    assert_contain_text('You were logged out.', 'ul.flash>li', rv.data)
 
 
 def test_logout_non_logged_user(fx_flask_client):
@@ -25,4 +25,4 @@ def test_logout_non_logged_user(fx_flask_client):
     assert rv.status_code == 302
 
     rv = fx_flask_client.get(get_url('index'))
-    assert_contain_text('You were logged out.', 'ul.flush>li', rv.data)
+    assert_contain_text('You were logged out.', 'ul.flash>li', rv.data)
