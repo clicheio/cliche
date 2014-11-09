@@ -20,6 +20,7 @@ from urllib.error import HTTPError, URLError
 
 from celery.utils.log import get_task_logger
 from SPARQLWrapper import JSON, SPARQLWrapper
+from SPARQLWrapper.SPARQLExceptions import EndPointNotFound
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import func
 
@@ -54,6 +55,8 @@ def select_dbpedia(query):
         except URLError as e:
             logger.warning('URLError %s, tried %d/%d',
                            e.args, tried, wikipedia_limit)
+        except EndPointNotFound as e:
+            logger.warning('EndPointNotFound')
         else:
             return[{k: v['value'] for k, v in tupl.items()} for tupl in tuples]
     return []
@@ -328,15 +331,17 @@ def fetch_classes(page, object_, identity):
             with session.begin():
                 new_entity = object_(item)
                 new_entity.last_crawled = current_time
+                new_entity = session.merge(new_entity)
                 session.add(new_entity)
         except IntegrityError:
-            entity = session.query(object_) \
+            entities = session.query(object_) \
                 .filter_by(
                     name=item['name']
-                ) \
-                .one()
-            entity.last_crawled = current_time
-            entity.__init__(item)
+                )
+            if entities.count() > 0:
+                entity = entities.one()
+                entity.last_crawled = current_time
+                entity.__init__(item)
 
 
 def crawl_classes(identity):
@@ -372,11 +377,11 @@ def crawl_relation(page, relation_num, revision):
     for item in res:
         with session.begin():
             new_entity = Relation(
-                work=item['work'],
-                work_label=item['work_label'],
-                author=item['author'],
-                author_label=item['author_label'],
-                revision=item['revision'],
+                work=item.get('work', ''),
+                work_label=item.get('work_label', ''),
+                author=item.get('author', ''),
+                author_label=item.get('author_label', ''),
+                revision=item.get('revision', ''),
             )
             session.add(new_entity)
 
