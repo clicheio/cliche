@@ -51,14 +51,16 @@ def select_dbpedia(query):
             tuples = sparql.query().convert()['results']['bindings']
         except HTTPError as e:
             logger.exception('HTTPError %s: %s, tried %d/%d',
-                           e.code, e.reason, tried, wikipedia_limit)
+                             e.code, e.reason, tried, wikipedia_limit)
         except URLError as e:
             logger.exception('URLError %s, tried %d/%d',
-                           e.args, tried, wikipedia_limit)
+                             e.args, tried, wikipedia_limit)
         except ConnectionResetError as e:
             logger.exception('ConnectionResetError %s', e)
+        except IncompleteRead as e:
+            logger.exception('Network Error, retry %d', tried)
         except EndPointNotFound as e:
-            logger.exception('EndPointNotFound')
+            logger.exception('SQLAlchemy Error, retry %d', tried)
         else:
             return[{k: v['value'] for k, v in tupl.items()} for tupl in tuples]
     return []
