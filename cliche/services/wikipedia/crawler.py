@@ -16,6 +16,7 @@ References
 ----------
 """
 import datetime
+from http.client import IncompleteRead
 from urllib.error import HTTPError, URLError
 
 from celery.utils.log import get_task_logger
