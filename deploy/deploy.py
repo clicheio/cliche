@@ -130,7 +130,7 @@ def main():
                 revision = (args.build_number[0] + '_' +
                             head_file.readline().strip())
         else:
-            revision = content.strip()
+            revision = args.build_number[0] + '_' + content.strip()
 
     with (workdir /
           'deploy' /
