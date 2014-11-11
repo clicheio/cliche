@@ -16,6 +16,12 @@ __all__ = 'Entity', 'Relation', 'Artist', 'Work', 'Film', 'Book'
 
 class Entity(Base):
     """Representation of entities."""
+    TYPE_PREDICATES = {}
+    PROPERTIES = {
+        'dbpedia-owl:wikiPageRevisionID',
+        'rdfs:label',
+        'dbpprop:country'
+    }
 
     name = Column(String, primary_key=True)
     revision = Column(Integer)
@@ -41,17 +47,6 @@ class Entity(Base):
     def get_identities(ontology='Thing'):
         return 'dbpedia-owl:' + ontology
 
-    def get_entities():
-        entities = [
-            'dbpedia-owl:wikiPageRevisionID',
-            'rdfs:label',
-            'dbpprop:country',
-        ]
-        return entities
-
-    def get_properties():
-        return []
-
 
 class Relation(Base):
     """Representation of relations."""
@@ -68,6 +63,12 @@ class Relation(Base):
 
 class Artist(Entity):
     """Representation of artist as an ontology."""
+    TYPE_PREDICATES = {
+        'dbpedia-owl:writer',
+        'dbpedia-owl:author',
+        'dbpprop:author'
+    }
+    PROPERTIES = Entity.PROPERTIES | {'dbpedia-owl:notableWork'}
 
     notable_work = Column(String)
 
@@ -84,21 +85,15 @@ class Artist(Entity):
     def get_identities():
         return 'dbpedia-owl:Artist'
 
-    def get_entities():
-        return Entity.get_entities() + ['dbpedia-owl:notableWork']
-
-    def get_properties():
-        p = [
-            'dbpedia-owl:writer',
-            'dbpedia-owl:author',
-            'dbpedia-owl:author'
-        ]
-        return p
-
 
 class Work(Entity):
     """Representation of work as an ontology."""
-
+    PROPERTIES = Entity.PROPERTIES | {
+        'dbpedia-owl:writer',
+        'dbpedia-owl:author',
+        'dbpedia-owl:mainCharacter',
+        'dbpedia-owl:previousWork'
+    }
     writer = Column(String)
     author = Column(String)
     main_character = Column(String)
@@ -120,18 +115,10 @@ class Work(Entity):
     def get_identities():
         return 'dbpedia-owl:Work'
 
-    def get_entities():
-        entities = [
-            'dbpedia-owl:writer',
-            'dbpedia-owl:author',
-            'dbpedia-owl:mainCharacter',
-            'dbpedia-owl:previousWork',
-        ]
-        return Entity.get_entities() + entities
-
 
 class Film(Work):
     """Representation of film as an ontology."""
+    PROPERTIES = Work.PROPERTIES | {'dbpedia-owl:director'}
 
     director = Column(String)
 
@@ -148,12 +135,14 @@ class Film(Work):
     def get_identities():
         return 'dbpedia-owl:Film'
 
-    def get_entities():
-        return Work.get_entities() + ['dbpedia-owl:director']
-
 
 class Book(Work):
     """Representation of book as an ontology."""
+    PROPERTIES = Work.PROPERTIES | {
+        'dbpedia-owl:illustrator',
+        'dbpedia-owl:isbn',
+        'dbpedia-owl:numberOfPages'
+    }
 
     illustrator = Column(String)
     isbn = Column(String)
@@ -173,11 +162,3 @@ class Book(Work):
 
     def get_identities():
         return 'dbpedia-owl:Book'
-
-    def get_entities():
-        entities = [
-            'dbpedia-owl:illustrator',
-            'dbpedia-owl:isbn',
-            'dbpedia-owl:numberOfPages',
-        ]
-        return Work.get_entities() + entities

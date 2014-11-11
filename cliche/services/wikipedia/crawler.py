@@ -254,7 +254,7 @@ def parse_entity(entity):
     return col_name
 
 
-def select_by_class(s, s_name='subject',  p=[], entities=[], page=1):
+def select_by_class(s, s_name='subject',  p={}, entities=[], page=1):
     """List of **s** which as property as **entities**
 
     :param str s: Ontology name of subject.
@@ -326,9 +326,9 @@ def fetch_classes(page, object_, identity):
     res = select_by_class(
         s=identity,
         s_name='name',
-        entities=object_.get_entities(),
+        entities=object_.PROPERTIES,
         page=page,
-        p=object_.get_properties(),
+        p=object_.TYPE_PREDICATES,
     )
 
     current_time = datetime.datetime.now(datetime.timezone.utc)
