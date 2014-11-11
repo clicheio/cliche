@@ -4,7 +4,7 @@ import pathlib
 import types
 
 from click.testing import CliRunner
-from pytest import fixture, yield_fixture
+from pytest import fixture, skip, yield_fixture
 from yaml import dump
 
 from cliche.celery import app as celery_app
@@ -26,6 +26,10 @@ def pytest_addoption(parser):
                           '[default: %default]')
     parser.addoption('--echo-sql', action='store_true', default=False,
                      help='Print all executed queries for failed tests')
+    parser.addoption('--twitter-consumer-key', type='string',
+                     default=env('TWITTER_CONSUMER_KEY', None))
+    parser.addoption('--twitter-consumer-secret', type='string',
+                     default=env('TWITTER_CONSUMER_SECRET', None))
 
 
 @fixture
@@ -486,9 +490,43 @@ def fx_cfg_yml_file(fx_tmpdir):
 
 
 @fixture
-def fx_flask_client():
-    app.config['TESTING'] = True
+def fx_flask_client(fx_session):
+    app.config.update(
+        dict(
+            SECRET_KEY='TESTING',
+            TESTING=True,
+            LOGIN_EXPIRATION_INTERVAL=datetime.timedelta(hours=1),
+        )
+    )
+
     return app.test_client()
+
+
+@yield_fixture
+def fx_twitter_config(request):
+    app.config['TWITTER'] = dict()
+
+    try:
+        app.config['TWITTER']['consumer_key'] = \
+            request.config.getoption('--twitter-consumer-key')
+    except ValueError:
+        app.config['TWITTER']['consumer_key'] = None
+
+    if not app.config['TWITTER']['consumer_key']:
+        skip('--twitter-consumer-key is missing. Web test must need it.')
+
+    try:
+        app.config['TWITTER']['consumer_secret'] = \
+            request.config.getoption('--twitter-consumer-secret')
+    except ValueError:
+        app.config['TWITTER']['consumer_secret'] = None
+
+    if not app.config['TWITTER']['consumer_secret']:
+        skip('--twitter-consumer-secret is missing. Web test must need it.')
+
+    yield
+
+    del app.config['TWITTER']
 
 
 @fixture

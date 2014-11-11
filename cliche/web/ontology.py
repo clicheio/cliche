@@ -21,12 +21,6 @@ ontology = Blueprint('ontology', __name__,
                      template_folder='templates/ontology/')
 
 
-@ontology.route('/')
-def index():
-    """The root page. Currently no contents preserved yet."""
-    return 'Hello cliche!'
-
-
 @ontology.route('/work/')
 def list_():
     """A list of id-name pairs of works."""

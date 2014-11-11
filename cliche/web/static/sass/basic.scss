@@ -24,6 +24,19 @@ main {
   h1 {
     @include make-middle(10);
   }
+  ul.flash {
+    @include list-unstyled();
+    @include make-middle(10);
+
+    li {
+      padding: 1rem;
+    }
+    @include bg-variant('li.primary', $brand-primary);
+    @include bg-variant('li.success', $state-success-bg);
+    @include bg-variant('li.info', $state-info-bg);
+    @include bg-variant('li.warning', $state-warning-bg);
+    @include bg-variant('li.danger', $state-danger-bg);
+  }
 }
 
 table.list, table.page {

@@ -1,4 +1,9 @@
 language: python
+env:
+  global:
+  # Twitter
+  - secure: YHLzza7Qzm+pjNCELMujjI6udoV1mI5xOJ/g0gfpftegxDFX3QAYiRyjYFp93FUQulPGw44gCxkm9zzNckXv4u+xx2c8eFRTAMwcf9WGLasjNVm6jGxUHoX4oHb7qatFTzOoH1HEvbpDibpa1qdLRMlw7m67XxJveVC2CxJetXA=
+  - secure: R5TebdH6UpAgezFyVCbJbM7JhxODueFdniS1wHr5rmbGI8ONYUIPIf48BGlztrmJtA8szfilBViAE87yW41sy7gy9IIEq/M3yQanfDknwSlQxZh5fnqhf+5l7jLQxmna6SUTrYEWU5wyzESo3/OvAmF1uPRI5MsJmVeoLeyrS6w=
 python:
 - 3.3
 - 3.4

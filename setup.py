@@ -52,6 +52,8 @@ install_requires = {
     'Babel >= 1.3',
     # SCSS
     'libsass >= 0.6.0',
+    # OAuth client
+    'Flask-OAuthlib >= 0.7.0',
 }
 
 if sys.version_info < (3, 4, 0):

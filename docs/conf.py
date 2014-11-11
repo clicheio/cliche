@@ -277,6 +277,7 @@ intersphinx_mapping = {
     'werkzeug': ('http://werkzeug.pocoo.org/docs/', None),
     'flask': ('http://flask.pocoo.org/docs/', None),
     'click': ('http://click.pocoo.org/3/', None),
+    'flask_oauthlib': ('https://flask-oauthlib.readthedocs.org/en/latest/', None),
 }
 
 extlinks = {
