@@ -77,6 +77,7 @@ def upsert_entity(session, namespace, name, type, url):
                             .filter_by(namespace=namespace, name=name) \
                             .one()
             entity.url = url
+            entity.type = type
 
 
 def process_redirections(session, original_url, final_url, namespace, name):
