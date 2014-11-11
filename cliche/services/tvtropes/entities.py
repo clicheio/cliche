@@ -48,8 +48,8 @@ class Redirection(Base):
 
     alias_namespace = Column(String, primary_key=True)
     alias_name = Column(String, primary_key=True)
-    original_namespace = Column(String, primary_key=True)
-    original_name = Column(String, primary_key=True)
+    original_namespace = Column(String)
+    original_name = Column(String)
 
     original_entity = relationship('Entity',
                                    foreign_keys=[original_namespace,
