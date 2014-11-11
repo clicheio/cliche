@@ -313,8 +313,8 @@ def select_by_class(s, s_name='subject',  p=[], entities=[], page=1):
         limit=PAGE_ITEM_COUNT,
         offset=PAGE_ITEM_COUNT * page
     )
-    query = query.replace(':label ?label . ',
-                          ':label ?label .  filter langMatches( lang(?label), "EN" )')
+    query = query.replace('?label . ',
+                          '?label .  filter langMatches( lang(?label), "EN" )')
 
     return select_dbpedia(query)
 
