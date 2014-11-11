@@ -1,7 +1,7 @@
 """change work to relation, and add work to service/wikipedia
 
 Revision ID: 4191a9189f0
-Revises: 29bdbb279ab
+Revises: 5e043437da
 Create Date: 2014-10-27 20:53:10.670786
 
 """
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 revision = '4191a9189f0'
-down_revision = '29bdbb279ab'
+down_revision = '5e043437da'
 
 
 def upgrade():
