@@ -15,7 +15,7 @@ def test_work_list(fx_session, fx_flask_client):
     assert_contain_text('No contents here now.', 'tbody>tr>td', rv.data)
 
     # case 2: add document
-    work = Work()
+    work = Work(media_type='Literature')
     work.names.update({
         Name(nameable=work,
              name='Story of Your Life',
@@ -35,7 +35,7 @@ def test_work_page(fx_session, fx_flask_client):
     assert rv.status_code == 404
 
     # case 2: add document
-    work = Work()
+    work = Work(media_type='Literature')
     work.names.update({
         Name(nameable=work,
              name='Story of Your Life',
@@ -107,7 +107,7 @@ def test_work_page(fx_session, fx_flask_client):
 
 def test_complex_credits(fx_session, fx_flask_client):
     """Data: http://www.animenewsnetwork.com/encyclopedia/anime.php?id=12376"""
-    work = Work()
+    work = Work(media_type='Anime')
     work.names.update({
         Name(nameable=work,
              name='Fate/Zero',

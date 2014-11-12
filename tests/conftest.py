@@ -288,7 +288,8 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     f += fx_franchises
 
     # create 'Cardcaptor Sakura' combic book series
-    f.cardcaptor_sakura = Work(published_at=datetime.date(1996, 11, 22))
+    f.cardcaptor_sakura = Work(media_type='Comic Book',
+                               published_at=datetime.date(1996, 11, 22))
     f.cardcaptor_sakura.genres.update({f.comic, f.romance})
     f.cardcaptor_sakura.names.update({
         Name(nameable=f.cardcaptor_sakura,
@@ -322,7 +323,7 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     fx_session.add(f.skura_member_asso_4)
 
     # create 'The Lord of the Rings: The Fellowship of the Ring' film
-    f.lord_of_rings_film = Work()
+    f.lord_of_rings_film = Work(media_type='Film')
     f.lord_of_rings_film.names.update({
         Name(nameable=f.lord_of_rings_film,
              name='The Lord of the Rings: The Fellowship of the Ring',
@@ -338,7 +339,7 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     fx_session.add(f.lord_of_rings_film)
 
     # create 'The Avengers' film
-    f.avengers = Work()
+    f.avengers = Work(media_type='Film')
     f.avengers.names.update({
         Name(nameable=f.avengers,
              name='The Avengers',
@@ -350,7 +351,7 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     fx_session.add(f.avengers)
 
     # create 'Iron Man' film
-    f.iron_man_film = Work()
+    f.iron_man_film = Work(media_type='Film')
     f.iron_man_film.names.update({
         Name(nameable=f.iron_man_film,
              name='Iron Man',
@@ -360,7 +361,7 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     fx_session.add(f.iron_man_film)
 
     # create 'Journey to the West' novel
-    f.journey_west = Work()
+    f.journey_west = Work(media_type='Literature')
     f.journey_west.names.update({
         Name(nameable=f.journey_west,
              name='Journey to the West',
@@ -372,7 +373,7 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     fx_session.add(f.journey_west)
 
     # create 'Saiyuki' comic book series
-    f.saiyuki = Work()
+    f.saiyuki = Work(media_type='Comic Book')
     f.saiyuki.names.update({
         Name(nameable=f.saiyuki,
              name='Saiyuki',
@@ -384,7 +385,7 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     fx_session.add(f.saiyuki)
 
     # create '날아라 슈퍼보드' animation series
-    f.superboard = Work()
+    f.superboard = Work(media_type='Animation')
     f.superboard.names.update({
         Name(nameable=f.superboard,
              name='날아라 슈퍼보드',
