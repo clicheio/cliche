@@ -6,12 +6,21 @@ All classes in this file are rdfs:domain of its columns.
 .. _Wikipedia: http://wikipedia.org/
 
 """
+from urllib.parse import unquote_plus
+
 from sqlalchemy import Column, DateTime, Integer, String
 
 from ...orm import Base
 
 
 __all__ = 'Entity', 'Relation', 'Artist', 'Work', 'Film', 'Book'
+
+
+def url_to_label(url):
+    if url:
+        return unquote_plus(url[28:].replace('_', ' ')).strip().lower()
+    else:
+        return None
 
 
 class Entity(Base):
@@ -41,8 +50,9 @@ class Entity(Base):
     def initialize(cls, item):
         return cls(name=item.get('name', None),
                    revision=item.get('wikiPageRevisionID', None),
-                   label=item.get('label', None),
-                   country=item.get('country', None))
+                   label=item.get('label',
+                                  url_to_label(item.get('name', None))),
+                   country=url_to_label(item.get('country', None)))
 
     def get_identities(ontology='Thing'):
         return 'dbpedia-owl:' + ontology

@@ -1,7 +1,7 @@
 """camelCase to lower_and_underscore_case
 
 Revision ID: 5401daf82c9
-Revises: 1cd82c8d42
+Revises: 2feaab75746
 Create Date: 2014-11-09 22:18:42.737727
 
 """
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 revision = '5401daf82c9'
-down_revision = '1cd82c8d42'
+down_revision = '2feaab75746'
 
 
 def upgrade():

@@ -34,6 +34,9 @@ def upgrade():
                   sa.Column('type', sa.String(length=20), nullable=True))
     op.add_column('wikipedia_entities',
                   sa.Column('writer', sa.String(), nullable=True))
+    op.add_column('wikipedia_entities',
+                  sa.Column('last_crawled',
+                            sa.DateTime(timezone=True), nullable=False))
 
 
 def downgrade():
@@ -47,3 +50,4 @@ def downgrade():
     op.drop_column('wikipedia_entities', 'illustrator')
     op.drop_column('wikipedia_entities', 'director')
     op.drop_column('wikipedia_entities', 'author')
+    op.drop_column('wikipedia_entities', 'last_crawled')
