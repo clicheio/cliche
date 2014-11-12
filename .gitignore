@@ -1,5 +1,6 @@
 *.cfg.py
 *.cfg.yml
+!deploy/prod.cfg.yml
 *.db
 *.db-journal
 *.egg
@@ -29,3 +30,8 @@ cliche/web/static/css/*
 
 # ruby sass command cache file
 .sass-cache
+
+# ignore temporary deployment file
+deploy/tmp
+cliche-deploy-*.tar.gz
+deploy/cliche_deploy_key

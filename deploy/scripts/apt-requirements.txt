@@ -1,0 +1,10 @@
+python3.4
+python3.4-dev
+build-essential
+gcc
+g++
+libpq-dev
+libxml2-dev
+libxslt1-dev
+python-virtualenv
+sysv-rc-conf
