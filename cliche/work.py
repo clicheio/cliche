@@ -177,7 +177,7 @@ class Trope(Base):  # FIXME: Temporary, It not extend Nameable.
     #: (:class:`int`) The primary key integer.
     id = Column(Integer, primary_key=True)
 
-    #: (:class:`int`) Trope name
+    #: (:class:`str`) Trope name
     name = Column(String, nullable=False)
 
     #: (:class:`collections.abc.MutableSet`) The set of
