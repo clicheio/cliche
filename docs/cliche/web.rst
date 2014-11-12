@@ -4,6 +4,7 @@
    .. toctree::
       :maxdepth: 2
 
+      web/adv_search
       web/app
       web/db
       web/ontology
