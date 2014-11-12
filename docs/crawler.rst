@@ -34,3 +34,18 @@ links in the database, the crawler will skip this step and populate the queue
 from the database.
 
 .. _TVTropes Index Report: http://tvtropes.org/pmwiki/index_report.php
+
+
+Running Wikipedia crawler
+-------------------------
+
+You can run Wikipedia crawler in the same way using :program:`cliche crawler`
+command with :program:`celery worker`:
+
+.. code-block:: console
+
+   $ celery worker -A cliche.services.wikipedia.crawler \
+     --config dev.py
+   $ cliche sync wikipedia -c CONFIG_FILENAME_WITHOUT_EXT
+
+It also provides same options.

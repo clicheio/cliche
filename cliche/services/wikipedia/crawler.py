@@ -15,23 +15,56 @@ Crawling DBpedia tables into a relational database
 References
 ----------
 """
+import datetime
+from http.client import IncompleteRead
+from urllib.error import HTTPError, URLError
+
+from celery.utils.log import get_task_logger
 from SPARQLWrapper import JSON, SPARQLWrapper
+from SPARQLWrapper.SPARQLExceptions import EndPointNotFound
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import func
 
-from .work import Work
+from .work import (
+    Artist, Book, Entity, Film, Relation, Work
+)
 from ...celery import app, get_session
 
 
 PAGE_ITEM_COUNT = 100
 
 
+def get_wikipedia_limit():
+    return app.conf.get('WIKIPEDIA_RETRY_LIMIT', 20)
+
+
 def select_dbpedia(query):
+    logger = get_task_logger(__name__ + '.select_dbpedia')
     sparql = SPARQLWrapper("http://dbpedia.org/sparql")
     sparql.setReturnFormat(JSON)
-    sparql.setQuery(query)
-    tuples = sparql.query().convert()['results']['bindings']
-    return[{k: v['value'] for k, v in tupl.items()} for tupl in tuples]
+    sparql.setQuery('''PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
+    PREFIX dbpprop: <http://dbpedia.org/property/>'''+query)
+    tried = 0
+    wikipedia_limit = get_wikipedia_limit()
+    while tried < wikipedia_limit:
+        try:
+            tried = tried + 1
+            tuples = sparql.query().convert()['results']['bindings']
+        except HTTPError as e:
+            logger.exception('HTTPError %s: %s, tried %d/%d',
+                             e.code, e.reason, tried, wikipedia_limit)
+        except URLError as e:
+            logger.exception('URLError %s, tried %d/%d',
+                             e.args, tried, wikipedia_limit)
+        except ConnectionResetError as e:
+            logger.exception('ConnectionResetError %s', e)
+        except IncompleteRead as e:
+            logger.exception('Network Error, retry %d', tried)
+        except EndPointNotFound as e:
+            logger.exception('SQLAlchemy Error, retry %d', tried)
+        else:
+            return[{k: v['value'] for k, v in tupl.items()} for tupl in tuples]
+    return []
 
 
 def select_property(s, s_name='property', return_json=False):
@@ -70,7 +103,7 @@ def select_property(s, s_name='property', return_json=False):
         'dbpprop:': 'http://dbpedia.org/property/'
     }
 
-    query = '''select distinct ?property where{{
+    query = '''SELECT DISTINCT ?property WHERE{{
         {{
             ?property rdfs:domain ?class .
             {} rdfs:subClassOf+ ?class.
@@ -101,13 +134,7 @@ def count_by_relation(p):
     if not p:
         raise ValueError('at least one property required')
 
-    filt = '?p = {}'.format(p[0])
-    for x in p[1:]:
-        filt += '\n            || ?p = {}'.format(x)
-
-    query = '''PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
-    PREFIX dbpprop: <http://dbpedia.org/property/>
-    SELECT DISTINCT
+    query = '''SELECT DISTINCT
         count(?work)
     WHERE {{
         ?work ?p ?author
@@ -115,9 +142,37 @@ def count_by_relation(p):
         (  {filt}  )
         && STRSTARTS(STR(?work), "http://dbpedia.org/"))
     }}
-    '''.format(filt=filt)
+    '''.format(filt=' || '.join('?p = %s\n' % x for x in p))
 
-    return int(select_dbpedia(query)[0]['callret-0'])
+    cnt = select_dbpedia(query)
+    if cnt:
+        return int(cnt[0]['callret-0'])
+    else:
+        return 0
+
+
+def count_by_class(class_list):
+    """Get count of a ontology class
+
+    :param list class_list: List of properties
+    :rtype: :class:`int`
+    """
+
+    if not class_list:
+        raise ValueError('at least one property required')
+
+    query = '''SELECT DISTINCT
+        count(?subject)
+    WHERE {{
+        {classes}
+    }}'''.format(classes=' UNION '.join('{ ?subject a %s . }'
+                                        % x for x in class_list))
+
+    cnt = select_dbpedia(query)
+    if cnt:
+        return int(cnt[0]['callret-0'])
+    else:
+        return 0
 
 
 def select_by_relation(p, revision, s_name='subject', o_name='object', page=1):
@@ -157,41 +212,49 @@ def select_by_relation(p, revision, s_name='subject', o_name='object', page=1):
     if not p:
         raise ValueError('at least one property required')
 
-    filt = '?p = {}'.format(p[0])
-    for x in p[1:]:
-        filt += '\n            || ?p = {}'.format(x)
-    query = '''PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
-        PREFIX dbpprop: <http://dbpedia.org/property/>
-        SELECT DISTINCT
-            ?{s_name}
-            (group_concat( STR(?revision); SEPARATOR="$") as ?revision)
-            (group_concat( STR(?{o_name}) ; SEPARATOR="\\n") as ?{o_name})
-        WHERE {{
-            ?{s_name} ?p ?{o_name} .
-        FILTER(
-            (  {filt}  )
-            && STRSTARTS(STR(?{s_name}), "http://dbpedia.org/")) .
-            ?{s_name} dbpedia-owl:wikiPageRevisionID ?revision .
-            FILTER( ?revision > {revision} )
-        }}
-        GROUP BY ?{s_name}
-        LIMIT {limit}
-        OFFSET {offset}'''.format(
-            s_name=s_name,
-            o_name=o_name,
-            filt=filt,
-            limit=PAGE_ITEM_COUNT,
-            offset=PAGE_ITEM_COUNT * page,
-            revision=revision,
-        )
-
-    query_out = select_dbpedia(query)
-    for x in query_out:
-        x['revision'] = int(x['revision'].split('$')[0])
-    return query_out
+    query = '''SELECT DISTINCT
+        ?{s_name}
+        ?{s_name}_label
+        ?{o_name}
+        ?{o_name}_label
+        ?revision
+    WHERE {{
+        ?{s_name} ?p ?{o_name} .
+        OPTIONAL {{ ?{s_name} rdfs:label ?{s_name}_label .
+                FILTER langMatches( lang(?{s_name}_label), "EN" ) . }}
+        OPTIONAL {{ ?{o_name} rdfs:label ?{o_name}_label .
+                FILTER langMatches( lang(?{o_name}_label), "EN" ) . }}
+    FILTER(
+        (  {filt}  )
+        && STRSTARTS(STR(?{s_name}), "http://dbpedia.org/")) .
+        ?{s_name} dbpedia-owl:wikiPageRevisionID ?revision .
+        FILTER( ?revision > {revision} )
+    }}
+    GROUP BY ?{s_name}
+    LIMIT {limit}
+    OFFSET {offset}'''.format(
+        s_name=s_name,
+        o_name=o_name,
+        filt=' || '.join('?p = %s\n' % x for x in p),
+        limit=PAGE_ITEM_COUNT,
+        offset=PAGE_ITEM_COUNT * page,
+        revision=revision,
+    )
+    return select_dbpedia(query)
 
 
-def select_by_class(s, s_name='subject', entities=None, page=1):
+def parse_entity(entity):
+    if ':' in entity:
+        if ':' in entity:
+            col_name = entity.split(':')[1]
+        if '/' in entity:
+            col_name = entity.split('/')[1]
+    else:
+        col_name = entity[:3]
+    return col_name
+
+
+def select_by_class(s, s_name='subject',  p={}, entities=[], page=1):
     """List of **s** which as property as **entities**
 
     :param str s: Ontology name of subject.
@@ -204,9 +267,12 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
 
     For example::
 
-        select_by_class (s_name='author',
-        s=['dbpedia-owl:Artist', 'dbpedia-owl:ComicsCreator'],
-        entities=['dbpedia-owl:birthDate', 'dbpprop:shortDescription'])
+        select_by_class (
+            s_name='author',
+            s=['dbpedia-owl:Artist', 'dbpedia-owl:ComicsCreator'],
+            p=['dbpedia-owl:author', 'dbpprop:author', 'dbpedia-owl:writer'],
+            entities=['dbpedia-owl:birthDate', 'dbpprop:shortDescription']
+        )
 
 
     .. code-block:: json
@@ -222,53 +288,86 @@ def select_by_class(s, s_name='subject', entities=None, page=1):
     """
     if not s:
         raise ValueError('at least one class required')
-    if entities is None:
-        entities = []
 
-    query = '''PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
-        PREFIX dbpprop: <http://dbpedia.org/property/>
-        SELECT DISTINCT
-            ?{}\n'''.format(s_name)
-
-    group_concat = ''
-    s_property_o = ''
-
-    for entity in entities:
-        if ':' in entity:
-            col_name = entity.split(':')[1]
-            if '/' in entity:
-                col_name = entity.split('/')[1]
-        else:
-            col_name = entity[:3]
-
-        group_concat += ('(group_concat( STR(?{}) ; '
-                         'SEPARATOR="\\n") as ?{})\n').format(
-            col_name, col_name
-        )
-        s_property_o += '        ?{} {} ?{} .\n'.format(
-            s_name, entity, col_name
-        )
-
-    query += group_concat
-    query += '''    WHERE {{
-        {{ ?{} a {} . }}'''.format(s_name, s[0])
-    for x in s[1:]:
-        query += '''UNION
-        {{ ?{} a {} . }}\n'''.format(s_name, x)
-    query += s_property_o
-    query += '''        }}
-    GROUP BY ?{s_name}
-    LIMIT {limit}
-    OFFSET {offset}'''.format(
+    query = '''SELECT DISTINCT
+        ?{s_name}
+        {entities}
+        WHERE {{
+            {is_in_class}
+            {has_property}
+            {optional_properties}
+        }}
+        GROUP BY ?{s_name}
+        LIMIT {limit}
+        OFFSET {offset}'''.format(
         s_name=s_name,
+        entities='\n'.join('?%s'
+                           % parse_entity(entity) for entity in entities),
+        is_in_class=' UNION '.join('{ ?%s a %s . }\n'
+                                   % (s_name, x) for x in s),
+        has_property=''.join('UNION { ?%s %s ?prop . }\n'
+                             % (s_name, prop) for prop in p),
+        optional_properties=''.join('OPTIONAL { ?%s %s ?%s . }\n'
+                                    % (s_name, entity, parse_entity(entity))
+                                    for entity in entities),
         limit=PAGE_ITEM_COUNT,
-        offset=PAGE_ITEM_COUNT * (page - 1)
+        offset=PAGE_ITEM_COUNT * page
     )
+    query = query.replace('?label . ',
+                          '?label .  filter langMatches( lang(?label), "EN" )')
+
     return select_dbpedia(query)
 
 
 @app.task
-def crawl_page(page, relation_num, revision):
+def fetch_classes(page, object_, identity):
+    logger = get_task_logger(__name__ + '.fetch_classes')
+    session = get_session()
+    res = select_by_class(
+        s=identity,
+        s_name='name',
+        entities=object_.PROPERTIES,
+        page=page,
+        p=object_.TYPE_PREDICATES,
+    )
+
+    current_time = datetime.datetime.now(datetime.timezone.utc)
+    logger.warning('fetching %s, %d', identity, len(res))
+    for item in res:
+        try:
+            with session.begin():
+                new_entity = object_.initialize(item)
+                new_entity.last_crawled = current_time
+                new_entity = session.merge(new_entity)
+                session.add(new_entity)
+        except IntegrityError:
+            entities = session.query(object_) \
+                .filter_by(
+                    name=item['name']
+                )
+            if entities.count() > 0:
+                entity = entities.one()
+                entity.last_crawled = current_time
+                entity.initalize(item)
+
+
+def crawl_classes(identity):
+    entity_num = count_by_class(identity)
+    sql_classes = {
+        'dbpedia-owl:Artist': Artist,
+        'dbpedia-owl:Book': Book,
+        'dbpedia-owl:Entity': Entity,
+        'dbpedia-owl:Film': Film,
+        'dbpedia-owl:Relation': Relation,
+        'dbpedia-owl:Work': Work
+    }
+
+    for x in range(0, entity_num // PAGE_ITEM_COUNT + 1):
+        fetch_classes(x, sql_classes.get(identity[0], Entity), identity)
+
+
+@app.task
+def crawl_relation(page, relation_num, revision):
     session = get_session()
     res = select_by_relation(
         p=[
@@ -283,22 +382,24 @@ def crawl_page(page, relation_num, revision):
     )
 
     for item in res:
-        try:
-            with session.begin():
-                new_entity = Work(
-                    work=item['work'],
-                    author=item['author'],
-                    revision=item['revision']
-                )
-                session.add(new_entity)
-        except IntegrityError:
-            pass
+        with session.begin():
+            new_entity = Relation(
+                work=item.get('work', ''),
+                work_label=item.get('work_label', ''),
+                author=item.get('author', ''),
+                author_label=item.get('author_label', ''),
+                revision=item.get('revision', ''),
+            )
+            session.add(new_entity)
 
     result_len = len(res)
     current_retrieved = (page * PAGE_ITEM_COUNT) + result_len
     if (relation_num <= current_retrieved and result_len == PAGE_ITEM_COUNT):
-        crawl_page.delay(page + 1,
-                         current_retrieved + PAGE_ITEM_COUNT, revision)
+        crawl_relation.delay(
+            page + 1,
+            current_retrieved + PAGE_ITEM_COUNT,
+            revision
+        )
 
     if app.conf['CELERY_ALWAYS_EAGER']:
         return
@@ -306,9 +407,10 @@ def crawl_page(page, relation_num, revision):
 
 @app.task
 def crawl():
-    revision = get_session().query(func.max(Work.revision)).scalar()
-    if not revision:
-        revision = 0
+    relation_revision = \
+        get_session().query(func.max(Relation.revision)).scalar()
+    if not relation_revision:
+        relation_revision = 0
     relation_num = count_by_relation(
         p=[
             'dbpprop:author',
@@ -317,4 +419,10 @@ def crawl():
         ]
     )
     for x in range(0, relation_num // PAGE_ITEM_COUNT + 1):
-        crawl_page.delay(x, relation_num, revision)
+        crawl_relation.delay(x, relation_num, relation_revision)
+
+    crawl_classes(['dbpedia-owl:Artist'])
+    crawl_classes(['dbpedia-owl:Book', 'dbpedia-owl:Novel'])
+    crawl_classes(['dbpedia-owl:Cartoon'])
+    crawl_classes(['dbpedia-owl:Film'])
+    crawl_classes(['dbpedia-owl:Work'])

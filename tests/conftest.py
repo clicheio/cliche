@@ -532,4 +532,5 @@ def fx_twitter_config(request):
 @fixture
 def fx_celery_app():
     celery_app.conf['CELERY_ALWAYS_EAGER'] = True
+    celery_app.conf['WIKIPEDIA_RETRY_LIMIT'] = 10
     return celery_app
