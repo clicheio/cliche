@@ -12,7 +12,8 @@ from cliche.name import Name
 from cliche.people import Person, Team
 from cliche.sqltypes import HashableLocale as Locale
 from cliche.web.app import app
-from cliche.work import Character, Credit, Franchise, Genre, Role, Work, World
+from cliche.work import (Character, Credit, Franchise, Genre, Role, Trope,
+                         Work, World)
 
 from .db import DEFAULT_DATABASE_URL, get_session
 
@@ -288,7 +289,8 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     f += fx_franchises
 
     # create 'Cardcaptor Sakura' combic book series
-    f.cardcaptor_sakura = Work(published_at=datetime.date(1996, 11, 22))
+    f.cardcaptor_sakura = Work(media_type='Comic Book',
+                               published_at=datetime.date(1996, 11, 22))
     f.cardcaptor_sakura.genres.update({f.comic, f.romance})
     f.cardcaptor_sakura.names.update({
         Name(nameable=f.cardcaptor_sakura,
@@ -322,7 +324,7 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     fx_session.add(f.skura_member_asso_4)
 
     # create 'The Lord of the Rings: The Fellowship of the Ring' film
-    f.lord_of_rings_film = Work()
+    f.lord_of_rings_film = Work(media_type='Film')
     f.lord_of_rings_film.names.update({
         Name(nameable=f.lord_of_rings_film,
              name='The Lord of the Rings: The Fellowship of the Ring',
@@ -338,7 +340,7 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     fx_session.add(f.lord_of_rings_film)
 
     # create 'The Avengers' film
-    f.avengers = Work()
+    f.avengers = Work(media_type='Film')
     f.avengers.names.update({
         Name(nameable=f.avengers,
              name='The Avengers',
@@ -350,7 +352,7 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     fx_session.add(f.avengers)
 
     # create 'Iron Man' film
-    f.iron_man_film = Work()
+    f.iron_man_film = Work(media_type='Film')
     f.iron_man_film.names.update({
         Name(nameable=f.iron_man_film,
              name='Iron Man',
@@ -360,7 +362,7 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     fx_session.add(f.iron_man_film)
 
     # create 'Journey to the West' novel
-    f.journey_west = Work()
+    f.journey_west = Work(media_type='Literature')
     f.journey_west.names.update({
         Name(nameable=f.journey_west,
              name='Journey to the West',
@@ -372,7 +374,7 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     fx_session.add(f.journey_west)
 
     # create 'Saiyuki' comic book series
-    f.saiyuki = Work()
+    f.saiyuki = Work(media_type='Comic Book')
     f.saiyuki.names.update({
         Name(nameable=f.saiyuki,
              name='Saiyuki',
@@ -384,7 +386,7 @@ def fx_works(fx_session, fx_teams, fx_genres, fx_franchises):
     fx_session.add(f.saiyuki)
 
     # create '날아라 슈퍼보드' animation series
-    f.superboard = Work()
+    f.superboard = Work(media_type='Animation')
     f.superboard.names.update({
         Name(nameable=f.superboard,
              name='날아라 슈퍼보드',
@@ -470,6 +472,49 @@ def fx_characters(fx_session, fx_works):
     with fx_session.begin():
         fx_session.add_all([f.iron_man_character, f.hulk_character, f.frodo,
                             f.xuanzang, f.sanzo, f.samjang])
+    return f
+
+
+@fixture
+def fx_tropes(fx_session):
+    """create *Attack on Titan* (Anime)
+    with *The Ace*, *Action Girl*, *Behemoth Battle* tropes.
+    create *Dragon Ball Z* (Anime)
+    with *The Ace*, *Ass Kicking Pose*, *Cute Is Evil* tropes.
+
+    """
+    f = FixtureModule('fx_tropes')
+    f.attack_on_titan = Work(media_type='Anime')
+    f.attack_on_titan.names.update({
+        Name(nameable=f.attack_on_titan,
+             name='Attack on Titan',
+             locale=Locale.parse('en_US'))
+    })
+    f.the_ace = Trope(name='The Ace')
+    f.action_girl = Trope(name='Action Girl')
+    f.behemoth_battle = Trope(name='Behemoth Battle')
+    f.attack_on_titan.tropes.update(
+        {f.the_ace, f.action_girl, f.behemoth_battle}
+    )
+
+    f.dragon_ball_z = Work(media_type='Anime')
+    f.dragon_ball_z.names.update({
+        Name(nameable=f.dragon_ball_z,
+             name='Dragon Ball Z',
+             locale=Locale.parse('en_US'))
+    })
+    f.ass_kicking_pose = Trope(name='Ass Kicking Pose')
+    f.cute_is_evil = Trope(name='Cute Is Evil')
+    f.dragon_ball_z.tropes.update(
+        {f.the_ace, f.ass_kicking_pose, f.cute_is_evil}
+    )
+
+    with fx_session.begin():
+        fx_session.add_all(
+            [f.attack_on_titan, f.the_ace, f.action_girl, f.behemoth_battle,
+             f.ass_kicking_pose, f.dragon_ball_z]
+        )
+
     return f
 
 

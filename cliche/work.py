@@ -171,6 +171,28 @@ class Genre(Base):
     __repr_columns__ = id, name
 
 
+class Trope(Base):  # FIXME: Temporary, It not extend Nameable.
+    """Tropes"""
+
+    #: (:class:`int`) The primary key integer.
+    id = Column(Integer, primary_key=True)
+
+    #: (:class:`str`) Trope name
+    name = Column(String, nullable=False)
+
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`WorkTrope`.
+    work_tropes = relationship('WorkTrope', collection_class=set)
+
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`Work`.
+    works = relationship(lambda: Work, secondary='work_tropes',
+                         collection_class=set)
+
+    __tablename__ = 'tropes'
+    __repr_columns__ = id, name
+
+
 class Work(Nameable):
     """Creative work(s) that could be a single work like a film, or
     a series of works such as a combic book series and a television series.
@@ -178,6 +200,9 @@ class Work(Nameable):
 
     #: (:class:`int`) The primary key integer.
     id = Column(Integer, ForeignKey(Nameable.id), primary_key=True)
+
+    #: (:class:`str`) Work media type.
+    media_type = Column(String, nullable=False)
 
     #: (:class:`datetime.date`) The publication date.
     published_at = Column(Date)
@@ -217,6 +242,15 @@ class Work(Nameable):
     characters = relationship(Character,
                               secondary='work_characters',
                               collection_class=set)
+
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`WorkTrope`.
+    work_tropes = relationship(lambda: WorkTrope, collection_class=set)
+
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`Trope`.
+    tropes = relationship(Trope, secondary='work_tropes',
+                          collection_class=set)
 
     #: (:class:`datetime.datetime`) The date and time on which
     #: the record was created.
@@ -304,6 +338,25 @@ class WorkGenre(Base):
 
     __tablename__ = 'work_genres'
     __repr_columns__ = work_id, genre_id
+
+
+class WorkTrope(Base):
+    """Work - Trope"""
+
+    #: (:class:`int`) :class:`Work.id` of :attr:`work`.
+    work_id = Column(Integer, ForeignKey(Work.id), primary_key=True)
+
+    #: (:class:`int`) :class:`Trope.id` of :attr:`trope`.
+    trope_id = Column(Integer, ForeignKey(Trope.id), primary_key=True)
+
+    #: (:class:`Work`) The work.
+    work = relationship(Work)
+
+    #: (:class:`Trope`) The trope.
+    trope = relationship(Trope)
+
+    __tablename__ = 'work_tropes'
+    __repr_columns__ = work_id, trope_id
 
 
 class World(Nameable):
