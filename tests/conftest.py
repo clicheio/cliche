@@ -12,7 +12,8 @@ from cliche.name import Name
 from cliche.people import Person, Team
 from cliche.sqltypes import HashableLocale as Locale
 from cliche.web.app import app
-from cliche.work import Character, Credit, Franchise, Genre, Role, Work, World
+from cliche.work import (Character, Credit, Franchise, Genre, Role, Trope,
+                         Work, World)
 
 from .db import DEFAULT_DATABASE_URL, get_session
 
@@ -471,6 +472,49 @@ def fx_characters(fx_session, fx_works):
     with fx_session.begin():
         fx_session.add_all([f.iron_man_character, f.hulk_character, f.frodo,
                             f.xuanzang, f.sanzo, f.samjang])
+    return f
+
+
+@fixture
+def fx_tropes(fx_session):
+    """create *Attack on Titan* (Anime)
+    with *The Ace*, *Action Girl*, *Behemoth Battle* tropes.
+    create *Dragon Ball Z* (Anime)
+    with *The Ace*, *Ass Kicking Pose*, *Cute Is Evil* tropes.
+
+    """
+    f = FixtureModule('fx_tropes')
+    f.attack_on_titan = Work(media_type='Anime')
+    f.attack_on_titan.names.update({
+        Name(nameable=f.attack_on_titan,
+             name='Attack on Titan',
+             locale=Locale.parse('en_US'))
+    })
+    f.the_ace = Trope(name='The Ace')
+    f.action_girl = Trope(name='Action Girl')
+    f.behemoth_battle = Trope(name='Behemoth Battle')
+    f.attack_on_titan.tropes.update(
+        {f.the_ace, f.action_girl, f.behemoth_battle}
+    )
+
+    f.dragon_ball_z = Work(media_type='Anime')
+    f.dragon_ball_z.names.update({
+        Name(nameable=f.dragon_ball_z,
+             name='Dragon Ball Z',
+             locale=Locale.parse('en_US'))
+    })
+    f.ass_kicking_pose = Trope(name='Ass Kicking Pose')
+    f.cute_is_evil = Trope(name='Cute Is Evil')
+    f.dragon_ball_z.tropes.update(
+        {f.the_ace, f.ass_kicking_pose, f.cute_is_evil}
+    )
+
+    with fx_session.begin():
+        fx_session.add_all(
+            [f.attack_on_titan, f.the_ace, f.action_girl, f.behemoth_battle,
+             f.ass_kicking_pose, f.dragon_ball_z]
+        )
+
     return f
 
 

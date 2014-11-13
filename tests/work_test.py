@@ -134,6 +134,33 @@ def test_character_is_derived(fx_session, fx_characters):
     assert xuanzang.derived_characters == {sanzo, samjang}
 
 
+def test_works_have_tropes(fx_tropes):
+    assert fx_tropes.attack_on_titan.tropes == {
+        fx_tropes.the_ace,
+        fx_tropes.action_girl,
+        fx_tropes.behemoth_battle
+    }
+
+    assert fx_tropes.dragon_ball_z.tropes == {
+        fx_tropes.the_ace,
+        fx_tropes.ass_kicking_pose,
+        fx_tropes.cute_is_evil
+    }
+
+
+def test_tropes_be_subordinate_to_works(fx_tropes):
+    assert fx_tropes.the_ace.works == {
+        fx_tropes.attack_on_titan,
+        fx_tropes.dragon_ball_z
+    }
+
+    assert fx_tropes.action_girl.works == {fx_tropes.attack_on_titan}
+    assert fx_tropes.behemoth_battle.works == {fx_tropes.attack_on_titan}
+
+    assert fx_tropes.ass_kicking_pose.works == {fx_tropes.dragon_ball_z}
+    assert fx_tropes.cute_is_evil.works == {fx_tropes.dragon_ball_z}
+
+
 def test_discriminator():
     def assert_discriminator(cls):
         try:
