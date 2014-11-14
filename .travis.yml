@@ -31,7 +31,7 @@ before_install:
 - if [[ "$TRAVIS_REPO_SLUG" == "clicheio/cliche" && "$TRAVIS_BRANCH" == "master" &&
   "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_JOB_NUMBER" == "$TRAVIS_BUILD_NUMBER.1" ]];
   then openssl aes-256-cbc -k $KEY_ENCRYPTION_KEY -in deploy/cliche_deploy_key.enc
-  -out deploy/cliche_deploy_key -d
+  -out deploy/cliche_deploy_key -d; fi;
 install:
 # gcc >= 4.7 is needed for -std=c++11
 - sudo apt-get install -qq gcc-4.8 g++-4.8 libstdc++-4.8-dev
