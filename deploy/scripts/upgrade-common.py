@@ -5,6 +5,8 @@ import platform
 import sys
 import subprocess
 
+from yaml import load, dump
+
 
 def main():
     dist = platform.dist()
@@ -87,8 +89,13 @@ def main():
         ]
     )
 
-    with (venv_dir / 'etc' / 'cliche-uwsgi.ini').open('a+') as uwsgi_conf:
-        uwsgi_conf.write('virtualenv={}\n'.format(str(venv_dir)))
+    with (venv_dir / 'etc' / 'prod.cfg.yml').open('r') as config_data:
+        config = load(config_data)
+
+    config['uwsgi']['virtualenv'] = str(venv_dir)
+
+    with (venv_dir / 'etc' / 'prod.cfg.yml').open('w') as f:
+        print(dump(config), file=f)
 
 
 if __name__ == '__main__':
