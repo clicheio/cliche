@@ -1,6 +1,9 @@
 language: python
 env:
   global:
+  # Note: The encrypted key under are encrypted for clicheio/cliche repository.
+  # For testing, encrypt environmental variables for your own repository, and
+  # re-encrypt them for clicheio/cliche repository on pull request.
   # Twitter
   - secure: YHLzza7Qzm+pjNCELMujjI6udoV1mI5xOJ/g0gfpftegxDFX3QAYiRyjYFp93FUQulPGw44gCxkm9zzNckXv4u+xx2c8eFRTAMwcf9WGLasjNVm6jGxUHoX4oHb7qatFTzOoH1HEvbpDibpa1qdLRMlw7m67XxJveVC2CxJetXA=
   - secure: R5TebdH6UpAgezFyVCbJbM7JhxODueFdniS1wHr5rmbGI8ONYUIPIf48BGlztrmJtA8szfilBViAE87yW41sy7gy9IIEq/M3yQanfDknwSlQxZh5fnqhf+5l7jLQxmna6SUTrYEWU5wyzESo3/OvAmF1uPRI5MsJmVeoLeyrS6w=
@@ -25,7 +28,9 @@ before_install:
 # gcc >= 4.7 is needed for -std=c++11
 - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 - sudo apt-get update -qq
-- openssl aes-256-cbc -k $KEY_ENCRYPTION_KEY -in deploy/cliche_deploy_key.enc
+- if [[ "$TRAVIS_REPO_SLUG" == "clicheio/cliche" && "$TRAVIS_BRANCH" == "master" &&
+  "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_JOB_NUMBER" == "$TRAVIS_BUILD_NUMBER.1" ]];
+  then openssl aes-256-cbc -k $KEY_ENCRYPTION_KEY -in deploy/cliche_deploy_key.enc
   -out deploy/cliche_deploy_key -d
 install:
 # gcc >= 4.7 is needed for -std=c++11
