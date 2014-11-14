@@ -62,21 +62,21 @@ def check_login_status():
 
 @app.context_processor
 def template_processor():
-    def make_public_sentry_dsn():
-        sentry_dsn = app.config.get('SENTRY_DSN', None)
-        if sentry_dsn:
-            parsed_dsn = urllib.parse.urlparse(sentry_dsn)
-            new_dsn = (
-                parsed_dsn.scheme,
-                '{}@{}'.format(parsed_dsn.username, parsed_dsn.hostname),
-                parsed_dsn.path,
-                parsed_dsn.params,
-                parsed_dsn.query,
-                parsed_dsn.fragment,
-            )
-            return urllib.parse.ParseResult(*new_dsn).geturl()
+    sentry_dsn = app.config.get('SENTRY_DSN', None)
+    public_sentry_dsn = None
+    if sentry_dsn:
+        parsed_dsn = urllib.parse.urlparse(sentry_dsn)
+        new_dsn = (
+            parsed_dsn.scheme,
+            '{}@{}'.format(parsed_dsn.username, parsed_dsn.hostname),
+            parsed_dsn.path,
+            parsed_dsn.params,
+            parsed_dsn.query,
+            parsed_dsn.fragment,
+        )
+        public_sentry_dsn = urllib.parse.ParseResult(*new_dsn).geturl()
 
-    return dict(make_public_sentry_dsn=make_public_sentry_dsn)
+    return dict(public_sentry_dsn=public_sentry_dsn)
 
 
 @app.after_request
