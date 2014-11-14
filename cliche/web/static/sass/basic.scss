@@ -43,12 +43,48 @@ table.list, table.page {
   @include make-middle(10);
 }
 
-table.list, table.page, table.page table {
+table.list,
+table.page,
+table.page table,
+table.adv_search_result {
   @include make-middle(10);
 
   @extend .table;
   @extend .table-bordered;
 
+}
+
+form#adv_search {
+  @include make-middle(8);
+  @extend .jumbotron;
+
+  text-align: right;
+
+  > * {
+    clear: both;
+    text-align: left;
+  }
+
+  #more_info,
+  #more_cliche {
+    @extend .btn;
+    @extend .btn-default;
+
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+
+
+  #search_btn {
+    @extend .btn;
+    @extend .btn-primary;
+    @extend .btn-lg;
+  }
+
+  .more_query {
+    background: #ddd;
+    border-radius: 2rem;
+    padding: 2rem;
+  }
 }
 
 footer {

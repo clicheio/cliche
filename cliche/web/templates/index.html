@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block body %}
-  <h1>Cliche.io</h1>
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <ul class="flash">
@@ -10,4 +9,50 @@
       </ul>
     {% endif %}
   {% endwith %}
+
+  <form id="adv_search" method="post" action="{{ url_for('adv_search.result') }}">
+    <h1>Cliche.io</h1>
+    <p>Find My Work!</p>
+    <p>I know more <button id="more_info" type="button">infomation(Media)</button> or <button id="more_cliche" type="button">tropes(tropes, cliche)</button></p>
+    <input id="search_btn" type="submit" value="Search!">
+  </form>
+  <script>
+    (function($)
+    {
+      $(document).ready(function()
+      {
+        var $search_btn = $('#search_btn');
+
+        $('#more_info').click(function()
+        {
+          $search_btn.before(
+            '<p class="more_query">' +
+            '<input type="hidden" name="about[]" value="info">' +
+            '<select name="category[]"><option value="media">Media</option></select>: ' +
+            '<select name="detail[]">' +
+            '<option value="Film">Film</option>' +
+            '</select>' +
+            '</p>'
+          );
+        });
+
+        $('#more_cliche').click(function()
+        {
+          $search_btn.before(
+            '<p class="more_query">' +
+            '<input type="hidden" name="about[]" value="trope">' +
+            '<select name="category[]">' +
+            '<option value="0">All Tropes</option>' +
+            '</select>' +
+            '<select name="detail[]">' +
+            {% for trope in tropes %}
+              '<option value="{{ trope.id }}">{{ trope.name }}</option>' +
+            {% endfor %}
+            '</select>' +
+            '</p>'
+          );
+        });
+      })
+    })(jQuery);
+  </script>
 {% endblock %}
