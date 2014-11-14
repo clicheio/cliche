@@ -203,7 +203,7 @@ def dummy():
             Name(
                 nameable=film,
                 name=name,
-                locale=HashableLocale('en_US')
+                locale=HashableLocale.parse('en_US')
             )
         })
         return film
