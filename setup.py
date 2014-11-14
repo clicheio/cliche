@@ -54,6 +54,9 @@ install_requires = {
     'libsass >= 0.6.0',
     # OAuth client
     'Flask-OAuthlib >= 0.7.0',
+    # Sentry: Log Aggregation
+    'raven >= 5.1.1',
+    'blinker >= 1.3',
 }
 
 if sys.version_info < (3, 4, 0):
