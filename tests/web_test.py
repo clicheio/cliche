@@ -1,4 +1,5 @@
 import datetime
+import urllib.parse
 
 from cliche.user import User
 from .web_utils import assert_contain_text, get_url
@@ -35,3 +36,28 @@ def test_login_renewal(fx_session, fx_flask_client):
 
     rv = fx_flask_client.get(get_url('index'))
     assert rv.headers['X-Cliche-Login-User-Id'] == str(user.id)
+
+
+def test_raven_js_installed(fx_flask_client, fx_sentry_config):
+    rv = fx_flask_client.get(get_url('index'))
+    assert 'Raven.config(' in rv.data.decode('u8')
+
+
+def test_raven_js_not_installed(fx_flask_client):
+    """Without Sentry DSN, Raven-js must not set."""
+    rv = fx_flask_client.get(get_url('index'))
+    assert 'Raven.config(' not in rv.data.decode('u8')
+
+
+def test_raven_js_config_dsn_without_secret_key(fx_flask_client,
+                                                fx_sentry_config):
+    dsn = urllib.parse.urlparse(fx_sentry_config)
+    new_dsn = urllib.parse.ParseResult(dsn.scheme,
+                                       '{}@{}'.format(dsn.username,
+                                                      dsn.hostname),
+                                       dsn.path,
+                                       dsn.params,
+                                       dsn.query,
+                                       dsn.fragment).geturl()
+    rv = fx_flask_client.get(get_url('index'))
+    assert "Raven.config('{}'".format(new_dsn) in rv.data.decode('u8')

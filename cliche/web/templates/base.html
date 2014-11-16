@@ -12,7 +12,12 @@
         rel="stylesheet" media="screen" type="text/css">
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
   <script src="{{ url_for('static', filename='bootstrap-sass/assets/javascripts/bootstrap.js') }}"></script>
-
+  {% if public_sentry_dsn %}
+    <script src="//cdn.ravenjs.com/1.1.16/raven.min.js"></script>
+    <script>
+      Raven.config('{{ public_sentry_dsn }}').install();
+    </script>
+  {% endif %}
 </head>
 <body>
 <header>

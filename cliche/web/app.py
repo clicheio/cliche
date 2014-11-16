@@ -3,6 +3,7 @@
 
 """
 import datetime
+import urllib.parse
 
 from flask import Flask, current_app, g, render_template
 from flask import session as flask_session
@@ -57,6 +58,25 @@ def check_login_status():
 
     del flask_session['logged_id']
     del flask_session['logged_time']
+
+
+@app.context_processor
+def template_processor():
+    sentry_dsn = app.config.get('SENTRY_DSN', None)
+    public_sentry_dsn = None
+    if sentry_dsn:
+        parsed_dsn = urllib.parse.urlparse(sentry_dsn)
+        new_dsn = (
+            parsed_dsn.scheme,
+            '{}@{}'.format(parsed_dsn.username, parsed_dsn.hostname),
+            parsed_dsn.path,
+            parsed_dsn.params,
+            parsed_dsn.query,
+            parsed_dsn.fragment,
+        )
+        public_sentry_dsn = urllib.parse.ParseResult(*new_dsn).geturl()
+
+    return dict(public_sentry_dsn=public_sentry_dsn)
 
 
 @app.after_request

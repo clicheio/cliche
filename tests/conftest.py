@@ -27,6 +27,8 @@ def pytest_addoption(parser):
                           '[default: %default]')
     parser.addoption('--echo-sql', action='store_true', default=False,
                      help='Print all executed queries for failed tests')
+    parser.addoption('--sentry-dsn', type='string',
+                     default=env('SENTRY_DSN', None))
     parser.addoption('--twitter-consumer-key', type='string',
                      default=env('TWITTER_CONSUMER_KEY', None))
     parser.addoption('--twitter-consumer-secret', type='string',
@@ -545,6 +547,21 @@ def fx_flask_client(fx_session):
     )
 
     return app.test_client()
+
+
+@yield_fixture
+def fx_sentry_config(request):
+    try:
+        app.config['SENTRY_DSN'] = request.config.getoption('--sentry-dsn')
+    except ValueError:
+        pass
+
+    if not app.config['SENTRY_DSN']:
+        skip('--sentry-dsn is missing. Web test with sentry must need it.')
+
+    yield app.config['SENTRY_DSN']
+
+    del app.config['SENTRY_DSN']
 
 
 @yield_fixture
