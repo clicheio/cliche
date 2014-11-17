@@ -4,7 +4,9 @@
 """
 import datetime
 import urllib.parse
+import logging
 import os
+
 
 from flask import Flask, current_app, g, render_template
 from flask import session as flask_session
@@ -35,9 +37,15 @@ app.register_blueprint(ontology)
 app.register_blueprint(user_app)
 app.register_blueprint(oauth_app)
 
-sentry_dsn = os.environ.get('SENTRY_DSN', None)
-if sentry_dsn:
-    sentry = Sentry(app, dsn=sentry_dsn)
+app.config['SENTRY_DSN'] = os.environ.get('SENTRY_DSN', None)
+if app.config['SENTRY_DSN']:
+    app.config['SENTRY_INCLUDE_PATHS'] = ['cliche']
+    sentry = Sentry(
+        app,
+        dsn=app.config['SENTRY_DSN'],
+        logging=True,
+        level=logging.ERROR,
+    )
 
 
 @app.route('/')
