@@ -4,10 +4,14 @@
 """
 import datetime
 import urllib.parse
+import logging
+import os
+
 
 from flask import Flask, current_app, g, render_template
 from flask import session as flask_session
 from flask_oauthlib.client import OAuth
+from raven.contrib.flask import Sentry
 
 from ..user import User
 from .db import setup_session
@@ -32,6 +36,16 @@ app.url_map.converters['oauth_vendor'] = OAuthVendorConverter
 app.register_blueprint(ontology)
 app.register_blueprint(user_app)
 app.register_blueprint(oauth_app)
+
+app.config['SENTRY_DSN'] = os.environ.get('SENTRY_DSN', None)
+if app.config['SENTRY_DSN']:
+    app.config['SENTRY_INCLUDE_PATHS'] = ['cliche']
+    sentry = Sentry(
+        app,
+        dsn=app.config['SENTRY_DSN'],
+        logging=True,
+        level=logging.ERROR,
+    )
 
 
 @app.route('/')

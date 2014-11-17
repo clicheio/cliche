@@ -117,13 +117,22 @@ import pathlib
 
 from celery import Celery, current_app, current_task
 from celery.loaders.base import BaseLoader
-from celery.signals import task_postrun
+from celery.signals import celeryd_init, task_failure, task_postrun
+from raven import Client
+from raven.conf import setup_logging
+from raven.handlers.logging import SentryHandler
 from sqlalchemy.engine import create_engine, Engine
 
 from .config import ConfigDict, read_config
 from .orm import Session, import_all_modules
 
-__all__ = 'Loader', 'get_database_engine', 'get_session', 'app'
+__all__ = (
+    'Loader',
+    'get_database_engine',
+    'get_session',
+    'get_raven_client',
+    'app',
+)
 
 
 app = Celery(__name__, loader=__name__ + ':Loader')
@@ -185,3 +194,39 @@ def close_session(task_id, task, *args, **kwargs):
     session = getattr(task.request, 'db_session', None)
     if session is not None:
         session.close()
+
+
+def get_raven_client() -> Client:
+    """Get a raven client.
+
+    :returns: a raven client
+    :rtype: :class:`raven.Client`
+
+    """
+    config = current_app.conf
+    if 'SENTRY_DSN' in config:
+        if 'RAVEN_CLIENT' not in config:
+            sentry_dsn = config['SENTRY_DSN']
+            config['RAVEN_CLIENT'] = Client(
+                dsn=sentry_dsn,
+                include_paths=[
+                    'cliche',
+                ],
+            )
+        return config['RAVEN_CLIENT']
+    else:
+        return None
+
+
+@celeryd_init.connect
+def setup_raven_logging(conf=None, **kwargs):
+    client = get_raven_client()
+    if client is not None:
+        handler = SentryHandler(client)
+        setup_logging(handler)
+
+
+@task_failure.connect
+def report_task_failure(task_id, exception, args, kwargs, traceback, einfo):
+    client = get_raven_client()
+    client.captureException(einfo.exc_info)

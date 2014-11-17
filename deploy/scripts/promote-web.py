@@ -71,27 +71,6 @@ def main():
     subprocess.check_call(
         [
             'sudo',
-            '-ucliche',
-            'rm',
-            '-f',
-            '/home/cliche/etc/cliche-uwsgi.ini',
-        ]
-    )
-
-    subprocess.check_call(
-        [
-            'sudo',
-            '-ucliche',
-            'ln',
-            '-fs',
-            str(venv_dir / 'etc' / 'cliche-uwsgi.ini'),
-            '/home/cliche/etc/cliche-uwsgi.ini',
-        ]
-    )
-
-    subprocess.check_call(
-        [
-            'sudo',
             'cp',
             '-f',
             str(venv_dir / 'etc' / 'cliche-uwsgi.conf'),

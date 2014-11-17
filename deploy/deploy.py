@@ -31,6 +31,8 @@ def main():
                         help='Redis cache host address to use.')
     parser.add_argument('--redis-password', nargs=1,
                         help='OPTIONAL: Redis cache host password to use.')
+    parser.add_argument('--sentry-dsn', nargs=1,
+                        help='OPTIONAL: Sentry DSN to use.')
     parser.add_argument(
         '--crawler', action='append', nargs=1,
         help="""
@@ -89,6 +91,11 @@ def main():
         config['broker_url'] += ':' + args.redis_password[0] + '@'
     config['broker_url'] += '{}/1' \
                             .format(args.redis_host[0].rpartition('@')[2])
+
+    if args.sentry_dsn is not None and \
+       args.sentry_dsn[0] is not None:
+        config['SENTRY_DSN'] = args.sentry_dsn[0]
+        config['uwsgi']['env'] = 'SENTRY_DSN={}'.format(args.sentry_dsn[0])
 
     if args.identity is not None and args.identity[0] is not None:
         args.identity[0] = os.path.abspath(args.identity[0])

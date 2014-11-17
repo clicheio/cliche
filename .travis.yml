@@ -65,7 +65,8 @@ after_success:
   "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_JOB_NUMBER" == "$TRAVIS_BUILD_NUMBER.1" ]];
   then deploy/deploy.py -i deploy/cliche_deploy_key -b "$TRAVIS_BUILD_NUMBER"
   -c deploy/prod.cfg.yml -d "$DBHOST" --db-username "$DBUSER" --db-password "$DBPASSWORD"
-  -r "$REDISHOST" --redis-password "$REDISPASSWORD" --crawler "$CRAWLER1" --crawler "$CRAWLER2"
+  -r "$REDISHOST" --redis-password "$REDISPASSWORD" --sentry-dsn "$SENTRY_DSN"
+  --crawler "$CRAWLER1" --crawler "$CRAWLER2"
   --web-worker "$WEB1" --web-worker "$WEB2" --beat "$BEAT"; fi;
 notifications:
   irc:
