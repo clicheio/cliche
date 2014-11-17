@@ -117,7 +117,7 @@ import pathlib
 
 from celery import Celery, current_app, current_task
 from celery.loaders.base import BaseLoader
-from celery.signals import celeryd_init, task_postrun
+from celery.signals import celeryd_init, task_failure, task_postrun
 from raven import Client
 from raven.conf import setup_logging
 from raven.handlers.logging import SentryHandler
