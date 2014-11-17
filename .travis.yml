@@ -5,7 +5,7 @@ env:
   # For testing, encrypt environmental variables for your own repository, and
   # re-encrypt them for clicheio/cliche repository on pull request.
   # Sentry
-  - secure: "YEbB9D6YS8wr4fAeKHHvICEc14T6kDoH8UJF0TgBqYZS0Ab6oJRWMyFxFvdx1ThZd5t4J9dW72ZbzxdgU/MTsVSeHdCqHiNz+f6yxjwShZh6XwYXQsrMgY4MaimOPsaoOCxw9SPn6Jk/bSqlO9TgGGp+XO5pzuhRe3xpKejF1AU="
+  - secure: "bfyH1TMzsg/ueHoWXob3YlntuEwYip4qKBlZNXlUYeXdNAt3GtHuFvsLNP82y88p66pgqW+DsWzMSuCYVlqoCAM+rTfuszzD8TB7i6DqultbiXuq+7fBjfU1xqwPUlWiC245InFFWoVTKqo8jcBUNvg7JW8td/tSgTZZAW2GhTE="
   # Twitter
   - secure: "EfV35XpgCBgwuBUhbRKdi+YgRhZezJcvtpt1ZhkB4/+CC3QBLr6gDt9Vimqvdx2ZyUa8UQP5oWQ4q0YsRQf6c3qsmFHUU6ZVzMTHvRxSZ08o87kignYnlyd+RmfpSY08exwYdSrVnLbMn8igsLHuTVV1e5yOb2P8i+sXQOQQ4X8="
   - secure: "Q2c5a4gFu9wVjOJP9V8amJr0q4JfobXHVDaEFwNj7U+qn9CfFDoAcWKPuy7NYF5nY/ShrhJ7TQfmry9yDYpantvFpt0Dpv3/INb+7t+xdy2hlIBVbcMwvqaR2DGp6Z0wsEaUop015fQnh9cvkNhKctFJsdUql3W6joNkNSfaZ0c="
