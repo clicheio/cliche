@@ -127,11 +127,11 @@ from .config import ConfigDict, read_config
 from .orm import Session, import_all_modules
 
 __all__ = (
-  'Loader',
-  'get_database_engine',
-  'get_session',
-  'get_raven_client',
-  'app'
+    'Loader',
+    'get_database_engine',
+    'get_session',
+    'get_raven_client',
+    'app',
 )
 
 
