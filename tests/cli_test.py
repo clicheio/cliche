@@ -28,28 +28,24 @@ def test_upgrade_fine(fx_cli_runner, fx_cfg_yml_file):
     assert 'INFO  [alembic.migration]' in result.output
 
 
-def test_upgrade_downgrade_fine(fx_cli_runner, fx_cfg_yml_file):
-    """downgrade work normally"""
+def test_upgrade_downgrade_fine_after_upgrade(fx_cli_runner, fx_cfg_yml_file):
+    """downgrade work normally after upgrade"""
+    fx_cli_runner.invoke(upgrade, ['-c', str(fx_cfg_yml_file), '27e81ea4d86'])
+    fx_cli_runner.invoke(upgrade, ['-c', str(fx_cfg_yml_file)])
     result = fx_cli_runner.invoke(upgrade,
                                   ['-c', str(fx_cfg_yml_file), '27e81ea4d86'])
     assert result.exit_code == 0
     assert 'Running upgrade None -> 27e81ea4d86' in result.output
 
 
-def test_upgrade_downgrade_fail(fx_cli_runner, fx_cfg_yml_file):
-    """downgrade work incorrectly"""
+def test_upgrade_downgrade_fail_after_upgrade(fx_cli_runner, fx_cfg_yml_file):
+    """downgrade work incorrectly after upgrade"""
+    fx_cli_runner.invoke(upgrade, ['-c', str(fx_cfg_yml_file), '27e81ea4d86'])
+    fx_cli_runner.invoke(upgrade, ['-c', str(fx_cfg_yml_file)])
     result = fx_cli_runner.invoke(upgrade,
                                   ['-c', str(fx_cfg_yml_file), 'zzzzzzzzzzz'])
     assert result.exit_code == 1
     assert "No such revision 'zzzzzzzzzzz'" in result.output
-
-
-def test_upgrade_downup_fine(fx_cli_runner, fx_cfg_yml_file):
-    """down/upgrade work normally"""
-    fx_cli_runner.invoke(upgrade, ['-c', str(fx_cfg_yml_file), '27e81ea4d86'])
-    result = fx_cli_runner.invoke(upgrade, ['-c', str(fx_cfg_yml_file)])
-    assert result.exit_code == 0
-    assert 'INFO  [alembic.migration]' in result.output
 
 
 def test_shell_empty_cmd(fx_cli_runner):
