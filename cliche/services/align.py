@@ -3,12 +3,12 @@ import difflib
 from urllib.parse import unquote_plus
 
 from sqlalchemy import ForeignKeyConstraint
-from sqlalchemy.orm import foreign, relationship, remote
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import Date, DateTime, Integer, String
+from sqlalchemy.types import Integer, String
 
-from .tvtropes.entities import Entity as Tvtropes
-from .wikipedia.work import Entity as Wikipedia
+from .tvtropes.entities import ClicheTvtropesEdge, Entity as Tvtropes
+from .wikipedia.work import ClicheWikipediaEdge, Entity as Wikipedia
 from ..name import Name
 from ..orm import Base
 from ..sqltypes import HashableLocale as Locale
@@ -80,6 +80,37 @@ def alignment():
     wiki = next(wiki_iter)
     while(True):
         try:
+            with app.app_context():
+                wikipedia_work = Work(media_type=wiki[2])
+                wikipedia_work.names.update({
+                    Name(nameable=wikipedia_work,
+                         name=wiki[0],
+                         locale=Locale.parse('en_US'))
+                })
+                wikipedia_edge = ClicheWikipediaEdge(
+                    cliche_work=wikipedia_work,
+                    wikipedia_name=wiki[1],
+                    wikipedia_work=session.query(Wikipedia).
+                    filter_by(name=wiki[1]).first()
+                )
+
+                tvtropes_work = Work(media_type='work')
+                tvtropes_work.names.update({
+                    Name(nameable=tvtropes_work,
+                         name=trope[0],
+                         locale=Locale.parse('en_US'))
+                })
+                tvtropes_edge = ClicheTvtropesEdge(
+                    cliche_work=tvtropes_work,
+                    tvtropes_namespace=trope[2],
+                    tvtropes_name=trope[1],
+                    tvtropes_entity=session.query(Tvtropes).
+                    filter_by(name=trope[1], namespace=trope[2]).first()
+                )
+
+                with session.begin():
+                    session.add_all([wikipedia_work, tvtropes_work,
+                                     wikipedia_edge, tvtropes_edge])
             if is_same(trope[0], wiki[0]):
                 print(trope[0], wiki[0])
 
@@ -107,27 +138,8 @@ def alignment():
                                         Tvtropes.namespace.like(trope[2]))
                                     .first()
                     )
-                    work.external_ids.update({external_id})
                     with session.begin():
-                        session.add(work)
                         session.add(external_id)
-            else:
-                with app.app_context():
-                    wikipedia_work = Work(media_type=wiki[2])
-                    wikipedia_work.names.update({
-                        Name(nameable=wikipedia_work,
-                             name=wiki[0],
-                             locale=Locale.parse('en_US'))
-                    })
-                    tvtropes_work = Work(media_type='work')
-                    tvtropes_work.names.update({
-                        Name(nameable=tvtropes_work,
-                             name=trope[0],
-                             locale=Locale.parse('en_US'))
-                    })
-                    with session.begin():
-                        session.add(wikipedia_work)
-                        session.add(tvtropes_work)
 
             if trope[0] > wiki[0]:
                 wiki = next(wiki_iter)

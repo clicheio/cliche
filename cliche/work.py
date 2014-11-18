@@ -4,7 +4,6 @@
 """
 import enum
 
-from sqlalchemy import ForeignKeyConstraint
 from sqlalchemy.orm import foreign, relationship, remote
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.sql.functions import now

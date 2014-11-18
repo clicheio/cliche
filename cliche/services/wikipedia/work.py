@@ -183,8 +183,8 @@ class ClicheWikipediaEdge(Base):
 
     cliche_id = Column(Integer, ForeignKey('works.id'), primary_key=True)
     cliche_work = relationship(ClicheWork)
-    wikipedia_name = Column(String, ForeignKey(Work.name), primary_key=True)
-    wikipedia_work = relationship(Work)
+    wikipedia_name = Column(String, ForeignKey(Entity.name), primary_key=True)
+    wikipedia_work = relationship(Entity)
     confidence = Column(Integer, default=0.5)
 
     __tablename__ = 'cliche_wikipedia_edge'

@@ -1,8 +1,4 @@
-import subprocess
-
 from cliche.cli import cli, runserver, shell, upgrade
-from cliche.orm import Base
-from cliche.web.app import app
 
 
 def test_cli(fx_cli_runner):
