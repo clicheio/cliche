@@ -1,7 +1,7 @@
 """create external ids table
 
 Revision ID: 8084c9ecd2
-Revises: 6ea60f0db6
+Revises: 4ff1834aa21
 Create Date: 2014-11-14 23:19:53.507384
 
 """
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 revision = '8084c9ecd2'
-down_revision = '6ea60f0db6'
+down_revision = '4ff1834aa21'
 
 
 def upgrade():

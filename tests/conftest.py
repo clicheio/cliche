@@ -11,12 +11,13 @@ from yaml import dump
 from cliche.celery import app as celery_app
 from cliche.name import Name
 from cliche.people import Person, Team
+from cliche.services.align import ExternalId
 from cliche.services.wikipedia.work import ClicheWikipediaEdge, Film
 from cliche.services.wikipedia.work import Entity as WikipediaEntity
 from cliche.services.tvtropes.entities import ClicheTvtropesEdge, Entity
 from cliche.sqltypes import HashableLocale as Locale
 from cliche.web.app import app
-from cliche.work import (Character, Credit, ExternelId, Franchise, Genre, Role,
+from cliche.work import (Character, Credit, Franchise, Genre, Role,
                          Trope, Work, World)
 from .db import DEFAULT_DATABASE_URL, get_session
 
@@ -184,14 +185,13 @@ def fx_external_ids(fx_session):
         type='book',
     )
 
-    f.jane_eyre_ex = ExternelId(
+    f.jane_eyre_ex = ExternalId(
         work_id=f.jane_eyre.id,
         work=f.jane_eyre,
         wikipedia_id=f.jane_eyre_wikipedia.name,
         wikipedia=WikipediaEntity,
     )
 
-    f.jane_eyre.external_ids.update({f.jane_eyre_ex})
     return f
 
 

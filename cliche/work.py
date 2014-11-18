@@ -13,9 +13,8 @@ from sqlalchemy.types import Date, DateTime, Integer, String
 from .orm import Base
 from .sqltypes import EnumType, prevent_discriminator_from_changing
 from .name import Nameable
-from .services.tvtropes.entities import Entity
 
-__all__ = ('Character', 'Credit', 'ExternelId', 'Franchise', 'Genre', 'Role',
+__all__ = ('Character', 'Credit', 'Franchise', 'Genre', 'Role',
            'Work', 'WorkCharacter', 'WorkFranchise', 'WorkGenre', 'World')
 
 
@@ -100,30 +99,6 @@ class Credit(Base):
 
     __tablename__ = 'credits'
     __repr_columns__ = person_id, work_id, role, team_id
-
-
-class ExternelId(Base):
-    """Relationship between two kinds of external works"""
-
-    #: (:class:`int`) The primary key integer.
-    id = Column(Integer, primary_key=True)
-
-    work_id = Column(Integer, ForeignKey('works.id'), nullable=False)
-    work = relationship(lambda: Work)
-
-    tvtropes_namespace = Column(String)
-    tvtropes_name = Column(String)
-    tvtropes = relationship('cliche.services.tvtropes.entities.Entity')
-    wikipedia_id = Column(String, ForeignKey('wikipedia_entities.name'))
-    wikipedia = relationship('cliche.services.wikipedia.work.Entity')
-
-    __tablename__ = 'external_ids'
-    __table_args__ = (
-        ForeignKeyConstraint(
-            [tvtropes_namespace, tvtropes_name],
-            [Entity.namespace, Entity.name]
-        ),
-    )
 
 
 class Franchise(Nameable):
@@ -277,9 +252,6 @@ class Work(Nameable):
     #: :class:`Trope`.
     tropes = relationship(Trope, secondary='work_tropes',
                           collection_class=set)
-
-    external_ids = relationship(ExternelId,
-                                collection_class=set)
 
     #: (:class:`datetime.datetime`) The date and time on which
     #: the record was created.
