@@ -24,6 +24,7 @@ from .web.app import (app as flask_app,
                       setup_sentry as flask_setup_sentry)
 from .web.db import get_database_engine, session
 from .work import Trope, Work
+from .services.align import alignment
 
 
 __all__ = ('initialize_app', 'config', 'main')
@@ -143,6 +144,13 @@ def sync(service):  # FIXME available service listing
              file=sys.stderr)
     else:
         sync.delay()
+
+
+@cli.command()
+@config
+def align():
+    """Align database"""
+    alignment()
 
 
 @cli.command()

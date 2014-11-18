@@ -13,8 +13,8 @@ from .orm import Base
 from .sqltypes import EnumType, prevent_discriminator_from_changing
 from .name import Nameable
 
-__all__ = ('Character', 'Credit', 'Franchise', 'Genre', 'Role', 'Work',
-           'WorkCharacter', 'WorkFranchise', 'WorkGenre', 'World')
+__all__ = ('Character', 'Credit', 'Franchise', 'Genre', 'Role',
+           'Work', 'WorkCharacter', 'WorkFranchise', 'WorkGenre', 'World')
 
 
 class Role(enum.Enum):
