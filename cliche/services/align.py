@@ -1,3 +1,7 @@
+""":mod:`cliche.services.align` --- String matching to align
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+"""
 import difflib
 
 from urllib.parse import unquote_plus
@@ -18,18 +22,35 @@ from ..work import Work
 
 
 class ExternalId(Base):
-    """Relationship between two kinds of external works"""
+    """Relationship between two kinds of external works
+    This class can be replaced based on the probability of equality."""
 
     #: (:class:`int`) The primary key integer.
     id = Column(Integer, primary_key=True)
 
+    #: (:class:`int`) foreignkey for works.id
     work_id = Column(Integer, ForeignKey('works.id'), nullable=False)
+
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`cliche.work.Entity`.
     work = relationship(lambda: Work)
 
+    #: (:class:`str`) The namespace of the trope,
+    #: both namespace and name determines one trope.
     tvtropes_namespace = Column(String)
+
+    #: (:class:`str`) The name of the trope.
     tvtropes_name = Column(String)
+
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`cliche.services.tvtropes.entities.Entity`.
     tvtropes = relationship('cliche.services.tvtropes.entities.Entity')
+
+    #: (:class:`str`) The namespace of the trope.
     wikipedia_id = Column(String, ForeignKey('wikipedia_entities.name'))
+
+    #: (:class:`collections.abc.MutableSet`) The set of
+    #: :class:`cliche.services.wikipedia.work.Entity`.
     wikipedia = relationship('cliche.services.wikipedia.work.Entity')
 
     __tablename__ = 'external_ids'
