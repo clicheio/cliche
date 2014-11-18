@@ -33,8 +33,9 @@ def test_upgrade_wrong_path():
 
 def test_upgrade_fine_use_metadata(fx_cfg_yml_file_use_db_url):
     """work normally, no additional options"""
-    Base.metadata.drop_all(bind=app.config['DATABASE_ENGINE'])
-    app.config['DATABASE_ENGINE'].execute(
+    database_engine = app.config['DATABASE_ENGINE']
+    Base.metadata.drop_all(bind=database_engine)
+    database_engine.execute(
         "drop table if exists alembic_version;"
     )
     p = subprocess.Popen(
@@ -51,8 +52,9 @@ def test_upgrade_fine_use_metadata(fx_cfg_yml_file_use_db_url):
 def test_upgrade_fine_use_alembic(fx_cfg_yml_file_use_db_url,
                                   fx_only_support_pgsql):
     """work normally, no additional options"""
-    Base.metadata.drop_all(bind=app.config['DATABASE_ENGINE'])
-    app.config['DATABASE_ENGINE'].execute(
+    database_engine = app.config['DATABASE_ENGINE']
+    Base.metadata.drop_all(bind=database_engine)
+    database_engine.execute(
         "drop table if exists alembic_version;"
     )
     p = subprocess.Popen(
@@ -92,8 +94,9 @@ def test_upgrade_fine_use_alembic(fx_cfg_yml_file_use_db_url,
 def test_upgrade_downgrade_fine_after_upgrade(fx_cfg_yml_file_use_db_url,
                                               fx_only_support_pgsql):
     """downgrade work normally after upgrade"""
-    Base.metadata.drop_all(bind=app.config['DATABASE_ENGINE'])
-    app.config['DATABASE_ENGINE'].execute(
+    database_engine = app.config['DATABASE_ENGINE']
+    Base.metadata.drop_all(bind=database_engine)
+    database_engine.execute(
         "drop table if exists alembic_version;"
     )
     p = subprocess.Popen(
@@ -142,8 +145,9 @@ def test_upgrade_downgrade_fine_after_upgrade(fx_cfg_yml_file_use_db_url,
 def test_upgrade_downgrade_fail_after_upgrade(fx_cfg_yml_file_use_db_url,
                                               fx_only_support_pgsql):
     """downgrade work incorrectly after upgrade"""
-    Base.metadata.drop_all(bind=app.config['DATABASE_ENGINE'])
-    app.config['DATABASE_ENGINE'].execute(
+    database_engine = app.config['DATABASE_ENGINE']
+    Base.metadata.drop_all(bind=database_engine)
+    database_engine.execute(
         "drop table if exists alembic_version;"
     )
     p = subprocess.Popen(
