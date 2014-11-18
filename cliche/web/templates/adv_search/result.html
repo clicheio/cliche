@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %} - Adv. Search{% endblock %}
+{% block body %}
+  <table class="adv_search_result">
+    <thead>
+    <tr>
+      <th>Title</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for x in result %}
+      <tr>
+        <td><a href="{{ url_for('ontology.page', title=x.canonical_name) }}">{{ x.canonical_name }}</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

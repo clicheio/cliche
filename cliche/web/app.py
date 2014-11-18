@@ -14,11 +14,13 @@ from flask_oauthlib.client import OAuth
 from raven.contrib.flask import Sentry
 
 from ..user import User
+from .adv_search import adv_search_bp
 from .db import setup_session
 from .db import session as sa_session
 from .ontology import ontology
 from .social.oauth import OAuthVendorConverter, oauth_app
 from .user import user_app
+from ..work import Trope
 
 
 __all__ = 'app', 'check_login_status', 'index'
@@ -36,6 +38,7 @@ app.url_map.converters['oauth_vendor'] = OAuthVendorConverter
 app.register_blueprint(ontology)
 app.register_blueprint(user_app)
 app.register_blueprint(oauth_app)
+app.register_blueprint(adv_search_bp, url_prefix='/adv_search')
 
 app.config['SENTRY_DSN'] = os.environ.get('SENTRY_DSN', None)
 if app.config['SENTRY_DSN']:
@@ -51,7 +54,8 @@ if app.config['SENTRY_DSN']:
 @app.route('/')
 def index():
     """Cliche.io web index page."""
-    return render_template('index.html')
+    tropes = sa_session.query(Trope)
+    return render_template('index.html', tropes=tropes)
 
 
 @app.before_request
