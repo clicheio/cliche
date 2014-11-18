@@ -17,9 +17,12 @@ from werkzeug.utils import import_string
 
 from .celery import app as celery_app
 from .config import read_config
-from .orm import downgrade_database, upgrade_database
+from .name import Name
+from .orm import Base, downgrade_database, upgrade_database
+from .sqltypes import HashableLocale
 from .web.app import app as flask_app
-from .web.db import get_database_engine
+from .web.db import get_database_engine, session
+from .work import Trope, Work
 
 
 __all__ = ('initialize_app', 'config', 'main')
@@ -188,6 +191,113 @@ def runserver(host, port, threaded, processes,
                   threaded=threaded,
                   processes=processes,
                   passthrough_errors=passthrough_errors)
+
+
+@cli.command()
+@config
+def dummy():
+    """Generate dummy data for test."""
+    def make_film(name):
+        film = Work(media_type='Film')
+        film.names.update({
+            Name(
+                nameable=film,
+                name=name,
+                locale=HashableLocale.parse('en_US')
+            )
+        })
+        return film
+
+    action_duo = Trope(name='Action Duo')
+    action_girl = Trope(name='Action Girl')
+    adult_fear = Trope(name='Adult Fear')
+    badass = Trope(name='Badass')
+    come_with_me = Trope(name='Come with Me If You Want to Live')
+    cool_car = Trope(name='Cool Car')
+    cool_horse = Trope(name='Cool Horse')
+    creater_cameo = Trope(name='Creator Cameo')
+    the_dog_is_an_alien = Trope(name='The Dog Is an Alien')
+    the_dragon = Trope(name='The Dragon')
+    evil_elevator = Trope(name='Evil Elevator')
+    friends_all_along = Trope(name='Friends All Along')
+    i_lied = Trope(name='I Lied')
+    kick_the_dog = Trope(name='Kick the Dog')
+    macguffin = Trope(name='MacGuffin')
+    one_man_army = Trope(name='One-Man Army')
+    take_a_third_option = Trope(name='Take a Third Option')
+    zombie_infectee = Trope(name='Zombie Infectee')
+
+    lor = make_film('The Lord of the Rings')
+    lor.tropes.update({
+        action_girl,
+        come_with_me,
+        friends_all_along,
+        i_lied
+    })
+
+    commando = make_film('Commando')
+    commando.tropes.update({
+        badass,
+        the_dragon,
+        i_lied,
+        one_man_army
+    })
+
+    zombieland = make_film('Zombieland')
+    zombieland.tropes.update({
+        action_duo,
+        cool_car,
+        one_man_army,
+        zombie_infectee
+    })
+
+    resident_evil = make_film('Resident Evil')
+    resident_evil.tropes.update({
+        action_girl,
+        evil_elevator,
+        take_a_third_option,
+        zombie_infectee
+    })
+
+    titanic = make_film('Titanic')
+    titanic.tropes.update({
+        action_girl,
+        badass,
+        the_dragon,
+        take_a_third_option,
+        macguffin
+    })
+
+    man_in_black = make_film('Men in Black')
+    man_in_black.tropes.update({
+        cool_car,
+        creater_cameo,
+        the_dog_is_an_alien,
+        macguffin
+    })
+
+    the_wizard_of_oz = make_film('The Wizard of Oz')
+    the_wizard_of_oz.tropes.update({
+        adult_fear,
+        cool_horse,
+        kick_the_dog,
+        macguffin
+    })
+
+    with flask_app.app_context():
+        engine = get_database_engine()
+        Base.metadata.drop_all(bind=engine)
+        Base.metadata.create_all(bind=engine)
+        with session.begin():
+            session.add_all([
+                lor,
+                commando,
+                zombieland,
+                resident_evil,
+                titanic,
+                man_in_black,
+                the_wizard_of_oz
+            ])
 
 
 #: (:class:`collections.abc.Callable`) The CLI entry point.
