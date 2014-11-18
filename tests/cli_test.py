@@ -1,4 +1,8 @@
+import subprocess
+
 from cliche.cli import cli, runserver, shell, upgrade
+from cliche.orm import Base
+from cliche.web.app import app
 
 
 def test_cli(fx_cli_runner):
@@ -14,38 +18,163 @@ def test_upgrade_empty_cmd(fx_cli_runner):
     assert 'The -c/--config' in result.output
 
 
-def test_upgrade_wrong_path(fx_cli_runner):
+def test_upgrade_wrong_path():
     """wrong path"""
-    result = fx_cli_runner.invoke(upgrade, ['-c', 'invalid.cfg.py'])
-    assert result.exit_code == 2
-    assert 'Invalid value for "--config"' in result.output
+    p = subprocess.Popen(
+        ['cliche', 'upgrade', '-c', 'invalid.cfg.py'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    out, err = p.communicate()
+    exit_code = p.returncode
+    assert 'Invalid value for "--config"' in err.decode('u8')
+    assert exit_code == 2
 
 
-def test_upgrade_fine(fx_cli_runner, fx_cfg_yml_file):
+def test_upgrade_fine_use_metadata(fx_cfg_yml_file_use_db_url):
     """work normally, no additional options"""
-    result = fx_cli_runner.invoke(upgrade, ['-c', str(fx_cfg_yml_file)])
-    assert result.exit_code == 0
-    assert 'INFO  [alembic.migration]' in result.output
+    Base.metadata.drop_all(bind=app.config['DATABASE_ENGINE'])
+    app.config['DATABASE_ENGINE'].execute("drop table alembic_version;")
+    p = subprocess.Popen(
+        ['cliche', 'upgrade', '-c', str(fx_cfg_yml_file_use_db_url)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    out, err = p.communicate()
+    exit_code = p.returncode
+    assert 'INFO  [alembic.migration]' in err.decode('u8')
+    assert exit_code == 0
 
 
-def test_upgrade_downgrade_fine_after_upgrade(fx_cli_runner, fx_cfg_yml_file):
+def test_upgrade_fine_use_alembic(fx_cfg_yml_file_use_db_url):
+    """work normally, no additional options"""
+    Base.metadata.drop_all(bind=app.config['DATABASE_ENGINE'])
+    app.config['DATABASE_ENGINE'].execute("drop table alembic_version;")
+    p = subprocess.Popen(
+        [
+            'cliche',
+            'upgrade',
+            '-c',
+            str(fx_cfg_yml_file_use_db_url),
+            '27e81ea4d86'
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    out, err = p.communicate()
+    exit_code = p.returncode
+    assert 'Running upgrade None -> 27e81ea4d86, Add people table' in \
+        err.decode('u8')
+    assert exit_code == 0
+
+    p = subprocess.Popen(
+        [
+            'cliche',
+            'upgrade',
+            '-c',
+            str(fx_cfg_yml_file_use_db_url)
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    out, err = p.communicate()
+    exit_code = p.returncode
+    assert 'Running upgrade 27e81ea4d86 -> 2d8b17e13d1, Add teams table' in \
+        err.decode('u8')
+    assert exit_code == 0
+
+
+def test_upgrade_downgrade_fine_after_upgrade(fx_cfg_yml_file_use_db_url):
     """downgrade work normally after upgrade"""
-    fx_cli_runner.invoke(upgrade, ['-c', str(fx_cfg_yml_file), '27e81ea4d86'])
-    fx_cli_runner.invoke(upgrade, ['-c', str(fx_cfg_yml_file)])
-    result = fx_cli_runner.invoke(upgrade,
-                                  ['-c', str(fx_cfg_yml_file), '27e81ea4d86'])
-    assert result.exit_code == 0
-    assert 'Running upgrade None -> 27e81ea4d86' in result.output
+    Base.metadata.drop_all(bind=app.config['DATABASE_ENGINE'])
+    app.config['DATABASE_ENGINE'].execute("drop table alembic_version;")
+    p = subprocess.Popen(
+        [
+            'cliche',
+            'upgrade',
+            '-c',
+            str(fx_cfg_yml_file_use_db_url),
+            '27e81ea4d86'
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    p.communicate()
+
+    p = subprocess.Popen(
+        [
+            'cliche',
+            'upgrade',
+            '-c',
+            str(fx_cfg_yml_file_use_db_url)
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    p.communicate()
+
+    p = subprocess.Popen(
+        [
+            'cliche',
+            'upgrade',
+            '-c',
+            str(fx_cfg_yml_file_use_db_url),
+            '27e81ea4d86'
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    out, err = p.communicate()
+    exit_code = p.returncode
+    assert 'Running downgrade 2d8b17e13d1 -> 27e81ea4d86, Add teams table' in \
+           err.decode('u8')
+    assert exit_code == 0
 
 
-def test_upgrade_downgrade_fail_after_upgrade(fx_cli_runner, fx_cfg_yml_file):
+def test_upgrade_downgrade_fail_after_upgrade(fx_cfg_yml_file_use_db_url):
     """downgrade work incorrectly after upgrade"""
-    fx_cli_runner.invoke(upgrade, ['-c', str(fx_cfg_yml_file), '27e81ea4d86'])
-    fx_cli_runner.invoke(upgrade, ['-c', str(fx_cfg_yml_file)])
-    result = fx_cli_runner.invoke(upgrade,
-                                  ['-c', str(fx_cfg_yml_file), 'zzzzzzzzzzz'])
-    assert result.exit_code == 1
-    assert "No such revision 'zzzzzzzzzzz'" in result.output
+    Base.metadata.drop_all(bind=app.config['DATABASE_ENGINE'])
+    app.config['DATABASE_ENGINE'].execute("drop table alembic_version;")
+    p = subprocess.Popen(
+        [
+            'cliche',
+            'upgrade',
+            '-c',
+            str(fx_cfg_yml_file_use_db_url),
+            '27e81ea4d86'
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    p.communicate()
+
+    p = subprocess.Popen(
+        [
+            'cliche',
+            'upgrade',
+            '-c',
+            str(fx_cfg_yml_file_use_db_url)
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    p.communicate()
+
+    p = subprocess.Popen(
+        [
+            'cliche',
+            'upgrade',
+            '-c',
+            str(fx_cfg_yml_file_use_db_url),
+            'zzzzzzzzzzz'
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    out, err = p.communicate()
+    exit_code = p.returncode
+    assert "No such revision 'zzzzzzzzzzz'" in err.decode('u8')
+    assert exit_code == 1
 
 
 def test_shell_empty_cmd(fx_cli_runner):

@@ -570,10 +570,37 @@ def fx_cli_runner():
 
 
 @fixture
-def fx_cfg_yml_file(fx_tmpdir):
+def fx_cfg_yml_file(fx_session, fx_tmpdir):
+    cfg_file = fx_tmpdir / 'test.cfg.yml'
+    db_file = fx_tmpdir / 'test.db'
+    cfg = {
+        'DATABASE_URL': 'sqlite:///{}'.format(str(db_file))
+    }
+    with cfg_file.open('w') as f:
+        dump(cfg, stream=f)
+    return cfg_file
+
+
+@fixture
+def fx_cfg_yml_file_use_db_url(request, fx_session, fx_tmpdir):
+    make_db_file = False
+    try:
+        database_url = request.config.getoption('--database-url')
+    except ValueError:
+        make_db_file = True
+
+    if database_url == 'sqlite://' or ':memory:' in database_url:
+        make_db_file = True
+
+    if make_db_file:
+        db_file = fx_tmpdir / 'test.db'
+        with db_file.open('w'):
+            pass
+        database_url = 'sqlite:///{}'.format(str(db_file))
+
     cfg_file = fx_tmpdir / 'test.cfg.yml'
     cfg = {
-        'DATABASE_URL': 'sqlite:///:memory:'
+        'DATABASE_URL': database_url
     }
     with cfg_file.open('w') as f:
         dump(cfg, stream=f)
