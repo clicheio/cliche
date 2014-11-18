@@ -95,7 +95,6 @@ def main():
     if args.sentry_dsn is not None and \
        args.sentry_dsn[0] is not None:
         config['SENTRY_DSN'] = args.sentry_dsn[0]
-        config['uwsgi']['env'] = 'SENTRY_DSN={}'.format(args.sentry_dsn[0])
 
     if args.identity is not None and args.identity[0] is not None:
         args.identity[0] = os.path.abspath(args.identity[0])
