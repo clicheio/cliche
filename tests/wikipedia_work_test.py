@@ -1,4 +1,6 @@
-from cliche.services.wikipedia.work import Entity, Artist, Work, Film, Book
+from cliche.services.wikipedia.work import (
+    ClicheWikipediaEdge, Entity, Artist, Work, Film, Book
+)
 
 
 def test_properties():
@@ -61,3 +63,11 @@ def test_book_properties():
         'dbpedia-owl:numberOfPages',
     }
     assert Book.PROPERTIES == book_properties
+
+
+def test_wikipedia_edge(fx_edges):
+    fx_edges.wikipedia_film.corres == {
+        ClicheWikipediaEdge(cliche_work=fx_edges.cliche_work,
+                            wikipedia_work=fx_edges.wikipedia_film,
+                            confidence=0.9),
+    }

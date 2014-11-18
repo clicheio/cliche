@@ -10,12 +10,12 @@ from yaml import dump
 from cliche.celery import app as celery_app
 from cliche.name import Name
 from cliche.people import Person, Team
-from cliche.services.wikipedia.work import Film
-from cliche.services.tvtropes.entities import Entity
+from cliche.services.wikipedia.work import ClicheWikipediaEdge, Film
+from cliche.services.tvtropes.entities import ClicheTvtropesEdge, Entity
 from cliche.sqltypes import HashableLocale as Locale
 from cliche.web.app import app
-from cliche.work import (Character, CliTvCorres, CliWikiCorres, Credit,
-                         Franchise, Genre, Role, Trope, Work, World)
+from cliche.work import (Character, Credit, Franchise, Genre, Role, Trope,
+                         Work, World)
 
 from .db import DEFAULT_DATABASE_URL, get_session
 
@@ -523,40 +523,43 @@ def fx_tropes(fx_session):
 
 
 @fixture
-def fx_corres(fx_session):
+def fx_edges(fx_session):
     """create correspondences"""
 
     f = FixtureModule('fx_corres')
     current_time = datetime.datetime.now(datetime.timezone.utc)
 
-    f.tv_entity = Entity(
+    f.tvtropes_entity = Entity(
         namespace='Film',
         name='Iron Man',
         url='http://tvtropes.org/pmwiki/pmwiki.php/Film/IronMan',
         type='Work',
         last_crawled=current_time
     )
-    f.wiki_film = Film(name='Iron Man', label='Iron Man',
-                       last_crawled=current_time)
-    f.cli_work = Work(media_type='Film')
-    f.cli_work.names.update({
-        Name(nameable=f.cli_work,
+
+    f.wikipedia_film = Film(name='Iron Man', label='Iron Man',
+                            last_crawled=current_time)
+
+    f.cliche_work = Work(media_type='Film')
+    f.cliche_work.names.update({
+        Name(nameable=f.cliche_work,
              name='Iron Man',
              locale=Locale.parse('en_US'))
     })
 
-    f.tv_corres = CliTvCorres(confidence=0.8)
-    f.tv_corres.cli_work = f.cli_work
-    f.tv_corres.tv_entity = f.tv_entity
+    f.tvtropes_edge = ClicheTvtropesEdge(confidence=0.8)
+    f.tvtropes_edge.cliche_work = f.cliche_work
+    f.tvtropes_edge.tvtropes_entity = f.tvtropes_entity
 
-    f.wiki_corres = CliWikiCorres(confidence=0.9)
-    f.wiki_corres.cli_work = f.cli_work
-    f.wiki_corres.wiki_work = f.wiki_film
+    f.wikipedia_edge = ClicheWikipediaEdge(confidence=0.9)
+    f.wikipedia_edge.cliche_work = f.cliche_work
+    f.wikipedia_edge.wikipedia_work = f.wikipedia_film
 
     with fx_session.begin():
-        fx_session.add_all(
-            [f.tv_entity, f.wiki_film, f.cli_work, f.tv_corres, f.wiki_corres]
-        )
+        fx_session.add_all([
+            f.tvtropes_entity, f.wikipedia_film, f.cliche_work,
+            f.tvtropes_edge, f.wikipedia_edge
+        ])
 
     return f
 

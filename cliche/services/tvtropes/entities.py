@@ -4,14 +4,16 @@
 .. _TVTropes: http://tvtropes.org/
 
 """
-from sqlalchemy import Column, DateTime, ForeignKeyConstraint, String
 from sqlalchemy.orm import relationship
+from sqlalchemy.schema import Column, ForeignKey, ForeignKeyConstraint
 from sqlalchemy.sql.expression import and_
+from sqlalchemy.types import DateTime, Integer, String
 
 from ...orm import Base
+from ...work import Work
 
 
-__all__ = 'Entity', 'Redirection', 'Relation'
+__all__ = 'ClicheTvtropesEdge', 'Entity', 'Redirection', 'Relation'
 
 
 class Entity(Base):
@@ -39,7 +41,7 @@ class Entity(Base):
                  Entity.name == Redirection.original_name),
         collection_class=set)
 
-    corres = relationship('cliche.work.CliTvCorres', collection_class=set)
+    corres = relationship('ClicheTvtropesEdge', collection_class=set)
 
     __tablename__ = 'tvtropes_entities'
     __repr_columns__ = namespace, name
@@ -89,3 +91,26 @@ class Relation(Base):
     __tablename__ = 'tvtropes_relations'
     __repr_columns__ = (origin_namespace, origin_name, destination_namespace,
                         destination_name)
+
+
+class ClicheTvtropesEdge(Base):
+    """Correspondence between Works of Cliche and TV Tropes"""
+
+    cliche_id = Column(Integer, ForeignKey(Work.id), primary_key=True)
+    cliche_work = relationship(Work)
+    tvtropes_namespace = Column(String, primary_key=True)
+    tvtropes_name = Column(String, primary_key=True)
+    tvtropes_entity = relationship(Entity,
+                                   foreign_keys=[tvtropes_namespace,
+                                                 tvtropes_name])
+    confidence = Column(Integer, default=0.5)
+
+    __tablename__ = 'cliche_tvtropes_edges'
+    __table_args__ = (
+        ForeignKeyConstraint(
+            [tvtropes_namespace, tvtropes_name],
+            [Entity.namespace, Entity.name]
+        ),
+    )
+    __repr_columns__ = (cliche_id, tvtropes_namespace, tvtropes_name,
+                        confidence)

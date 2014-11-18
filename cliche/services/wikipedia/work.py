@@ -8,13 +8,15 @@ All classes in this file are rdfs:domain of its columns.
 """
 from urllib.parse import unquote_plus
 
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from ...orm import Base
+from ...work import Work as ClicheWork
 
 
-__all__ = 'Entity', 'Relation', 'Artist', 'Work', 'Film', 'Book'
+__all__ = ('ClicheWikipediaEdge', 'Entity', 'Relation', 'Artist', 'Work',
+           'Film', 'Book')
 
 
 def url_to_label(url):
@@ -109,7 +111,7 @@ class Work(Entity):
     author = Column(String)
     main_character = Column(String)
     previous_work = Column(String)
-    corres = relationship('cliche.work.CliWikiCorres', collection_class=set)
+    corres = relationship('ClicheWikipediaEdge', collection_class=set)
 
     __mapper_args__ = {
         'polymorphic_identity': 'work'
@@ -174,3 +176,16 @@ class Book(Work):
 
     def get_identities():
         return 'dbpedia-owl:Book'
+
+
+class ClicheWikipediaEdge(Base):
+    """Correspondence between Works of Cliche and Wikipedia"""
+
+    cliche_id = Column(Integer, ForeignKey('works.id'), primary_key=True)
+    cliche_work = relationship(ClicheWork)
+    wikipedia_name = Column(String, ForeignKey(Work.name), primary_key=True)
+    wikipedia_work = relationship(Work)
+    confidence = Column(Integer, default=0.5)
+
+    __tablename__ = 'cliche_wikipedia_edge'
+    __repr_columns__ = cliche_id, wikipedia_name, confidence
