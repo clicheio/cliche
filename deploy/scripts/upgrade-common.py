@@ -93,7 +93,7 @@ def main():
         config = load(config_data)
 
     config['uwsgi']['virtualenv'] = str(venv_dir)
-    config['uwsgi']['pythonpath'] = str(venv_dir / 'etc')
+    config['uwsgi']['wsgi-file'] = str(venv_dir / 'etc' / 'wsgi.py')
 
     with (venv_dir / 'etc' / 'prod.cfg.yml').open('w') as f:
         print(dump(config), file=f)
