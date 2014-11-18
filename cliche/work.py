@@ -5,16 +5,19 @@
 import enum
 
 from sqlalchemy.orm import foreign, relationship, remote
-from sqlalchemy.schema import Column, ForeignKey
+from sqlalchemy.schema import Column, ForeignKey, ForeignKeyConstraint
 from sqlalchemy.sql.functions import now
 from sqlalchemy.types import Date, DateTime, Integer, String
 
 from .orm import Base
 from .sqltypes import EnumType, prevent_discriminator_from_changing
 from .name import Nameable
+from .services.wikipedia.work import Work as WikiWork
+from .services.tvtropes.entities import Entity as TvEntity
 
-__all__ = ('Character', 'Credit', 'Franchise', 'Genre', 'Role', 'Work',
-           'WorkCharacter', 'WorkFranchise', 'WorkGenre', 'World')
+__all__ = ('Character', 'CliTvCorres', 'CliWikiCorres', 'Credit', 'Franchise',
+           'Genre', 'Role', 'Work', 'WorkCharacter', 'WorkFranchise',
+           'WorkGenre', 'World')
 
 
 class Role(enum.Enum):
@@ -62,6 +65,40 @@ class Character(Nameable):
     __mapper_args__ = {
         'polymorphic_identity': 'characters',
     }
+
+
+class CliTvCorres(Base):
+    """Correspondence between Works of Cliche and TV Tropes"""
+
+    cli_id = Column(Integer, ForeignKey('works.id'), primary_key=True)
+    cli_work = relationship(lambda: Work)
+    tv_namespace = Column(String, primary_key=True)
+    tv_name = Column(String, primary_key=True)
+    tv_entity = relationship(TvEntity,
+                             foreign_keys=[tv_namespace, tv_name])
+    confidence = Column(Integer, default=0.5)
+
+    __tablename__ = 'cli_tv_corres'
+    __table_args__ = (
+        ForeignKeyConstraint(
+            [tv_namespace, tv_name],
+            [TvEntity.namespace, TvEntity.name]
+        ),
+    )
+    __repr_columns__ = cli_id, tv_namespace, tv_name, confidence
+
+
+class CliWikiCorres(Base):
+    """Correspondence between Works of Cliche and Wikipedia"""
+
+    cli_id = Column(Integer, ForeignKey('works.id'), primary_key=True)
+    cli_work = relationship(lambda: Work)
+    wiki_name = Column(String, ForeignKey(WikiWork.name), primary_key=True)
+    wiki_work = relationship(WikiWork)
+    confidence = Column(Integer, default=0.5)
+
+    __tablename__ = 'cli_wiki_corres'
+    __repr_columns__ = cli_id, wiki_name, confidence
 
 
 class Credit(Base):
@@ -204,7 +241,7 @@ class Work(Nameable):
     #: (:class:`str`) Work media type.
     media_type = Column(String, nullable=False)
 
-    #: (:class:`datetime.date`) The publication date.
+    #: (:class:`datetimeself.date`) The publication date.
     published_at = Column(Date)
 
     #: (:class:`collections.abc.MutableSet`) The set of
@@ -251,6 +288,10 @@ class Work(Nameable):
     #: :class:`Trope`.
     tropes = relationship(Trope, secondary='work_tropes',
                           collection_class=set)
+
+    tv_corres = relationship(CliTvCorres, collection_class=set)
+
+    wiki_corres = relationship(CliWikiCorres, collection_class=set)
 
     #: (:class:`datetime.datetime`) The date and time on which
     #: the record was created.

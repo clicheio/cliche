@@ -1,4 +1,5 @@
-from cliche.work import Credit, Franchise, Role, Work, World
+from cliche.work import (CliTvCorres, CliWikiCorres, Credit, Franchise, Role,
+                         Work, World)
 
 
 def test_genres_of_work(fx_works, fx_genres):
@@ -159,6 +160,29 @@ def test_tropes_be_subordinate_to_works(fx_tropes):
 
     assert fx_tropes.ass_kicking_pose.works == {fx_tropes.dragon_ball_z}
     assert fx_tropes.cute_is_evil.works == {fx_tropes.dragon_ball_z}
+
+
+def test_correspondences(fx_corres):
+    fx_corres.cli_work.tv_corres == {
+        CliTvCorres(cli_work=fx_corres.cli_work,
+                    tv_entity=fx_corres.tv_entity,
+                    confidence=0.8),
+    }
+    fx_corres.cli_work.wiki_corres == {
+        CliWikiCorres(cli_work=fx_corres.cli_work,
+                      wiki_work=fx_corres.wiki_film,
+                      confidence=0.9),
+    }
+    fx_corres.wiki_film.corres == {
+        CliWikiCorres(cli_work=fx_corres.cli_work,
+                      wiki_work=fx_corres.wiki_film,
+                      confidence=0.9),
+    }
+    fx_corres.tv_entity.corres == {
+        CliTvCorres(cli_work=fx_corres.cli_work,
+                    tv_entity=fx_corres.tv_entity,
+                    confidence=0.8),
+    }
 
 
 def test_discriminator():

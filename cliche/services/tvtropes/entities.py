@@ -39,6 +39,8 @@ class Entity(Base):
                  Entity.name == Redirection.original_name),
         collection_class=set)
 
+    corres = relationship('cliche.work.CliTvCorres', collection_class=set)
+
     __tablename__ = 'tvtropes_entities'
     __repr_columns__ = namespace, name
 

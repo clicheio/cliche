@@ -9,6 +9,7 @@ All classes in this file are rdfs:domain of its columns.
 from urllib.parse import unquote_plus
 
 from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy.orm import relationship
 
 from ...orm import Base
 
@@ -108,6 +109,7 @@ class Work(Entity):
     author = Column(String)
     main_character = Column(String)
     previous_work = Column(String)
+    corres = relationship('cliche.work.CliWikiCorres', collection_class=set)
 
     __mapper_args__ = {
         'polymorphic_identity': 'work'
