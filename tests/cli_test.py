@@ -201,6 +201,7 @@ def test_shell_empty_cmd(fx_cli_runner):
 
 def test_shell_wrong_path(fx_cli_runner):
     """give -c/--config but wrong path"""
+    
     result = fx_cli_runner.invoke(shell, ['-c', 'invalid.cfg.py'])
     assert result.exit_code == 2
     assert 'Invalid value for "--config"' in result.output
