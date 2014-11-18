@@ -96,7 +96,7 @@ def main():
     config['uwsgi']['wsgi-file'] = str(venv_dir / 'etc' / 'wsgi.py')
 
     with (venv_dir / 'etc' / 'prod.cfg.yml').open('w') as f:
-        print(dump(config), file=f)
+        print(dump(config, default_flow_style=False), file=f)
 
 
 if __name__ == '__main__':
