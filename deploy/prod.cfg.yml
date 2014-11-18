@@ -17,6 +17,5 @@ uwsgi:
   chdir: /home/cliche
   chmod-socket: 666
   callable: app
-  module: wsgi
   socket: /tmp/cliche-uwsgi.sock
   plugins: python34

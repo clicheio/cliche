@@ -339,7 +339,7 @@ def upload(address, revision, config, workdir, identity):
           'tmp' /
           'etc' /
           'prod.cfg.yml').open('w') as f:
-        print(dump(config), file=f)
+        print(dump(config, default_flow_style=False), file=f)
     subprocess.check_call(
         [
             'cp',
