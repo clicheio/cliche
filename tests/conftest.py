@@ -5,18 +5,19 @@ import types
 
 from click.testing import CliRunner
 from pytest import fixture, skip, yield_fixture
+from sqlalchemy.sql.functions import now
 from yaml import dump
 
 from cliche.celery import app as celery_app
 from cliche.name import Name
 from cliche.people import Person, Team
 from cliche.services.wikipedia.work import ClicheWikipediaEdge, Film
+from cliche.services.wikipedia.work import Entity as WikipediaEntity
 from cliche.services.tvtropes.entities import ClicheTvtropesEdge, Entity
 from cliche.sqltypes import HashableLocale as Locale
 from cliche.web.app import app
-from cliche.work import (Character, Credit, Franchise, Genre, Role, Trope,
-                         Work, World)
-
+from cliche.work import (Character, Credit, ExternelId, Franchise, Genre, Role,
+                         Trope, Work, World)
 from .db import DEFAULT_DATABASE_URL, get_session
 
 
@@ -160,6 +161,37 @@ def fx_genres(fx_session):
     f.romance = Genre(name='Romance')
     fx_session.add(f.romance)
     fx_session.flush()
+    return f
+
+
+@fixture
+def fx_external_ids(fx_session):
+    f = FixtureModule('fx_external_ids')
+
+    f.jane_eyre = Work()
+    f.jane_eyre.names.update({
+        Name(nameable=f.jane_eyre,
+             name='jane eyre',
+             locale=Locale.parse('en_US'))
+    })
+
+    f.jane_eyre_wikipedia = WikipediaEntity(
+        name='http://dbpedia.org/resource/Jane_Eyre',
+        revision=606655259,
+        label='Jane Eyre',
+        country='England',
+        last_crawled=now(),
+        type='book',
+    )
+
+    f.jane_eyre_ex = ExternelId(
+        work_id=f.jane_eyre.id,
+        work=f.jane_eyre,
+        wikipedia_id=f.jane_eyre_wikipedia.name,
+        wikipedia=WikipediaEntity,
+    )
+
+    f.jane_eyre.external_ids.update({f.jane_eyre_ex})
     return f
 
 
