@@ -608,6 +608,19 @@ def fx_cfg_yml_file_use_db_url(request, fx_session, fx_tmpdir):
 
 
 @fixture
+def fx_only_support_pgsql(request):
+    try:
+        database_url = request.config.getoption('--database-url')
+    except ValueError:
+        skip('This test must need --database-url option.')
+
+    if not database_url.startswith('postgresql://'):
+        skip('This test must need PostgreSQL.')
+
+    return True
+
+
+@fixture
 def fx_flask_client(fx_session):
     app.config.update(
         dict(
