@@ -18,11 +18,11 @@ from werkzeug.utils import import_string
 from .celery import app as celery_app
 from .config import read_config
 from .name import Name
-from .orm import downgrade_database, upgrade_database
+from .orm import Base, downgrade_database, upgrade_database
 from .sqltypes import HashableLocale
 from .web.app import app as flask_app
 from .web.db import get_database_engine, session
-from .work import Trope, Work, WorkTrope
+from .work import Trope, Work
 
 
 __all__ = ('initialize_app', 'config', 'main')
@@ -285,11 +285,10 @@ def dummy():
     })
 
     with flask_app.app_context():
+        engine = get_database_engine()
+        Base.metadata.drop_all(bind=engine)
+        Base.metadata.create_all(bind=engine)
         with session.begin():
-            session.query(Name).delete()
-            session.query(WorkTrope).delete()
-            session.query(Trope).delete()
-            session.query(Work).delete()
             session.add_all([
                 lor,
                 commando,
