@@ -20,7 +20,8 @@ from .config import read_config
 from .name import Name
 from .orm import Base, downgrade_database, upgrade_database
 from .sqltypes import HashableLocale
-from .web.app import app as flask_app
+from .web.app import (app as flask_app,
+                      setup_sentry as flask_setup_sentry)
 from .web.db import get_database_engine, session
 from .work import Trope, Work
 
@@ -182,6 +183,8 @@ def runserver(host, port, threaded, processes,
         debug = flask_app.debug
     if reload is None:
         reload = flask_app.debug
+
+    flask_setup_sentry()
 
     flask_app.run(host=host,
                   port=port,
