@@ -10,6 +10,8 @@ from yaml import dump
 from cliche.celery import app as celery_app
 from cliche.name import Name
 from cliche.people import Person, Team
+from cliche.services.wikipedia.work import ClicheWikipediaEdge, Film
+from cliche.services.tvtropes.entities import ClicheTvtropesEdge, Entity
 from cliche.sqltypes import HashableLocale as Locale
 from cliche.web.app import app
 from cliche.work import (Character, Credit, Franchise, Genre, Role, Trope,
@@ -516,6 +518,48 @@ def fx_tropes(fx_session):
             [f.attack_on_titan, f.the_ace, f.action_girl, f.behemoth_battle,
              f.ass_kicking_pose, f.dragon_ball_z]
         )
+
+    return f
+
+
+@fixture
+def fx_edges(fx_session):
+    """create correspondences"""
+
+    f = FixtureModule('fx_corres')
+    current_time = datetime.datetime.now(datetime.timezone.utc)
+
+    f.tvtropes_entity = Entity(
+        namespace='Film',
+        name='Iron Man',
+        url='http://tvtropes.org/pmwiki/pmwiki.php/Film/IronMan',
+        type='Work',
+        last_crawled=current_time
+    )
+
+    f.wikipedia_film = Film(name='Iron Man', label='Iron Man',
+                            last_crawled=current_time)
+
+    f.cliche_work = Work(media_type='Film')
+    f.cliche_work.names.update({
+        Name(nameable=f.cliche_work,
+             name='Iron Man',
+             locale=Locale.parse('en_US'))
+    })
+
+    f.tvtropes_edge = ClicheTvtropesEdge(confidence=0.8)
+    f.tvtropes_edge.cliche_work = f.cliche_work
+    f.tvtropes_edge.tvtropes_entity = f.tvtropes_entity
+
+    f.wikipedia_edge = ClicheWikipediaEdge(confidence=0.9)
+    f.wikipedia_edge.cliche_work = f.cliche_work
+    f.wikipedia_edge.wikipedia_work = f.wikipedia_film
+
+    with fx_session.begin():
+        fx_session.add_all([
+            f.tvtropes_entity, f.wikipedia_film, f.cliche_work,
+            f.tvtropes_edge, f.wikipedia_edge
+        ])
 
     return f
 
