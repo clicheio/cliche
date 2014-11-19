@@ -8,7 +8,8 @@ All classes in this file are rdfs:domain of its columns.
 """
 from urllib.parse import unquote_plus
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import (Boolean, Column, DateTime, Float, ForeignKey, Integer,
+                        String)
 from sqlalchemy.orm import relationship
 
 from ...orm import Base
@@ -111,6 +112,7 @@ class Work(Entity):
     author = Column(String)
     main_character = Column(String)
     previous_work = Column(String)
+
     corres = relationship('ClicheWikipediaEdge', collection_class=set)
 
     __mapper_args__ = {
@@ -185,7 +187,12 @@ class ClicheWikipediaEdge(Base):
     cliche_work = relationship(ClicheWork)
     wikipedia_name = Column(String, ForeignKey(Entity.name), primary_key=True)
     wikipedia_work = relationship(Entity)
-    confidence = Column(Integer, default=0.5)
+
+    confidence = Column(Float, default=0.5, index=True)
+
+    #: (:class:`bool`) used in matching process.
+    #: denote available edge in process
+    available = Column(Boolean, nullable=False, default=True, index=True)
 
     __tablename__ = 'cliche_wikipedia_edge'
     __repr_columns__ = cliche_id, wikipedia_name, confidence
