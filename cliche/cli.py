@@ -222,20 +222,45 @@ def dummy():
     action_duo = Trope(name='Action Duo')
     action_girl = Trope(name='Action Girl')
     adult_fear = Trope(name='Adult Fear')
+    after_the_end = Trope(name='After the End')
     badass = Trope(name='Badass')
+    badass_grandpa = Trope(name='Badass Grandpa')
+    big_eater = Trope(name='Big Eater')
+    black_comedy = Trope(name='Black Comedy')
+    blue_blood_literally = Trope(name='Blue Blood: Literally')
+    byronic_hero = Trope(name='Byronic Hero')
     come_with_me = Trope(name='Come with Me If You Want to Live')
+    cool_bike = Trope(name='Cool Bike')
+    cool_boat = Trope(name='Cool Boat')
     cool_car = Trope(name='Cool Car')
+    cool_guns = Trope(name='Cool Guns')
+    cool_helmet = Trope(name='Cool Helmet')
+    cool_plane = Trope(name='Cool Plane')
     cool_horse = Trope(name='Cool Horse')
     creater_cameo = Trope(name='Creator Cameo')
+    deus_ex_machina = Trope(name='Deus ex Machina')
     the_dog_is_an_alien = Trope(name='The Dog Is an Alien')
     the_dragon = Trope(name='The Dragon')
+    the_driver = Trope(name='The Driver')
     evil_elevator = Trope(name='Evil Elevator')
+    the_faceless = Trope(name='The Faceless')
+    fake_ultimate_hero = Trope(name='Fake Ultimate Hero')
     friends_all_along = Trope(name='Friends All Along')
+    heroic_sacrifice = Trope(name='Heroic Sacrifice')
     i_lied = Trope(name='I Lied')
     kick_the_dog = Trope(name='Kick the Dog')
     macguffin = Trope(name='MacGuffin')
+    my_favorite_shirt = Trope(name='My Favorite Shirt')
     one_man_army = Trope(name='One-Man Army')
+    secret_test = Trope(name='Secret Test')
+    self_description = Trope(name='Self-Deprecation')
+    stupid_boss = Trope(name='Stupid Boss')
     take_a_third_option = Trope(name='Take a Third Option')
+    take_my_hand = Trope(name='Take My Hand')
+    terrible_trio = Trope(name='Terrible Trio')
+    use_your_hand = Trope(name='Use Your Head')
+    what_year_is_this = Trope(name='What Year Is This?')
+    you_are_number_six = Trope(name='You Are Number Six')
     zombie_infectee = Trope(name='Zombie Infectee')
 
     lor = make_film('The Lord of the Rings')
@@ -243,7 +268,7 @@ def dummy():
         action_girl,
         come_with_me,
         friends_all_along,
-        i_lied
+        i_lied,
     })
 
     commando = make_film('Commando')
@@ -251,7 +276,7 @@ def dummy():
         badass,
         the_dragon,
         i_lied,
-        one_man_army
+        one_man_army,
     })
 
     zombieland = make_film('Zombieland')
@@ -259,7 +284,7 @@ def dummy():
         action_duo,
         cool_car,
         one_man_army,
-        zombie_infectee
+        zombie_infectee,
     })
 
     resident_evil = make_film('Resident Evil')
@@ -267,7 +292,7 @@ def dummy():
         action_girl,
         evil_elevator,
         take_a_third_option,
-        zombie_infectee
+        zombie_infectee,
     })
 
     titanic = make_film('Titanic')
@@ -276,7 +301,7 @@ def dummy():
         badass,
         the_dragon,
         take_a_third_option,
-        macguffin
+        macguffin,
     })
 
     man_in_black = make_film('Men in Black')
@@ -284,7 +309,8 @@ def dummy():
         cool_car,
         creater_cameo,
         the_dog_is_an_alien,
-        macguffin
+        macguffin,
+        secret_test,
     })
 
     the_wizard_of_oz = make_film('The Wizard of Oz')
@@ -292,7 +318,96 @@ def dummy():
         adult_fear,
         cool_horse,
         kick_the_dog,
-        macguffin
+        macguffin,
+    })
+
+    the_amazing_spider_man = make_film('The Amazing Spider-Man')
+    the_amazing_spider_man.tropes.update({
+        adult_fear,
+        big_eater,
+        byronic_hero,
+        kick_the_dog,
+    })
+
+    v_for_vendetta = make_film('V for Vendetta')
+    v_for_vendetta.tropes.update({
+        after_the_end,
+        the_faceless,
+        byronic_hero,
+        secret_test,
+        you_are_number_six,
+    })
+
+    stardust = make_film('Stardust')
+    stardust.tropes.update({
+        black_comedy,
+        blue_blood_literally,
+        terrible_trio,
+        you_are_number_six,
+    })
+
+    monty_pythons_the_meaning_of_life = \
+        make_film("Monty Python's The Meaning of Life")
+    monty_pythons_the_meaning_of_life.tropes.update({
+        badass_grandpa,
+        black_comedy,
+        self_description,
+        stupid_boss,
+    })
+
+    die_hard = make_film('Die Hard')
+    die_hard.tropes.update({
+        badass_grandpa,
+        the_dragon,
+        the_driver,
+        secret_test,
+    })
+
+    captain_america_the_first_avenger = \
+        make_film('Captain America: The First Avenger')
+    captain_america_the_first_avenger.tropes.update({
+        action_girl,
+        cool_bike,
+        cool_boat,
+        cool_guns,
+        cool_helmet,
+        cool_plane,
+        cool_car,
+        fake_ultimate_hero,
+        secret_test,
+    })
+
+    maverick = make_film('Maverick')
+    maverick.tropes.update({
+        fake_ultimate_hero,
+        friends_all_along,
+        my_favorite_shirt,
+        take_my_hand,
+    })
+
+    the_matrix = make_film('The Matrix')
+    the_matrix.tropes.update({
+        heroic_sacrifice,
+        my_favorite_shirt,
+        take_my_hand,
+        use_your_hand,
+    })
+
+    the_terminator = make_film('The Terminator')
+    the_terminator.tropes.update({
+        come_with_me,
+        heroic_sacrifice,
+        kick_the_dog,
+        what_year_is_this,
+    })
+
+    jumanji = make_film('Jumanji')
+    jumanji.tropes.update({
+        adult_fear,
+        badass,
+        deus_ex_machina,
+        heroic_sacrifice,
+        what_year_is_this,
     })
 
     with flask_app.app_context():
@@ -307,7 +422,17 @@ def dummy():
                 resident_evil,
                 titanic,
                 man_in_black,
-                the_wizard_of_oz
+                the_wizard_of_oz,
+                the_amazing_spider_man,
+                v_for_vendetta,
+                stardust,
+                monty_pythons_the_meaning_of_life,
+                die_hard,
+                captain_america_the_first_avenger,
+                maverick,
+                the_matrix,
+                the_terminator,
+                jumanji,
             ])
 
 
