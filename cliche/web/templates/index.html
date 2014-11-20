@@ -19,22 +19,21 @@
   <script>
     (function($)
     {
-
       $(document).ready(function()
       {
         var $search_btn = $('#search_btn');
 
-          tropes_ = [
-          {% for trope in tropes %}
-            "{{ trope.name }}",
-          {% endfor %}
-          ];
+        tropes_ = [
+        {% for trope in tropes %}
+          "{{ trope.name }}",
+        {% endfor %}
+        ];
 
-          trope_id = {
-          {% for trope in tropes %}
-            "{{ trope.name }}" : "{{ trope.id }}",
-          {% endfor %}
-          };
+        trope_id = {
+        {% for trope in tropes %}
+          "{{ trope.name }}": d"{{ trope.id }}",
+        {% endfor %}
+        };
 
         $('#adv_search').submit(function()
         {
@@ -70,7 +69,6 @@
             '<input class="tags detail_name" type="text"><input type="hidden" name="detail[]">' +
             '</p>'
           );
-
 
           $( ".tags" ).autocomplete({
             source: tropes_
