@@ -208,6 +208,9 @@ def runserver(host, port, threaded, processes,
 @config
 def dummy():
     """Generate dummy data for test."""
+
+    tropes = dict()
+
     def make_film(name):
         film = Work(media_type='Film')
         film.names.update({
@@ -219,206 +222,230 @@ def dummy():
         })
         return film
 
-    accidental_kidnapping = Trope(name='Accidental Kidnapping')
-    action_duo = Trope(name='Action Duo')
-    action_girl = Trope(name='Action Girl')
-    adult_fear = Trope(name='Adult Fear')
-    after_the_end = Trope(name='After the End')
-    alien_invasion = Trope(name='Alien Invasion')
-    all_just_a_dream = Trope(name='All Just a Dream')
-    badass = Trope(name='Badass')
-    badass_grandpa = Trope(name='Badass Grandpa')
-    big_eater = Trope(name='Big Eater')
-    black_comedy = Trope(name='Black Comedy')
-    blue_blood_literally = Trope(name='Blue Blood: Literally')
-    bullet_time = Trope(name='Bullet Time')
-    byronic_hero = Trope(name='Byronic Hero')
-    come_with_me = Trope(name='Come with Me If You Want to Live')
-    cool_bike = Trope(name='Cool Bike')
-    cool_boat = Trope(name='Cool Boat')
-    cool_car = Trope(name='Cool Car')
-    cool_guns = Trope(name='Cool Guns')
-    cool_helmet = Trope(name='Cool Helmet')
-    cool_plane = Trope(name='Cool Plane')
-    cool_horse = Trope(name='Cool Horse')
-    creater_cameo = Trope(name='Creator Cameo')
-    deus_ex_machina = Trope(name='Deus ex Machina')
-    dressing_as_the_enemy = Trope(name='Dressing as the Enemy')
-    the_dog_is_an_alien = Trope(name='The Dog Is an Alien')
-    the_dragon = Trope(name='The Dragon')
-    the_driver = Trope(name='The Driver')
-    evil_elevator = Trope(name='Evil Elevator')
-    the_faceless = Trope(name='The Faceless')
-    fake_ultimate_hero = Trope(name='Fake Ultimate Hero')
-    friends_all_along = Trope(name='Friends All Along')
-    great_escape = Trope(name='Great Escape')
-    heroic_sacrifice = Trope(name='Heroic Sacrifice')
-    i_lied = Trope(name='I Lied')
-    kick_the_dog = Trope(name='Kick the Dog')
-    love_obstructing_parents = Trope(name='Love-Obstructing Parents')
-    macguffin = Trope(name='MacGuffin')
-    my_favorite_shirt = Trope(name='My Favorite Shirt')
-    not_blood_siblings = Trope(name='Not Blood Siblings')
-    not_evil_just_misunderstood = Trope(name='Not Evil, Just Misunderstood')
-    not_quite_dead = Trope(name='Not Quite Dead')
-    one_man_army = Trope(name='One-Man Army')
-    secret_test = Trope(name='Secret Test')
-    self_description = Trope(name='Self-Deprecation')
-    stupid_boss = Trope(name='Stupid Boss')
-    take_a_third_option = Trope(name='Take a Third Option')
-    take_my_hand = Trope(name='Take My Hand')
-    terrible_trio = Trope(name='Terrible Trio')
-    use_your_hand = Trope(name='Use Your Head')
-    what_year_is_this = Trope(name='What Year Is This?')
-    you_are_number_six = Trope(name='You Are Number Six')
-    zombie_infectee = Trope(name='Zombie Infectee')
+    def add_trope(name):
+        if not tropes.get(name):
+            tropes[name] = Trope(name=name)
+
+    def add_tropes(names):
+        for name in names:
+            add_trope(name)
+
+    def get_trope(name):
+        return tropes.get(name)
+
+    def get_tropes(names):
+        for name in names:
+            if name:
+                yield name
+
+    add_tropes(
+        'Accidental Kidnapping',
+        'Action Duo',
+        'Action Girl',
+        'Adult Fear',
+        'After the End',
+        'Alien Invasion',
+        'All Just a Dream',
+        'Badass',
+        'Badass Grandpa',
+        'Big Eater',
+        'Black Comedy',
+        'Blue Blood: Literally',
+        'Bullet Time',
+        'Byronic Hero',
+        'Come with Me If You Want to Live',
+        'Cool Bike',
+        'Cool Boat',
+        'Cool Car',
+        'Cool Guns',
+        'Cool Helmet',
+        'Cool Plane',
+        'Cool Horse',
+        'Creator Cameo',
+        'Deus ex Machina',
+        'Dressing as the Enemy',
+        'The Dog Is an Alien',
+        'The Dragon',
+        'The Driver',
+        'Evil Elevator',
+        'The Faceless',
+        'Fake Ultimate Hero',
+        'Friends All Along',
+        'Great Escape',
+        'Heroic Sacrifice',
+        'I Lied',
+        'Kick the Dog',
+        'Love-Obstructing Parents',
+        'MacGuffin',
+        'My Favorite Shirt',
+        'Not Blood Siblings',
+        'Not Evil, Just Misunderstood',
+        'Not Quite Dead',
+        'One-Man Army',
+        'Secret Test',
+        'Self-Deprecation',
+        'Stupid Boss',
+        'Take a Third Option',
+        'Take My Hand',
+        'Terrible Trio',
+        'Use Your Head',
+        'What Year Is This?',
+        'You Are Number Six',
+        'Zombie Infectee',
+    )
 
     lor = make_film('The Lord of the Rings')
-    lor.tropes.update({
-        action_girl,
-        come_with_me,
-        friends_all_along,
-        i_lied,
-    })
+    lor.tropes.update(get_tropes({
+        'Come with Me If You Want to Live',
+        'Friends All Along',
+        'I Lied',
+    }))
 
     commando = make_film('Commando')
-    commando.tropes.update({
-        badass,
-        the_dragon,
-        i_lied,
-        one_man_army,
-    })
+    commando.tropes.update(get_tropes({
+        'Badass',
+        'The Dragon',
+        'I Lied',
+        'One-Man Army',
+    }))
 
     zombieland = make_film('Zombieland')
-    zombieland.tropes.update({
-        action_duo,
-        cool_car,
-        one_man_army,
-        zombie_infectee,
-    })
+    zombieland.tropes.update(get_tropes({
+        'Action Duo',
+        'Cool Car',
+        'One-Man Army',
+        'Zombie Infectee',
+    }))
 
     resident_evil = make_film('Resident Evil')
-    resident_evil.tropes.update({
-        action_girl,
-        evil_elevator,
-        take_a_third_option,
-        zombie_infectee,
-    })
+    resident_evil.tropes.update(get_tropes({
+        'Action Girl',
+        'Evil Elevator',
+        'Take a Third Option',
+        'Zombie Infectee',
+    }))
 
     titanic = make_film('Titanic')
-    titanic.tropes.update({
-        action_girl,
-        badass,
-        the_dragon,
-        take_a_third_option,
-        macguffin,
-    })
+    titanic.tropes.update(get_tropes({
+        'Action Girl',
+        'Badass',
+        'The Dragon',
+        'Take a Third Option',
+        'MacGuffin',
+    }))
 
     man_in_black = make_film('Men in Black')
-    man_in_black.tropes.update({
-        cool_car,
-        creater_cameo,
-        the_dog_is_an_alien,
-        macguffin,
-        secret_test,
-    })
+    man_in_black.tropes.update(get_tropes({
+        'Cool Car',
+        'Creator Cameo',
+        'The Dog Is an Alien',
+        'MacGuffin',
+        'Secret Test',
+    }))
 
     the_wizard_of_oz = make_film('The Wizard of Oz')
-    the_wizard_of_oz.tropes.update({
-        adult_fear,
-        cool_horse,
-        kick_the_dog,
-        macguffin,
-    })
+    the_wizard_of_oz.tropes.update(get_tropes({
+        'Adult Fear',
+        'Cool Horse',
+        'Kick the Dog',
+        'MacGuffin',
+    }))
 
     the_amazing_spider_man = make_film('The Amazing Spider-Man')
-    the_amazing_spider_man.tropes.update({
-        adult_fear,
-        big_eater,
-        byronic_hero,
-        kick_the_dog,
-    })
+    the_amazing_spider_man.tropes.update(get_tropes({
+        'Adult Fear',
+        'Big Eater',
+        'Byronic Hero',
+        'Kick the Dog',
+    }))
 
     v_for_vendetta = make_film('V for Vendetta')
-    v_for_vendetta.tropes.update({
-        after_the_end,
-        the_faceless,
-        byronic_hero,
-        secret_test,
-        you_are_number_six,
-    })
+    v_for_vendetta.tropes.update(get_tropes({
+        'After the End',
+        'The Faceless',
+        'Byronic Hero',
+        'Secret Test',
+        'You Are Number Six',
+    }))
 
     stardust = make_film('Stardust')
-    stardust.tropes.update({
-        black_comedy,
-        blue_blood_literally,
-        terrible_trio,
-        you_are_number_six,
-    })
+    stardust.tropes.update(get_tropes({
+        'Black Comedy',
+        'Blue Blood: Literally',
+        'Terrible Trio',
+        'You Are Number Six',
+    }))
 
     monty_pythons_the_meaning_of_life = \
         make_film("Monty Python's The Meaning of Life")
-    monty_pythons_the_meaning_of_life.tropes.update({
-        badass_grandpa,
-        black_comedy,
-        self_description,
-        stupid_boss,
-    })
+    monty_pythons_the_meaning_of_life.tropes.update(get_tropes({
+        'Badass Grandpa',
+        'Black Comedy',
+        'Self-Deprecation',
+        'Stupid Boss',
+    }))
 
     die_hard = make_film('Die Hard')
-    die_hard.tropes.update({
-        badass_grandpa,
-        the_dragon,
-        the_driver,
-        secret_test,
-    })
+    die_hard.tropes.update(get_tropes({
+        'Badass Grandpa',
+        'The Dragon',
+        'The Driver',
+        'Secret Test',
+    }))
 
     captain_america_the_first_avenger = \
         make_film('Captain America: The First Avenger')
-    captain_america_the_first_avenger.tropes.update({
-        action_girl,
-        cool_bike,
-        cool_boat,
-        cool_guns,
-        cool_helmet,
-        cool_plane,
-        cool_car,
-        fake_ultimate_hero,
-        secret_test,
-    })
+    captain_america_the_first_avenger.tropes.update(get_tropes({
+        'Action Girl',
+        'Cool Bike',
+        'Cool Boat',
+        'Cool Guns',
+        'Cool Helmet',
+        'Cool Plane',
+        'Cool Car',
+        'Fake Ultimate Hero',
+        'Secret Test',
+    }))
 
     maverick = make_film('Maverick')
-    maverick.tropes.update({
-        fake_ultimate_hero,
-        friends_all_along,
-        my_favorite_shirt,
-        take_my_hand,
-    })
+    maverick.tropes.update(get_tropes({
+        'Fake Ultimate Hero',
+        'Friends All Along',
+        'My Favorite Shirt',
+        'Take My Hand',
+    }))
 
     the_matrix = make_film('The Matrix')
-    the_matrix.tropes.update({
-        heroic_sacrifice,
-        my_favorite_shirt,
-        take_my_hand,
-        use_your_hand,
-    })
+    the_matrix.tropes.update(get_tropes({
+        'All Just a Dream',
+        'Bullet Time',
+        'Heroic Sacrifice',
+        'My Favorite Shirt',
+        'Take My Hand',
+        'Use Your Head',
+    }))
 
     the_terminator = make_film('The Terminator')
-    the_terminator.tropes.update({
-        come_with_me,
-        heroic_sacrifice,
-        kick_the_dog,
-        what_year_is_this,
-    })
+    the_terminator.tropes.update(get_tropes({
+        'Come with Me If You Want to Live',
+        'Heroic Sacrifice',
+        'Kick the Dog',
+        'What Year Is This?',
+    }))
 
     jumanji = make_film('Jumanji')
-    jumanji.tropes.update({
-        adult_fear,
-        badass,
-        deus_ex_machina,
-        heroic_sacrifice,
-        what_year_is_this,
-    })
+    jumanji.tropes.update(get_tropes({
+        'Adult Fear',
+        'Badass',
+        'Deus ex Machina',
+        'Heroic Sacrifice',
+        'What Year Is This?',
+    }))
+
+    independence_day = make_film('Independence Day')
+    independence_day.tropes.update(get_tropes({
+        'Alien Invasion',
+    }))
 
     with flask_app.app_context():
         engine = get_database_engine()
