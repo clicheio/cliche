@@ -228,10 +228,6 @@ def dummy():
         if not tropes.get(name):
             tropes[name] = Trope(name=name)
 
-    def add_tropes(names):
-        for name in names:
-            add_trope(name)
-
     def get_trope(name):
         add_trope(name)
         return tropes[name]
