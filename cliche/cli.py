@@ -391,7 +391,7 @@ def dummy():
         'Alien Invasion',
     }))
 
-    naruto = make_work('Naruto', 'Anime')
+    naruto = make_work('Naruto', 'Animation')
     naruto.tropes.update(get_tropes({
         "Early-Bird Cameo",
         "Early Installment Weirdness",
@@ -409,7 +409,8 @@ def dummy():
         "Empathic Environment",
         "Empowered Badass Normal",
         "Ending Theme",
-        "End of an Age / Dawn of an Era",
+        "End of an Age",
+        "Dawn of an Era",
         "The End of the World as We Know It",
         "The End... Or Is It?",
         "Enemy Civil War",
@@ -673,7 +674,8 @@ def dummy():
         "Nobody Poops",
         "Nonhumans Lack Attributes",
         "The Nose Bleed",
-        "Not a Date / She Is Not My Girlfriend",
+        "Not a Date",
+        "She Is Not My Girlfriend",
         "Not Cheating Unless You Get Caught",
         "Not Even Human",
         "Nothing but Skin and Bones",
@@ -757,7 +759,8 @@ def dummy():
         "Sealed Evil in a Can",
         "Self-Duplication",
         "Self Healing Phlebotinum",
-        "Sempai/Kohai",
+        "Sempai",
+        "Kohai",
         "Series Continuity Error",
         "Serpent of Immortality",
         "Sexposition",
@@ -829,7 +832,6 @@ def dummy():
         "Troll",
         "True Companions",
         "Try Not to Die",
-        "Tsundere",
         "Tunnel King",
         "Turtle Island",
         "Two Guys and a Girl",
@@ -882,7 +884,7 @@ def dummy():
         "Your Mind Makes It Real",
     }))
 
-    onepiece = make_work('One Piece', 'Anime')
+    onepiece = make_work('One Piece', 'Animation')
     onepiece.tropes.update(get_tropes({
         "Abhorrent Admirer",
         "The Abridged Series",
@@ -933,8 +935,8 @@ def dummy():
         "Animal Talk",
         "Animate Dead",
         "Animation Bump",
-        "Animesque",
-        "Anime Theme Song",
+        "Animationsque",
+        "Animation Theme Song",
         "Animorphism",
         "Annoying Arrows",
         "Arbitrary Skepticism",
@@ -1090,7 +1092,8 @@ def dummy():
         "Charles Atlas Superpower",
         "Charlie Brown from Outta Town",
         "Chaste Hero",
-        "Chekhov's Armoury\Chekhov's Army",
+        "Chekhov's Armoury",
+        "Chekhov's Army",
         "Cheerful Child",
         "Chef of Iron",
         "Cherry Blossoms",
@@ -1305,7 +1308,7 @@ def dummy():
         "Fur Bikini",
     }))
 
-    sailor_moon = make_work('Sailor Moon', 'Anime')
+    sailor_moon = make_work('Sailor Moon', 'Animation')
     sailor_moon.tropes.update(get_tropes({
         'Action Girl',
         'Dangerously Short Skirt',
@@ -1360,7 +1363,8 @@ def dummy():
         'Forgotten Phlebotinum',
         'Four Is Death',
         'Frilly Upgrade',
-        'Genre Popularizer / Trope Codifier',
+        'Genre Popularizer',
+        'Trope Codifier',
         'Giant Waist Ribbon',
         'A God Am I',
         'Grand Finale',
@@ -1478,7 +1482,7 @@ def dummy():
         'You Have Failed Me',
     }))
 
-    speed_racer = make_work('Speed Racer', 'Anime')
+    speed_racer = make_work('Speed Racer', 'Animation')
     speed_racer.tropes.update(get_tropes({
         'The Abridged Series',
         'Adaptation Dye-Job',
@@ -1612,7 +1616,8 @@ def dummy():
         'Cue the Sun',
         'Cup Holders',
         'Curse Escape Clause',
-        'Cuteness Overload/Cuteness Proximity',
+        'Cuteness Overload',
+        'Cuteness Proximity',
         'Dagwood Sandwich',
         'Damsel in Distress',
         'Dance Party Ending',
@@ -1795,8 +1800,6 @@ def dummy():
         'Rant Inducing Slight',
         'Reality Ensues',
         'Reality Is Unrealistic',
-        'Both',
-        'Both',
         'Rebellious Princess',
         'Recognition Failure',
         'Red Oni, Blue Oni',
@@ -1826,7 +1829,8 @@ def dummy():
         'Ship Tease',
         'Shoo Out the Clowns',
         'Shout-Out Theme Naming',
-        'Shut Up, Hannibal! / Talk to the Fist',
+        'Shut Up, Hannibal!',
+        'Talk to the Fist',
         '"Shut Up" Kiss',
         'Sibling Yin-Yang',
         'Sidekick Song',
@@ -1837,8 +1841,6 @@ def dummy():
         'Snow Means Death',
         'Softer And Slower Cover',
         'The Sociopath',
-        'The title is even worse in Chinese',
-        'A great Woolseyism in the Finnish translation',
         'The Stinger',
         'Storming the Castle',
         'Sugar and Ice Personality',
