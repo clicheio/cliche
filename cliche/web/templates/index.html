@@ -19,9 +19,29 @@
   <script>
     (function($)
     {
+
       $(document).ready(function()
       {
         var $search_btn = $('#search_btn');
+
+          tropes_ = [
+          {% for trope in tropes %}
+            $('<textarea />').html("{{ trope.name }}").text(),
+          {% endfor %}
+          ];
+
+          trope_id = {
+          {% for trope in tropes %}
+            "{{ trope.name }}" : "{{ trope.id }}",
+          {% endfor %}
+          };
+
+        $('#adv_search').submit(function()
+        {
+          $('.detail_name').each(function(){
+            $(this).next('input[type=hidden]').val(trope_id[$(this).val()]);
+          })
+        });
 
         $('#more_info').click(function()
         {
@@ -38,6 +58,7 @@
           );
         });
 
+
         $('#more_cliche').click(function()
         {
           $search_btn.before(
@@ -46,13 +67,14 @@
             '<select name="category[]">' +
             '<option value="0">All Tropes</option>' +
             '</select>' +
-            '<select name="detail[]">' +
-            {% for trope in tropes %}
-              '<option value="{{ trope.id }}">{{ trope.name }}</option>' +
-            {% endfor %}
-            '</select>' +
+            '<input class="tags detail_name" type="text"><input type="hidden" name="detail[]">' +
             '</p>'
           );
+
+
+          $( ".tags" ).autocomplete({
+            source: tropes_
+          });
         });
       })
     })(jQuery);

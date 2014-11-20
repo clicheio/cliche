@@ -4,6 +4,7 @@
 """
 import datetime
 import urllib.parse
+from urllib.parse import unquote_plus
 import logging
 
 from flask import Flask, current_app, g, render_template
@@ -68,6 +69,8 @@ def get_sentry() -> Sentry:
 def index():
     """Cliche.io web index page."""
     tropes = sa_session.query(Trope).order_by(Trope.name)
+    for x in tropes:
+        x.name = unquote_plus(x.name)
     return render_template('index.html', tropes=tropes)
 
 
