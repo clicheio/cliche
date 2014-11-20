@@ -1,0 +1,24 @@
+{% extends "page.html" %}
+{% block page_title %}
+  <a href="{{ url_for('.trope_list') }}">Trope</a> / {{ name }}
+{% endblock %}
+
+{% block tbody %}
+  <tr class="name">
+    <th scope="row">name</th>
+    <td>{{ name }}</td>
+  </tr>
+
+  {% if work_names %}
+    <tr class="works">
+      <th role="row">works</th>
+      <td>
+        <ul>
+          {% for work in work_names %}
+            <li><a href="{{ url_for('.work_page', title=work) }}">{{ work }}</a></li>
+          {% endfor %}
+        </ul>
+      </td>
+    </tr>
+  {% endif %}
+{% endblock %}

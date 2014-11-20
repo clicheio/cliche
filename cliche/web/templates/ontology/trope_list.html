@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %} - list of Tropes{% endblock %}
+{% block body %}
+  <table class="list">
+    <caption>List of <a href="{{ url_for('.trope_list') }}">Trope</a></caption>
+    <thead>
+    <tr>
+      <th>Name</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for name in trope_list %}
+      <tr>
+        <td><a href="{{ url_for('.trope_page', name=name) }}">{{ name }}</a></td>
+      </tr>
+    {% else %}
+      <tr>
+        <td>No contents here now.</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

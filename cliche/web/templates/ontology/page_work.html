@@ -1,4 +1,8 @@
 {% extends "page.html" %}
+{% block page_title %}
+<a href="{{ url_for('.work_list') }}">Work</a> / {{ title }}
+{% endblock %}
+
 {% block tbody %}
   <tr class="name">
     <th scope="row">name</th>
@@ -18,7 +22,7 @@
       <td>
         <ul>
           {% for val in work.genres %}
-            <li><a href="{{ url_for('.page', type_='genre', title=val.name) }}">{{ val.name }}</a></li>
+            <li><a href="#">{{ val.name }}</a></li>
           {% endfor %}
         </ul>
       </td>
@@ -44,12 +48,12 @@
                 {% if team_id is none %}
                   <tr>
                     <td colspan="2" class="name">
-                      <a href="{{ url_for('.page', type_='person', title=credit.person.id) }}">
+                      <a href="#">
                         {{- credit.person.canonical_name(locale) -}}
                       </a>
                     </td>
                     <td class="role">
-                      <a href="{{ url_for('.page', type_='role', title=credit.role.id) }}">
+                      <a href="#">
                         {{- credit.role.value -}}
                       </a>
                     </td>
@@ -58,18 +62,18 @@
                   <tr>
                     {% if loop.first %}
                       <td rowspan="{{ loop.length }}" class="team">
-                        <a href="{{ url_for('.page', type_='team', title=credit.team.id) }}">
+                        <a href="#">
                           {{- credit.team.canonical_name(locale) -}}
                         </a>
                       </td>
                     {% endif %}
                     <td class="name">
-                      <a href="{{ url_for('.page', type_='person', title=credit.person.id) }}">
+                      <a href="#">
                         {{- credit.person.canonical_name(locale) -}}
                       </a>
                     </td>
                     <td class="role">
-                      <a href="{{ url_for('.page', type_='role', title=credit.role.value) }}">
+                      <a href="#">
                         {{- credit.role.value -}}
                       </a>
                     </td>
@@ -83,13 +87,13 @@
     </tr>
   {% endif %}
 
-  {% if work.tropes %}
+  {% if trope_names %}
     <tr class="tropes">
       <th role="row">tropes</th>
       <td>
         <ul>
-          {% for trope in work.tropes %}
-            <li>{{ trope.name }}</li>
+          {% for trope in trope_names %}
+            <li><a href="{{ url_for('.trope_page', name=trope) }}">{{ trope }}</a></li>
           {% endfor %}
         </ul>
       </td>
