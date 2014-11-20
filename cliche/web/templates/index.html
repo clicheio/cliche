@@ -10,7 +10,7 @@
     {% endif %}
   {% endwith %}
 
-  <form id="adv_search" method="post" action="{{ url_for('adv_search.result') }}">
+  <form id="adv_search" method="post" role="form" action="{{ url_for('adv_search.result') }}">
     <h1>Cliche.io</h1>
     <p>Find My Work!</p>
     <p>I know more <button id="more_info" type="button">infomation(Media)</button> or <button id="more_cliche" type="button">tropes(tropes, cliche)</button></p>
@@ -23,17 +23,9 @@
       {
         var $search_btn = $('#search_btn');
 
-        tropes_ = [
-        {% for trope in tropes %}
-          "{{ trope.name }}",
-        {% endfor %}
-        ];
+        trope_names = {{ trope_names | safe}};
 
-        trope_id = {
-        {% for trope in tropes %}
-          "{{ trope.name }}": d"{{ trope.id }}",
-        {% endfor %}
-        };
+        trope_id = {{ trope_id | safe}};
 
         $('#adv_search').submit(function()
         {
@@ -71,7 +63,7 @@
           );
 
           $( ".tags" ).autocomplete({
-            source: tropes_
+            source: trope_names
           });
         });
       })

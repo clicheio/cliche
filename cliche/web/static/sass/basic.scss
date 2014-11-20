@@ -71,6 +71,13 @@ form#adv_search {
     @extend .btn-default;
 
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+
+    .detail_name {
+      @extend .form-control;
+
+      display: inline-block;
+      width: 70%;
+    }
   }
 
 
