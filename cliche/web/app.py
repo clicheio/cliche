@@ -67,7 +67,7 @@ def get_sentry() -> Sentry:
 @app.route('/')
 def index():
     """Cliche.io web index page."""
-    tropes = sa_session.query(Trope)
+    tropes = sa_session.query(Trope).order_by(Trope.name)
     return render_template('index.html', tropes=tropes)
 
 

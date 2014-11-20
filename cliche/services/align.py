@@ -9,6 +9,7 @@ from urllib.parse import unquote_plus
 from sqlalchemy import ForeignKeyConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Column, ForeignKey
+from sqlalchemy.sql import func
 from sqlalchemy.types import Integer, String
 
 from .tvtropes.entities import ClicheTvtropesEdge, Entity as Tvtropes
@@ -169,3 +170,75 @@ def alignment():
                 trope = next(tv_iter)
         except StopIteration:
             break
+
+
+def matching_from_cliche_tvtropes_edges():
+    # assume there are a few cliche-tvtropes edges
+
+    with app.app_context():
+        with session.begin():
+            session.query(ClicheTvtropesEdge).update({'available': True})
+
+            while True:
+                max_conf = session \
+                    .query(func.max(ClicheTvtropesEdge.confidence)) \
+                    .filter_by(available=True) \
+                    .scalar()
+                if not max_conf:
+                    break
+
+                matching = session \
+                    .query(ClicheTvtropesEdge) \
+                    .filter_by(confidence=max_conf, available=True) \
+                    .first()
+
+                cliche_work = matching.cliche_work
+                tvtropes_entity = matching.tvtropes_entity
+
+                session.query(ClicheTvtropesEdge) \
+                       .filter_by(cliche_work=cliche_work,
+                                  available=True) \
+                       .update({'available': False})
+
+                session.query(ClicheTvtropesEdge) \
+                       .filter_by(tvtropes_entity=tvtropes_entity,
+                                  available=True) \
+                       .update({'available': False})
+
+                yield matching
+
+
+def matching_from_cliche_wikipedia_edges():
+    # assume there are a few cliche-wikipedia edges
+
+    with app.app_context():
+        with session.begin():
+            session.query(ClicheWikipediaEdge).update({'available': True})
+
+            while True:
+                max_conf = session \
+                    .query(func.max(ClicheWikipediaEdge.confidence)) \
+                    .filter_by(available=True) \
+                    .scalar()
+                if not max_conf:
+                    break
+
+                matching = session \
+                    .query(ClicheWikipediaEdge) \
+                    .filter_by(confidence=max_conf, available=True) \
+                    .first()
+
+                cliche_work = matching.cliche_work
+                wikipedia_work = matching.wikipedia_work
+
+                session.query(ClicheWikipediaEdge) \
+                       .filter_by(cliche_work=cliche_work,
+                                  available=True) \
+                       .update({'available': False})
+
+                session.query(ClicheWikipediaEdge) \
+                       .filter_by(wikipedia_work=wikipedia_work,
+                                  available=True) \
+                       .update({'available': False})
+
+                yield matching

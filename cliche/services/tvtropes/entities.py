@@ -7,7 +7,7 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Column, ForeignKey, ForeignKeyConstraint
 from sqlalchemy.sql.expression import and_
-from sqlalchemy.types import DateTime, Integer, String
+from sqlalchemy.types import Boolean, DateTime, Float, Integer, String
 
 from ...orm import Base
 from ...work import Work
@@ -103,7 +103,11 @@ class ClicheTvtropesEdge(Base):
     tvtropes_entity = relationship(Entity,
                                    foreign_keys=[tvtropes_namespace,
                                                  tvtropes_name])
-    confidence = Column(Integer, default=0.5)
+    confidence = Column(Float, default=0.5, index=True)
+
+    #: (:class:`bool`) used in matching process.
+    #: denote available edge in process
+    available = Column(Boolean, nullable=False, default=True, index=True)
 
     __tablename__ = 'cliche_tvtropes_edges'
     __table_args__ = (
