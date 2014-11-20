@@ -13,6 +13,7 @@ from alembic.util import CommandError
 from click import Path, argument, echo, group, option
 from flask import _request_ctx_stack
 from sassutils.wsgi import SassMiddleware
+from sqlalchemy.sql.functions import count
 from werkzeug.utils import import_string
 
 from .celery import app as celery_app
@@ -23,7 +24,7 @@ from .sqltypes import HashableLocale
 from .web.app import (app as flask_app,
                       setup_sentry as flask_setup_sentry)
 from .web.db import get_database_engine, session
-from .work import Trope, Work
+from .work import Trope, Work, WorkTrope
 from .services.align import alignment
 
 
@@ -5339,6 +5340,14 @@ def dummy():
         with session.begin():
             session.add_all(works)
 
+        single_tropes = session.query(WorkTrope.trope_id). \
+            group_by(WorkTrope.trope_id). \
+            having(count() == 1).all()
+
+        for trope in single_tropes:
+            trope = session.query(Trope).get(trope)
+            with session.begin():
+                session.delete(trope)
 
 #: (:class:`collections.abc.Callable`) The CLI entry point.
 main = cli
