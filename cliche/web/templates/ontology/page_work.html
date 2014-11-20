@@ -82,4 +82,17 @@
       </td>
     </tr>
   {% endif %}
+
+  {% if work.tropes %}
+    <tr class="tropes">
+      <th role="row">tropes</th>
+      <td>
+        <ul>
+          {% for trope in work.tropes %}
+            <li>{{ trope.name }}</li>
+          {% endfor %}
+        </ul>
+      </td>
+    </tr>
+  {% endif %}
 {% endblock %}
