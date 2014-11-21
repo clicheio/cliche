@@ -9,14 +9,14 @@
       </ul>
     {% endif %}
   {% endwith %}
-  <div style="font-family:Lobster;text-align:center;margin: 0 auto;">
-  <h1 style="font-size:10rem;">Cliche.io</h1><br style="font-size:10rem;" />
-  <h2 style="position:relative; top:-4.25rem;font-size:3rem;">Find My Work!</h2>
+  <div class="header-group">
+  <h1>Cliche.io</h1>
+  <h2>Find My Work!</h2>
   </div>
-  <div style="position:relative; top: -2rem;max-width: 120rem; margin: 0 auto;">
-    <form style="text-align:center;" id="adv_search" method="post" role="form" action="{{ url_for('adv_search.result') }}">
-      <p style="font-family:Lato;font-style:italic; text-align:center;" id="add_desc">I can come up with more <button id="more_info" type="button" style="font-style:normal">infomation(Media)</button> or <button id="more_cliche" type="button" style="font-style:normal">tropes(tropes, cliche)</button></p>
-      <input style="position:relative; top:2rem; width: 30rem;" id="search_btn" type="submit" value="Search!">
+  <div id="adv_search_container">
+    <form id="adv_search" method="post" role="form" action="{{ url_for('adv_search.result') }}">
+      <p id="add_desc">I can come up with more <button id="more_info" type="button">infomation(Media)</button> or <button id="more_cliche" type="button">tropes(tropes, cliche)</button></p>
+      <input id="search_btn" type="submit" value="Search!">
     </form>
   </div>
   <script>
@@ -26,9 +26,9 @@
       {
         var $add_desc = $('#add_desc');
 
-        trope_names = {{ trope_names | safe}};
+        trope_names = {{ trope_names | safe }};
 
-        trope_id = {{ trope_id | safe}};
+        trope_id = {{ trope_id | safe }};
 
         $('#adv_search').submit(function()
         {

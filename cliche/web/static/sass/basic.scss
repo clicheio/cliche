@@ -1,7 +1,7 @@
 @import "../bootstrap-sass/assets/stylesheets/bootstrap";
 
 @import url(https://fonts.googleapis.com/css?family=Lobster);
-@import url(http://fonts.googleapis.com/css?family=Lato:400italic,400);
+@import url(https://fonts.googleapis.com/css?family=Lato:400italic,400);
 
 @mixin make-middle($width) {
   @include make-sm-column($width);
@@ -54,48 +54,79 @@ table.adv_search_result {
   @extend .table-bordered;
 
 }
-
-form#adv_search {
-  @include make-middle(8);
-  @extend .jumbotron;
-
-  text-align: right;
-
-  > * {
-    clear: both;
-    text-align: left;
+.header-group {
+  font-family: 'Lobster';
+  margin: 0 auto;
+  text-align: center;
+  h1 {
+    font-size: 10rem;
+    margin-bottom: 10rem;
   }
+  h2 {
+    font-size: 3rem;
+    position: relative;
+    top: -4.25rem;
+  }
+}
 
-  #more_info,
-  #more_cliche {
-    @extend .btn;
-    @extend .btn-default;
+#adv_search_container {
+  max-width: 120rem;
+  margin: 0 auto;
+  position: relative;
+  top: -2rem;
 
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  #adv_search {
+    @include make-middle(8);
+    @extend .jumbotron;
 
-    .detail_name {
-      @extend .form-control;
+    text-align: center;
 
-      display: inline-block;
-      width: 70%;
+    > * {
+      clear: both;
+      text-align: left;
     }
-  }
+    #add_desc {
+      font-family: 'Lato';
+      font-style: italic;
+      text-align: center;
+    }
 
+    #more_info,
+    #more_cliche {
+      @extend .btn;
+      @extend .btn-default;
 
-  #search_btn {
-    @extend .btn;
-    @extend .btn-primary;
-    @extend .btn-lg;
-  }
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-style: normal;
 
-  .more_query {
-    background: #ddd;
-    border-radius: 2rem;
-    padding: 2rem;
+      .detail_name {
+        @extend .form-control;
+
+        display: inline-block;
+        width: 70%;
+      }
+    }
+
+    #search_btn {
+      @extend .btn;
+      @extend .btn-primary;
+      @extend .btn-lg;
+
+      position: relative;
+      top: 2rem;
+      width: 30rem;
+    }
+
+    .more_query {
+      background: #ddd;
+      border-radius: 2rem;
+      padding: 2rem;
+    }
   }
 }
 
 footer {
+  font-family: "Lato";
   p {
     text-align: center;
   }
