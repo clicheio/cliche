@@ -55,17 +55,20 @@ table.adv_search_result {
 
 }
 .header-group {
+  @extend .clearfix;
   font-family: 'Lobster';
   margin: 0 auto;
   text-align: center;
   h1 {
     font-size: 10rem;
-    margin-bottom: 10rem;
   }
   h2 {
     font-size: 3rem;
     position: relative;
     top: -4.25rem;
+  }
+  br {
+    font-size: 10rem;
   }
 }
 
