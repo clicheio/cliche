@@ -15,7 +15,7 @@
   </div>
   <div id="adv_search_container">
     <form id="adv_search" method="post" role="form" action="{{ url_for('adv_search.result') }}">
-      <p id="add_desc">I can come up with more <button id="more_info" type="button">Media</button> or <button id="more_cliche" type="button">Tropes</button></p>
+      <p id="add_desc">I can come up with <span id="more_article">a</span> <button id="more_info" type="button">Media</button> or <button id="more_cliche" type="button">Tropes</button> ...</p>
       <input id="search_btn" type="submit" value="Search!">
     </form>
   </div>
@@ -25,6 +25,8 @@
       $(document).ready(function()
       {
         var $add_desc = $('#add_desc');
+
+        var $more_article = $('#more_article');
 
         trope_names = {{ trope_names | safe }};
 
@@ -39,7 +41,17 @@
 
         $('#more_info').click(function()
         {
-          $add_desc.before(
+          if ($more_article.text() == 'a') {
+            $add_desc.fadeOut(200, more_media());
+          }
+          else
+          {
+            more_media();
+          }
+        });
+
+        function more_media() {
+          var $more_query = $(
             '<p class="more_query">' +
             '<input type="hidden" name="about[]" value="info">' +
             '<select name="category[]"><option value="media">Media</option></select>: ' +
@@ -49,13 +61,33 @@
             '<option value="TV Series">TV Series</option>' +
             '</select>' +
             '</p>'
-          );
-        });
-
+          )
+          $more_query.hide()
+          $add_desc.before($more_query);
+          $more_query.slideDown(200, function() {
+            if ($more_article.text() == 'a') {
+              $more_article.text('more');
+              $add_desc.fadeIn(200);
+            }
+          });
+          $('html, body').animate({
+            scrollTop: $more_query.offset().top
+          }, 500);
+        }
 
         $('#more_cliche').click(function()
         {
-          $add_desc.before(
+          if ($more_article.text() == 'a') {
+            $add_desc.fadeOut(200, more_cliche());
+          }
+          else
+          {
+            more_cliche();
+          }
+        });
+
+        function more_cliche() {
+          var $more_query = $(
             '<p class="more_query">' +
             '<input type="hidden" name="about[]" value="trope">' +
             '<select name="category[]">' +
@@ -63,12 +95,23 @@
             '</select>' +
             '<input style="width: 80%" class="tags detail_name" type="text"><input type="hidden" name="detail[]">' +
             '</p>'
-          );
+          )
+          $more_query.hide()
+          $add_desc.before($more_query);
+          $more_query.slideDown(200, function() {
+            if ($more_article.text() == 'a') {
+              $more_article.text('more');
+              $add_desc.fadeIn(200);
+            }
+          });
+          $('html, body').animate({
+            scrollTop: $more_query.offset().top
+          }, 500);
 
           $( ".tags" ).autocomplete({
             source: trope_names
           });
-        });
+        }
       })
     })(jQuery);
   </script>
