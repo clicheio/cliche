@@ -17,9 +17,7 @@ env:
   - secure: "UwuBYCWianghVXrP8q0MLLQK8bGCvb+lu/K/H8b8qLZLhDH82IytLUra6262SAdfZUCf06SUPFFPjI8ptWGfksMKiuF9zAGBojcmah/TmNdaP5YWp817YeQGpkr1BxWsMTYXVMfGk85ehNoVrR5F8q66wGuVerKNa1eHxfNEyFM="
   - secure: "U+Q1YEBypBmWrffsjFaN9Oqm/oDasAyKfMfpSEzQrPS5u9JYbvU5vBIyGRktdUyx+tvLY+RdfOdh6liszw8baN+5dsvS7LnoSxF6cwiMf8pWh3754zlOPVElyx+54D2rKnPFjZOzI8qMiU6m2L0njQd3EXQGCmze8tu8RdNd844="
   - secure: "Cu0y6JEqapgqfMOBSAIDkZ4jT22mMt6svZbNl1b2UdICIm08XRw1Th3m5yU4vPaQANPVQYXpXDMXXMsM/yKGqYv9o9Nvf/E1bnlm9FpnsA8uaR/eWRvwec7UVCG4w8MGmHVNLtHC/Hpv7FPMM3/TJUYhrCmz6DjU5YokzFHfQ/s="
-  - secure: "HUfe3dKmAUsHNIFKZKgIcx6qc8pdTAxuV9sP0kDP4eGhvBA7/3TOb/B5cEG3fXaHpDoHGlU9eGYJuxAjA1iFlHWZfEuXdX0gexl3YifMjtdPwuS3s/uHulZfAQqkYM5IjJuAGJNO1VgoDd3eZqRSCWhEEYJVt4IueSiYi6lRFEA="
   - secure: "AriQB92U1k0Djek2czndC5tYqx6TmwCZWmpzIwCfP+dF8pzT/d5pZmzWGh0KU2GnE4JGzZ8FzDtjVPmC4dzn+UPzuH5B1sj07V1lfUJIarSYQBxK0HgXPs1qIZ2f5Aup/OPwQ7kPDfc0qmP+3i9KcHcx8+qQkspPXDSv+ZKYABc="
-  - secure: "abpzA7DMzbAoOe8SvP3IgCC40WdzPyT1Xsuw0qF5bMZxfvoLAyHz/GfIXh8qoDsBjJgkbsaeRb3QQ25MNheoiqSTEFfoDK2syucqfQxTFpS+2cP1pfpARzLQDwRvTw8w1T1J86Yd3svdtfmIOmKHYg55sCb7tkJIMVan2Bt00WE="
   - secure: "VuAQNt2USB4KO+OlzBN0GXbrf3dzkIWNu2Seh5iVMwUeD4vd4Fro2Wi6Ybd0k0sn0zzRK2h2sTgz+u/nGYy/IZd1hfUJyiGcuSI36+CLIgIHh/Uk5IvRxo4/9XfaV4Tiy1/deAG0gmc2TAXQSkeDWuWEEXhx8VHAx7CGt8mkIxQ="
 python:
 - 3.4
@@ -66,8 +64,7 @@ after_success:
   then deploy/deploy.py -i deploy/cliche_deploy_key -b "$TRAVIS_BUILD_NUMBER"
   -c deploy/prod.cfg.yml -d "$DBHOST" --db-username "$DBUSER" --db-password "$DBPASSWORD"
   -r "$REDISHOST" --redis-password "$REDISPASSWORD" --sentry-dsn "$SENTRY_DSN"
-  --crawler "$CRAWLER1" --crawler "$CRAWLER2"
-  --web-worker "$WEB1" --web-worker "$WEB2" --beat "$BEAT"; fi;
+  --crawler "$CRAWLER1" --web-worker "$WEB1" --beat "$BEAT"; fi;
 notifications:
   irc:
     channels:
