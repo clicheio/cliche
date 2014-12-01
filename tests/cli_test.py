@@ -31,7 +31,8 @@ def test_upgrade_wrong_path():
     assert exit_code == 2
 
 
-def test_upgrade_fine_use_metadata(fx_cfg_yml_file_use_db_url):
+def test_upgrade_fine_use_metadata(fx_cfg_yml_file_use_db_url,
+                                   fx_only_support_pgsql):
     """work normally, no additional options"""
     database_engine = app.config['DATABASE_ENGINE']
     Base.metadata.drop_all(bind=database_engine)
@@ -46,6 +47,8 @@ def test_upgrade_fine_use_metadata(fx_cfg_yml_file_use_db_url):
     out, err = p.communicate()
     exit_code = p.returncode
     assert 'INFO  [alembic.migration]' in err.decode('u8')
+    import pdb
+    pdb.set_trace()
     assert exit_code == 0
 
 
@@ -70,7 +73,7 @@ def test_upgrade_fine_use_alembic(fx_cfg_yml_file_use_db_url,
     )
     out, err = p.communicate()
     exit_code = p.returncode
-    assert 'Running upgrade None -> 27e81ea4d86, Add people table' in \
+    assert 'Running upgrade  -> 27e81ea4d86, Add people table' in \
         err.decode('u8')
     assert exit_code == 0
 
@@ -188,7 +191,7 @@ def test_upgrade_downgrade_fail_after_upgrade(fx_cfg_yml_file_use_db_url,
     )
     out, err = p.communicate()
     exit_code = p.returncode
-    assert "No such revision 'zzzzzzzzzzz'" in err.decode('u8')
+    assert "No such revision or branch 'zzzzzzzzzzz'" in err.decode('u8')
     assert exit_code == 1
 
 
