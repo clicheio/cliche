@@ -31,8 +31,7 @@ def test_upgrade_wrong_path():
     assert exit_code == 2
 
 
-def test_upgrade_fine_use_metadata(fx_cfg_yml_file_use_db_url,
-                                   fx_only_support_pgsql):
+def test_upgrade_fine_use_metadata(fx_cfg_yml_file_use_db_url):
     """work normally, no additional options"""
     database_engine = app.config['DATABASE_ENGINE']
     Base.metadata.drop_all(bind=database_engine)
