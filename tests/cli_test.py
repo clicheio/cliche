@@ -70,7 +70,7 @@ def test_upgrade_fine_use_alembic(fx_cfg_yml_file_use_db_url,
     )
     out, err = p.communicate()
     exit_code = p.returncode
-    assert 'Running upgrade None -> 27e81ea4d86, Add people table' in \
+    assert 'Running upgrade  -> 27e81ea4d86, Add people table' in \
         err.decode('u8')
     assert exit_code == 0
 
@@ -188,7 +188,7 @@ def test_upgrade_downgrade_fail_after_upgrade(fx_cfg_yml_file_use_db_url,
     )
     out, err = p.communicate()
     exit_code = p.returncode
-    assert "No such revision 'zzzzzzzzzzz'" in err.decode('u8')
+    assert "No such revision or branch 'zzzzzzzzzzz'" in err.decode('u8')
     assert exit_code == 1
 
 

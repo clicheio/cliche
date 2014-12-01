@@ -34,7 +34,7 @@ def test_upgrade_downgrade(tmp_engine):
     assert script.revision == rev
     downgrade_database(tmp_engine, 'base')
     script = get_database_revision(tmp_engine)
-    assert script is None
+    assert not script
 
 
 def test_import_all_modules():

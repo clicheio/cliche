@@ -33,6 +33,7 @@ from alembic.script import ScriptDirectory
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql.expression import literal_column
 
 __all__ = ('Base', 'Session', 'downgrade_database', 'get_alembic_config',
            'get_database_revision', 'import_all_modules',
@@ -176,11 +177,29 @@ def upgrade_database(engine, revision='head'):
     script = ScriptDirectory.from_config(config)
 
     def upgrade(rev, context):
-        if rev is None and revision == 'head':
+        def update_current_rev(old, new):
+            if old == new:
+                return
+            if new is None:
+                context.impl._exec(context._version.delete())
+            elif old is None:
+                context.impl._exec(
+                    context._version.insert().values(
+                        version_num=literal_column("'%s'" % new)
+                    )
+                )
+            else:
+                context.impl._exec(
+                    context._version.update().values(
+                        version_num=literal_column("'%s'" % new)
+                    )
+                )
+
+        if not rev and revision == 'head':
             import_all_modules()
             Base.metadata.create_all(engine)
             dest = script.get_revision(revision)
-            context._update_current_rev(None, dest and dest.revision)
+            update_current_rev(None, dest and dest.revision)
             return []
         return script._upgrade_revs(revision, rev)
     with EnvironmentContext(config, script, fn=upgrade, as_sql=False,
