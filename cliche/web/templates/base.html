@@ -11,6 +11,10 @@
   <link href="{{ url_for('static', filename='css/basic.scss.css') }}"
         rel="stylesheet" media="screen" type="text/css">
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+  
   <script src="{{ url_for('static', filename='bootstrap-sass/assets/javascripts/bootstrap.js') }}"></script>
   {% if public_sentry_dsn %}
     <script src="//cdn.ravenjs.com/1.1.16/raven.min.js"></script>
@@ -30,7 +34,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">Cliche.io</a>
+        <a class="navbar-brand" href="{{ url_for('index') }}">Cliche.io</a>
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->
@@ -50,12 +54,11 @@
   {% block body %}{% endblock %}
 </main>
 <footer>
-  <p><iframe src="http://ghbtns.com/github-btn.html?user=clicheio&repo=cliche&type=watch&count=true"
-             allowtransparency="true" frameborder="0" scrolling="0" width="95" height="20"></iframe>
-    <iframe src="http://ghbtns.com/github-btn.html?user=clicheio&repo=cliche&type=fork&count=true"
-             allowtransparency="true" frameborder="0" scrolling="0" width="95" height="20"></iframe></p>
+  <p><a data-count-api="/repos/clicheio/cliche#subscribers_count" data-count-href="/clicheio/cliche/watchers" data-icon="octicon-eye" href="https://github.com/clicheio/cliche" class="github-button">Watch</a>
+    <a data-count-api="/repos/clicheio/cliche#forks_count" data-count-href="/clicheio/cliche/network" data-icon="octicon-git-branch" href="https://github.com/clicheio/cliche" class="github-button">Fork</a></p>
   <p>Cliche.io website code licensed under <a href="https://github.com/clicheio/cliche/raw/master/LICENSE">AGPLv3 or later</a>.</p>
   <p>Everyone can see code at <a href="https://github.com/clicheio/cliche/">GitHub</a> and contribute.</p>
 </footer>
+<script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
 </body>
 </html>

@@ -10,7 +10,7 @@
     <tbody>
     {% for x in result %}
       <tr>
-        <td><a href="{{ url_for('ontology.page', title=x.canonical_name) }}">{{ x.canonical_name }}</a></td>
+        <td><a href="{{ url_for('ontology.work_page', title=x.canonical_name) }}">{{ x.canonical_name }}</a></td>
       </tr>
     {% endfor %}
     </tbody>

@@ -2,7 +2,7 @@
 {% block title %} - list of Work{% endblock %}
 {% block body %}
   <table class="list">
-    <caption>List of <a href="{{ url_for('.list_') }}">Work</a></caption>
+    <caption>List of <a href="{{ url_for('.work_list') }}">Work</a></caption>
     <thead>
       <tr>
         <th>Title</th>
@@ -11,7 +11,7 @@
     <tbody>
       {% for id, title in work_list %}
         <tr>
-          <td><a href="{{ url_for('.page', title=title) }}">{{ title }}</a></td>
+          <td><a href="{{ url_for('.work_page', title=title) }}">{{ title }}</a></td>
         </tr>
       {% else %}
         <tr>

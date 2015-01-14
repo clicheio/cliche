@@ -182,7 +182,9 @@ class Trope(Base):  # FIXME: Temporary, It not extend Nameable.
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkTrope`.
-    work_tropes = relationship('WorkTrope', collection_class=set)
+    work_tropes = relationship('WorkTrope',
+                               cascade='delete, merge, save-update',
+                               collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`Work`.
@@ -245,7 +247,9 @@ class Work(Nameable):
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`WorkTrope`.
-    work_tropes = relationship(lambda: WorkTrope, collection_class=set)
+    work_tropes = relationship(lambda: WorkTrope,
+                               cascade='delete, merge, save-update',
+                               collection_class=set)
 
     #: (:class:`collections.abc.MutableSet`) The set of
     #: :class:`Trope`.

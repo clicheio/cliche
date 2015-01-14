@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %} - contents of {{ title }}{% endblock %}
 {% block body %}
-  <h1><a href="{{ url_for('.list_') }}">Work</a> / {{ title }}</h1>
+  <h1>{% block page_title %}{% endblock %}</h1>
   <table class="page">
     <thead>
       <tr>

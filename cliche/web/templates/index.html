@@ -9,49 +9,109 @@
       </ul>
     {% endif %}
   {% endwith %}
-
-  <form id="adv_search" method="post" action="{{ url_for('adv_search.result') }}">
-    <h1>Cliche.io</h1>
-    <p>Find My Work!</p>
-    <p>I know more <button id="more_info" type="button">infomation(Media)</button> or <button id="more_cliche" type="button">tropes(tropes, cliche)</button></p>
-    <input id="search_btn" type="submit" value="Search!">
-  </form>
+  <div class="header-group">
+  <h1>Cliche.io</h1><br>
+  <h2>Find My Work!</h2>
+  </div>
+  <div id="adv_search_container">
+    <form id="adv_search" method="post" role="form" action="{{ url_for('adv_search.result') }}">
+      <p id="add_desc">I can come up with <span id="more_article">a</span> <button id="more_info" type="button">Media</button> or <button id="more_cliche" type="button">Tropes</button> ...</p>
+      <input id="search_btn" type="submit" value="Search!">
+    </form>
+  </div>
   <script>
     (function($)
     {
       $(document).ready(function()
       {
-        var $search_btn = $('#search_btn');
+        var $add_desc = $('#add_desc');
+
+        var $more_article = $('#more_article');
+
+        trope_names = {{ trope_names | safe }};
+
+        trope_id = {{ trope_id | safe }};
+
+        $('#adv_search').submit(function()
+        {
+          $('.detail_name').each(function(){
+            $(this).next('input[type=hidden]').val(trope_id[$(this).val()]);
+          })
+        });
 
         $('#more_info').click(function()
         {
-          $search_btn.before(
+          if ($more_article.text() == 'a') {
+            $add_desc.fadeOut(200, more_media());
+          }
+          else
+          {
+            more_media();
+          }
+        });
+
+        function more_media() {
+          var $more_query = $(
             '<p class="more_query">' +
             '<input type="hidden" name="about[]" value="info">' +
             '<select name="category[]"><option value="media">Media</option></select>: ' +
             '<select name="detail[]">' +
+            '<option value="Animation">Animation</option>' +
             '<option value="Film">Film</option>' +
+            '<option value="TV Series">TV Series</option>' +
             '</select>' +
             '</p>'
-          );
-        });
+          )
+          $more_query.hide()
+          $add_desc.before($more_query);
+          $more_query.slideDown(200, function() {
+            if ($more_article.text() == 'a') {
+              $more_article.text('more');
+              $add_desc.fadeIn(200);
+            }
+          });
+          $('html, body').animate({
+            scrollTop: $more_query.offset().top
+          }, 500);
+        }
 
         $('#more_cliche').click(function()
         {
-          $search_btn.before(
+          if ($more_article.text() == 'a') {
+            $add_desc.fadeOut(200, more_cliche());
+          }
+          else
+          {
+            more_cliche();
+          }
+        });
+
+        function more_cliche() {
+          var $more_query = $(
             '<p class="more_query">' +
             '<input type="hidden" name="about[]" value="trope">' +
             '<select name="category[]">' +
             '<option value="0">All Tropes</option>' +
             '</select>' +
-            '<select name="detail[]">' +
-            {% for trope in tropes %}
-              '<option value="{{ trope.id }}">{{ trope.name }}</option>' +
-            {% endfor %}
-            '</select>' +
+            '<input style="width: 80%" class="tags detail_name" type="text"><input type="hidden" name="detail[]">' +
             '</p>'
-          );
-        });
+          )
+          $more_query.hide()
+          $add_desc.before($more_query);
+          $more_query.slideDown(200, function() {
+            if ($more_article.text() == 'a') {
+              $more_article.text('more');
+              $add_desc.fadeIn(200);
+            }
+          });
+          $('html, body').animate({
+            scrollTop: $more_query.offset().top
+          }, 500);
+
+          $( ".tags" ).autocomplete({
+            source: trope_names
+          });
+        }
       })
     })(jQuery);
   </script>
