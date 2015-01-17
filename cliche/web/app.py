@@ -70,7 +70,7 @@ def index():
     """Cliche.io web index page."""
     tropes = sa_session.query(Trope).order_by(Trope.name)
     trope_names = json.dumps([x.name for x in tropes])
-    trope_id = json.dumps(dict((x.name, x.id) for x in tropes))
+    trope_id = json.dumps({x.name: x.id for x in tropes})
     return render_template('index.html', tropes=tropes,
                            trope_names=trope_names,
                            trope_id=trope_id)
