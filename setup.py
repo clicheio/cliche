@@ -57,6 +57,8 @@ install_requires = {
     # Sentry: Log Aggregation
     'raven >= 5.1.1',
     'blinker >= 1.3',
+    # Deployment
+    "invoke == 0.9.0",
 }
 
 if sys.version_info < (3, 4, 0):

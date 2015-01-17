@@ -1,0 +1,15 @@
+config_template: path_to_config_template
+database_server: database_server_ip_or_hostname
+#database_user: database_username
+#database_password: database_password
+redis_server: redis_server_ip_or_hostname
+#redis_password: redis_auth_password
+#ssh_identity: path_to_identity_file
+#crawler: [
+#  'root@localhost', # list of user@hostname combo
+#]
+#web: [
+#  'root@localhost', # list of user@hostname combo
+#]
+#beat_server: celery_beat_server_ip_or_hostname
+#sentry_dsn: sentry_dsn_url_if_applicable
