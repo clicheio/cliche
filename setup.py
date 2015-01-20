@@ -57,8 +57,6 @@ install_requires = {
     # Sentry: Log Aggregation
     'raven >= 5.1.1',
     'blinker >= 1.3',
-    # Deployment
-    "invoke == 0.9.0",
 }
 
 if sys.version_info < (3, 4, 0):
@@ -74,6 +72,10 @@ tests_require = {
 
 docs_require = {
     'Sphinx >= 1.2',
+}
+
+deploy_requires = {
+    "invoke == 0.9.0",
 }
 
 
@@ -230,7 +232,8 @@ setup(
     tests_require=tests_require,
     extras_require={
         'docs': docs_require,
-        'tests': tests_require
+        'tests': tests_require,
+        'deploy': deploy_requires,
     },
     cmdclass=cmdclass,
     classifiers=[
