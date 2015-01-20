@@ -74,6 +74,10 @@ docs_require = {
     'Sphinx >= 1.2',
 }
 
+deploy_requires = {
+    "invoke == 0.9.0",
+}
+
 
 class BaseAlembicCommand(distutils.core.Command):
     """Base class for commands provided by Alembic."""
@@ -228,7 +232,8 @@ setup(
     tests_require=tests_require,
     extras_require={
         'docs': docs_require,
-        'tests': tests_require
+        'tests': tests_require,
+        'deploy': deploy_requires,
     },
     cmdclass=cmdclass,
     classifiers=[

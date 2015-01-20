@@ -58,6 +58,7 @@ script:
 - hooks/pre-commit
 after_success:
 - coveralls
+- pip install -e .[deploy]
 - chmod 600 deploy/cliche_deploy_key
 - if [[ "$TRAVIS_REPO_SLUG" == "clicheio/cliche" && "$TRAVIS_BRANCH" == "master" &&
   "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_JOB_NUMBER" == "$TRAVIS_BUILD_NUMBER.1" ]];
