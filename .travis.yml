@@ -9,16 +9,6 @@ env:
   # Twitter
   - secure: "EfV35XpgCBgwuBUhbRKdi+YgRhZezJcvtpt1ZhkB4/+CC3QBLr6gDt9Vimqvdx2ZyUa8UQP5oWQ4q0YsRQf6c3qsmFHUU6ZVzMTHvRxSZ08o87kignYnlyd+RmfpSY08exwYdSrVnLbMn8igsLHuTVV1e5yOb2P8i+sXQOQQ4X8="
   - secure: "Q2c5a4gFu9wVjOJP9V8amJr0q4JfobXHVDaEFwNj7U+qn9CfFDoAcWKPuy7NYF5nY/ShrhJ7TQfmry9yDYpantvFpt0Dpv3/INb+7t+xdy2hlIBVbcMwvqaR2DGp6Z0wsEaUop015fQnh9cvkNhKctFJsdUql3W6joNkNSfaZ0c="
-  # Deployment
-  - secure: "Z2DkX7b4AcBQCObHYn9ANILPwQRZSM1ShxScT/EnB1H9omOkAd4chCeMV8cK5/HqE8ft7sT159oKYuSXbggthOpUffj+5xsIHsa2MWqzh+iCa9H+QH9bTygpLYy3+BPuHfmaN6PpD1hxJK7TSUEhKLfTpMqlIz741g3vE087uwk="
-  - secure: "fxvA1nmPS58leJ9Wew5XPzVYzIhN07bUZudFNjv9v4jrn05qIubzJVu1Wo9amFC7q05MnNn+8EQKdlBN2rUymvkr4wR0ODjyTwuTy/y+pNQLqy98ZZvXjB5brNMC7pAT6GDorF81Z4ENNZc2ONSJVEzs0PQ0mHQ0UyomZHg1+ho="
-  - secure: "L2CIZxMDfoQEkVhC7hPS5s7ZDgB18ZY3tsZRN8HoSUQuR1upDSMaJwzClYiM9Zo+f+MlS4+C5wrzLnZhbRkO9OLF0R1SXyR7tiaQvPCffrLdbUxh+lSopM1ddTX0lLVk4fMZSArHwfGmkFcTWFFnQfTwN9U5IavbHVyI/GoMpSg="
-  - secure: "LNPpJtccVS+seQ3SePfNwfz1az3jjXggHG6UsdMrw6WGahOPmp9MaNcG+YYoDgVyRd2CvdVg12s9PKMewGABE6ycQbroX5Ftz4Tny/ndaZQWc8zBXaozWSV0fYPEf7TU6YrtgnoP9rz+AGkY3/ztoAiJaVHUy9B7Gx/Rjegam5M="
-  - secure: "UwuBYCWianghVXrP8q0MLLQK8bGCvb+lu/K/H8b8qLZLhDH82IytLUra6262SAdfZUCf06SUPFFPjI8ptWGfksMKiuF9zAGBojcmah/TmNdaP5YWp817YeQGpkr1BxWsMTYXVMfGk85ehNoVrR5F8q66wGuVerKNa1eHxfNEyFM="
-  - secure: "U+Q1YEBypBmWrffsjFaN9Oqm/oDasAyKfMfpSEzQrPS5u9JYbvU5vBIyGRktdUyx+tvLY+RdfOdh6liszw8baN+5dsvS7LnoSxF6cwiMf8pWh3754zlOPVElyx+54D2rKnPFjZOzI8qMiU6m2L0njQd3EXQGCmze8tu8RdNd844="
-  - secure: "Cu0y6JEqapgqfMOBSAIDkZ4jT22mMt6svZbNl1b2UdICIm08XRw1Th3m5yU4vPaQANPVQYXpXDMXXMsM/yKGqYv9o9Nvf/E1bnlm9FpnsA8uaR/eWRvwec7UVCG4w8MGmHVNLtHC/Hpv7FPMM3/TJUYhrCmz6DjU5YokzFHfQ/s="
-  - secure: "AriQB92U1k0Djek2czndC5tYqx6TmwCZWmpzIwCfP+dF8pzT/d5pZmzWGh0KU2GnE4JGzZ8FzDtjVPmC4dzn+UPzuH5B1sj07V1lfUJIarSYQBxK0HgXPs1qIZ2f5Aup/OPwQ7kPDfc0qmP+3i9KcHcx8+qQkspPXDSv+ZKYABc="
-  - secure: "VuAQNt2USB4KO+OlzBN0GXbrf3dzkIWNu2Seh5iVMwUeD4vd4Fro2Wi6Ybd0k0sn0zzRK2h2sTgz+u/nGYy/IZd1hfUJyiGcuSI36+CLIgIHh/Uk5IvRxo4/9XfaV4Tiy1/deAG0gmc2TAXQSkeDWuWEEXhx8VHAx7CGt8mkIxQ="
 python:
 - 3.4
 - 3.3
@@ -28,10 +18,6 @@ before_install:
 # gcc >= 4.7 is needed for -std=c++11
 - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 - sudo apt-get update -qq
-- if [[ "$TRAVIS_REPO_SLUG" == "clicheio/cliche" && "$TRAVIS_BRANCH" == "master" &&
-  "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_JOB_NUMBER" == "$TRAVIS_BUILD_NUMBER.1" ]];
-  then openssl aes-256-cbc -k $KEY_ENCRYPTION_KEY -in deploy/cliche_deploy_key.enc
-  -out deploy/cliche_deploy_key -d; fi;
 install:
 # gcc >= 4.7 is needed for -std=c++11
 - sudo apt-get install -qq gcc-4.8 g++-4.8 libstdc++-4.8-dev
@@ -58,14 +44,6 @@ script:
 - hooks/pre-commit
 after_success:
 - coveralls
-- pip install -e .[deploy]
-- chmod 600 deploy/cliche_deploy_key
-- if [[ "$TRAVIS_REPO_SLUG" == "clicheio/cliche" && "$TRAVIS_BRANCH" == "master" &&
-  "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_JOB_NUMBER" == "$TRAVIS_BUILD_NUMBER.1" ]];
-  then deploy/deploy.py -i deploy/cliche_deploy_key -b "$TRAVIS_BUILD_NUMBER"
-  -c deploy/prod.cfg.yml -d "$DBHOST" --db-username "$DBUSER" --db-password "$DBPASSWORD"
-  -r "$REDISHOST" --redis-password "$REDISPASSWORD" --sentry-dsn "$SENTRY_DSN"
-  --crawler "$CRAWLER1" --web-worker "$WEB1" --beat "$BEAT"; fi;
 notifications:
   irc:
     channels:
