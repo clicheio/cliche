@@ -132,23 +132,20 @@ def fetch_link(url, session, *, log_prefix=''):
         return False, None, None, None, final_url
     tree = document_fromstring(r.text)
     try:
-        namespace = tree.xpath('//div[@class="pagetitle"]')[0] \
-            .text.strip()[:-1]
+        name_path = '//div[@class="pagetitle"]/div[@class="article_title"]/h1'
+        name = tree.xpath(name_path)[0].text.strip()
     except (AttributeError, AssertionError, IndexError):
-        logger.warning('%sWarning on url %s: '
-                       'There is no pagetitle on this page. Ignoring.',
-                       log_prefix, url)
+        logger.warning('no name in %s', final_url)
         return False, tree, None, None, final_url
-    if namespace == '':
-        namespace = 'Main'
-    name = tree.xpath('//div[@class="pagetitle"]/span')[0].text.strip()
-
-    type = determine_type(namespace)
-    if type == 'Administrivia':
-        return False, tree, namespace, name, final_url
-    upsert_entity(session, namespace, name, type, final_url)
-    process_redirections(session, url, final_url, namespace, name)
-    return True, tree, namespace, name, final_url
+    else:
+        (namespace, name) = map(lambda x: x.strip(), name.split(':'))
+        namespace = 'Main' if namespace == '' else namespace
+        type = determine_type(namespace)
+        if type == 'Administrivia':
+            return False, tree, namespace, name, final_url
+        upsert_entity(session, namespace, name, type, final_url)
+        process_redirections(session, url, final_url, namespace, name)
+        return True, tree, namespace, name, final_url
 
 
 def recently_crawled(current_time, url, session):
