@@ -129,7 +129,7 @@ class UuidType(TypeDecorator):
 
     def result_processor(self, dialect, coltype):
         def process_result_value(value):
-            if value is None:
+            if value is None or isinstance(value, uuid.UUID):
                 return value
             else:
                 return uuid.UUID(value)
