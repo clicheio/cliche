@@ -8,6 +8,7 @@ from __future__ import print_function
 
 import datetime
 import urllib.parse
+import re
 
 from celery.utils.log import get_task_logger
 from lxml.html import document_fromstring, parse
@@ -132,14 +133,14 @@ def fetch_link(url, session, *, log_prefix=''):
         return False, None, None, None, final_url
     tree = document_fromstring(r.text)
     try:
-        name_path = '//div[@class="pagetitle"]/div[@class="article_title"]/h1'
-        name = tree.xpath(name_path)[0].text.strip()
+        name = (tree.find_class('article_title')[0]).text_content()
     except (AttributeError, AssertionError, IndexError):
         logger.warning('no name in %s', final_url)
         return False, tree, None, None, final_url
     else:
-        (namespace, name) = map(lambda x: x.strip(), name.split(':'))
-        namespace = 'Main' if namespace == '' else namespace
+        *namespace, name = name.split(':')
+        name = name.strip()
+        namespace = 'Main' if not namespace else namespace[0]
         type = determine_type(namespace)
         if type == 'Administrivia':
             return False, tree, namespace, name, final_url

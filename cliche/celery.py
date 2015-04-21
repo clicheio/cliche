@@ -227,6 +227,6 @@ def setup_raven_logging(conf=None, **kwargs):
 
 
 @task_failure.connect
-def report_task_failure(task_id, exception, args, kwargs, traceback, einfo):
+def report_task_failure(task_id, exception, args, kwargs, traceback, einfo, sender, signal):
     client = get_raven_client()
     client.captureException(einfo.exc_info)
