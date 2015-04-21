@@ -8,7 +8,6 @@ from __future__ import print_function
 
 import datetime
 import urllib.parse
-import re
 
 from celery.utils.log import get_task_logger
 from lxml.html import document_fromstring, parse
