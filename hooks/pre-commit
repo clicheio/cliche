@@ -1,4 +1,5 @@
 #!/bin/bash
 set -e
 python3 -m flake8 -j auto
+import-order cliche
 docs/coverage.py
