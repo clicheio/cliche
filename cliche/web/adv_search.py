@@ -1,9 +1,9 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from sqlalchemy.orm.exc import NoResultFound
 
-from .db import session
 from ..sqltypes import HashableLocale as Locale
 from ..work import Trope, Work
+from .db import session
 
 
 adv_search_bp = Blueprint('adv_search', __name__)

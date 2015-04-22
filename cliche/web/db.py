@@ -4,7 +4,7 @@
 Use :data:`session` in view functions.
 
 """
-from flask import _app_ctx_stack, current_app, g
+from flask import current_app, g, _app_ctx_stack
 from sqlalchemy import create_engine
 from werkzeug.local import LocalProxy
 

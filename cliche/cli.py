@@ -21,12 +21,12 @@ from .celery import app as celery_app
 from .config import read_config
 from .name import Name
 from .orm import Base, downgrade_database, upgrade_database
+from .services.align import alignment
 from .sqltypes import HashableLocale
 from .web.app import (app as flask_app,
                       setup_sentry as flask_setup_sentry)
 from .web.db import get_database_engine, session
 from .work import Trope, Work
-from .services.align import alignment
 
 
 __all__ = ('initialize_app', 'config', 'main')
