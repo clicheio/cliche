@@ -19,4 +19,3 @@ def test_fetch_link(monkeypatch, fx_session, fx_celery_app):
 
     result = fetch_link(url, fx_session)
     assert result[-3:] == ('Main', 'God Job', url)
-
