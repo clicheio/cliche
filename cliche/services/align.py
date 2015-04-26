@@ -12,14 +12,14 @@ from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.sql import func
 from sqlalchemy.types import Integer, String
 
-from .tvtropes.entities import ClicheTvtropesEdge, Entity as Tvtropes
-from .wikipedia.work import ClicheWikipediaEdge, Entity as Wikipedia
 from ..name import Name
 from ..orm import Base
 from ..sqltypes import HashableLocale as Locale
 from ..web.app import app
 from ..web.db import session
 from ..work import Work
+from .tvtropes.entities import ClicheTvtropesEdge, Entity as Tvtropes
+from .wikipedia.work import ClicheWikipediaEdge, Entity as Wikipedia
 
 
 class ExternalId(Base):

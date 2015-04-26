@@ -121,7 +121,7 @@ from celery.signals import celeryd_init, task_failure, task_postrun
 from raven import Client
 from raven.conf import setup_logging
 from raven.handlers.logging import SentryHandler
-from sqlalchemy.engine import create_engine, Engine
+from sqlalchemy.engine import Engine, create_engine
 
 from .config import ConfigDict, read_config
 from .orm import Session, import_all_modules

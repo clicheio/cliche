@@ -11,15 +11,16 @@ import collections
 import datetime
 import enum
 
-from flask import Blueprint, flash, redirect, request, url_for
+from flask import Blueprint, flash, redirect, request
 from flask import session as flask_session
+from flask import url_for
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.routing import BaseConverter, ValidationError
 
 from ...credentials import TwitterCredential
+from ...user import User
 from ..db import session as sa_session
 from .provider import twitter
-from ...user import User
 
 
 __all__ = ('OAuthVendorConverter', 'Vendor', 'Version', 'login', 'oauth_app',

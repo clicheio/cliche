@@ -3,9 +3,9 @@
 
 """
 import datetime
-import urllib.parse
 import json
 import logging
+import urllib.parse
 
 from flask import Flask, current_app, g, render_template
 from flask import session as flask_session
@@ -13,13 +13,13 @@ from flask_oauthlib.client import OAuth
 from raven.contrib.flask import Sentry
 
 from ..user import User
+from ..work import Trope
 from .adv_search import adv_search_bp
-from .db import setup_session
 from .db import session as sa_session
+from .db import setup_session
 from .ontology import ontology
 from .social.oauth import OAuthVendorConverter, oauth_app
 from .user import user_app
-from ..work import Trope
 
 
 __all__ = 'app', 'check_login_status', 'index', 'setup_sentry'

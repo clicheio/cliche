@@ -9,9 +9,9 @@ from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.sql.functions import now
 from sqlalchemy.types import Date, DateTime, Integer, String
 
+from .name import Nameable
 from .orm import Base
 from .sqltypes import EnumType, prevent_discriminator_from_changing
-from .name import Nameable
 
 __all__ = ('Character', 'Credit', 'Franchise', 'Genre', 'Role',
            'Work', 'WorkCharacter', 'WorkFranchise', 'WorkGenre', 'World')

@@ -10,12 +10,13 @@ It widely uses Flask_ as its web framework.
 """
 import itertools
 
-from cliche.sqltypes import HashableLocale as Locale
+
 from flask import Blueprint, abort, render_template
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
-from .db import session
+from ..sqltypes import HashableLocale as Locale
 from ..work import Credit, Trope, Work
+from .db import session
 
 ontology = Blueprint('ontology', __name__,
                      template_folder='templates/ontology/')

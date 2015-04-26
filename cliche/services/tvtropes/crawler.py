@@ -9,15 +9,14 @@ from __future__ import print_function
 import datetime
 import urllib.parse
 
-import requests
-
 from celery.utils.log import get_task_logger
 from lxml.html import document_fromstring, parse
+import requests
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError, NoResultFound
 
-from .entities import Entity, Redirection, Relation
 from ...celery import app, get_session
+from .entities import Entity, Redirection, Relation
 
 
 BASE_URL = 'http://tvtropes.org/pmwiki/'

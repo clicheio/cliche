@@ -1,4 +1,14 @@
 #!/bin/bash
 set -e
+if [[ $TRAVIS_PYTHON_VERSION ]]; then
+    VERSION=$TRAVIS_PYTHON_VERSION
+else
+    VERSION=$(python3 -c 'import sys; v = sys.version_info; print("{}.{}".format(v[0], v[1]));')
+fi
 python3 -m flake8 -j auto
+if [ $VERSION = '3.4' ]; then
+    import-order cliche
+else
+    echo "Don't check import order with this python version."
+fi
 docs/coverage.py

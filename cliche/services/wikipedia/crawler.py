@@ -25,10 +25,10 @@ from SPARQLWrapper.SPARQLExceptions import EndPointNotFound
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import func
 
+from ...celery import app, get_session
 from .work import (
     Artist, Book, Entity, Film, Relation, Work
 )
-from ...celery import app, get_session
 
 
 PAGE_ITEM_COUNT = 100
