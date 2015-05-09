@@ -132,9 +132,11 @@ def fetch_link(url, session, *, log_prefix=''):
         return False, None, None, None, final_url
     tree = document_fromstring(r.text)
     try:
-        name = (tree.find_class('article_title')[0]).text_content()
+        name = tree.find_class('article_title')[0].text_content()
     except (AttributeError, AssertionError, IndexError):
-        logger.warning('no name in %s', final_url)
+        logger.warning('%sWarning on url %s: '
+                       'There is no pagetitle on this page. Ignoring.',
+                       log_prefix, url)
         return False, tree, None, None, final_url
     else:
         *namespace, name = name.split(':')
