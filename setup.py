@@ -215,7 +215,7 @@ setup(
     long_description=readme(),
     author='The Cliche team',
     url='http://cliche.io/',
-    license='AGPLv3 or later',
+    license='MIT',
     packages=find_packages(exclude=['tests']),
     package_data={
         'cliche': [
@@ -241,8 +241,7 @@ setup(
         'Development Status :: 1 - Planning',
         'Environment :: Web Environment',
         'Intended Audience :: End Users/Desktop',
-        'License :: OSI Approved ::'
-        ' GNU Affero General Public License v3 or later (AGPLv3+)',
+        'License :: OSI Approved :: MIT License',
         'Operating System :: MacOS :: MacOS X',
         'Operating System :: POSIX :: Linux',
         'Programming Language :: Python :: 3.3',
